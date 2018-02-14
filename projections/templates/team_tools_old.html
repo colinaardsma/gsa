@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+<style type="text/css">
+    div#team_tools {
+        display: inline-block;
+        padding:0 30px 0 30px;
+        vertical-align: top;
+    }
+</style>
+<div id="team_tools">
+    {% include "top_fa.html" %}
+</div>
+<div id="team_tools">
+    {% include "single_player.html" %}
+</div>
+</br>
+<div id="team_tools">
+    {% include "trade_projection.html" %}
+</div>
+<!-- get rid of these breaks -->
+</br>
+<div id="team_tools">
+    {% include "projected_standings.html" %}
+</div>
+<!-- get rid of these breaks -->
+</br>
+<div id="team_tools">
+    {% include "all_keepers.html" %}
+</div>
+<div id="team_tools">
+    {% include "proj_keepers.html" %}
+</div>
+
+{% endblock %}

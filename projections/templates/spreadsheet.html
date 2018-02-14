@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block content %}
+{% load projection_filters %}
+<!-- TODO: move this into bootstrap -->
+<style type="text/css">
+  th, td
+  {
+      padding:0 10px 0 10px;
+  }
+</style>
+<table>
+    <thead>
+    <tr>
+        <th>Value</th>
+        <th>Name</th>
+        <th>Team</th>
+        <th>POS</th>
+        <th>Status</th>
+        <!-- <th>SGP</th> -->
+        {% if cat == "batter" %}
+        <th>AB</th>
+        <th>R</th>
+        <th>HR</th>
+        <th>RBI</th>
+        <th>SB</th>
+        <th>OPS</th>
+        <th>AVG</th>
+        {% elif cat == "pitcher" %}
+        <th>IP</th>
+        <th>W</th>
+        <th>SV</th>
+        <th>K</th>
+        <th>ERA</th>
+        <th>WHIP</th>
+        <th>K/IP</th>
+        {% endif %}
+    </tr>
+    </thead>
+    {% for player in players %}
+    <tr>
+        <td>${{player.dollarValue|floatformat:2}}</td>
+        <td><a href="https://baseball.fantasysports.yahoo.com/b1/5091/playersearch?&search={{player.name|url_safe_spaces}}" target="_blank">{{player.name}}</a></td>
+        <td>{{player.team}}</td>
+        <td>{{player.pos}}</td>
+        {% if 'DL' in player.status %}
+        <td style="color:red">{{player.status}}</td>
+        {% elif 'MiLB' in player.status %}
+        <td style="color:blue">{{player.status}}</td>
+        {% else %}
+        <td></td>
+        {% endif %}
+        <!-- <td>{{player.sgp}}</td> -->
+        {% if cat == "batter" %}
+        <td>{{player.ab|floatformat}}</td>
+        <td>{{player.r|floatformat}}</td>
+        <td>{{player.hr|floatformat}}</td>
+        <td>{{player.rbi|floatformat}}</td>
+        <td>{{player.sb|floatformat}}</td>
+        <td>{{player.ops|floatformat:3}}</td>
+        <td>{{player.avg|floatformat:3}}</td>
+        {% elif cat == "pitcher" %}
+        <td>{{player.ip|floatformat}}</td>
+        <td>{{player.w|floatformat}}</td>
+        <td>{{player.sv|floatformat}}</td>
+        <td>{{player.k|floatformat}}</td>
+        <td>{{player.era|floatformat:2}}</td>
+        <td>{{player.whip|floatformat:2}}</td>
+        <td>{{player.kip|floatformat:2}}</td>
+        {% endif %}
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

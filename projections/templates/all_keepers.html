@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block content %}
+{% load projection_filters %}
+<!-- TODO: move this into bootstrap -->
+<style type="text/css">
+  th, td
+  {
+      padding:0 10px 0 10px;
+  }
+</style>
+{% load projection_filters %}
+<div>
+    <h2>All Keepers</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Cost</th>
+            <th>Name</th>
+            <th>Team</th>
+            <th>POS</th>
+            <th>Status</th>
+            <th>Fantasy Team</th>
+        </tr>
+        </thead>
+        {% for team in all_keepers %}
+        {% for player in team.roster %}
+        <tr>
+            <td>${{player.keeper_cost|floatformat}}</td>
+            <td><a href="https://baseball.fantasysports.yahoo.com/b1/5091/playersearch?&search={{player.full_name|url_safe_spaces}}" target="_blank">{{player.full_name}}</a></td>
+            <td>{{player.team}}</td>
+            <td>{{player.positions}}</td>
+            {% if 'DL' in player.status %}
+            <td style="color:red">{{player.status}}</td>
+            {% elif 'MiLB' in player.status %}
+            <td style="color:blue">{{player.status}}</td>
+            {% else %}
+            <td></td>
+            {% endif %}
+            <td>{{team.team_name}}</td>
+        </tr>
+        {% endfor %}
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}

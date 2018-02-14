@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% block content %}
+{% load projection_filters %}
+<div>
+    <h2>FA/Team Valuation for {{team_name}}</h2>
+    <h4>Top FA Pitchers</h4>
+    <table>
+        <tr>
+            <th>Value</th>
+            <th>Player Name</th>
+            <th>Team</th>
+            <th>Position</th>
+            <th>Status</th>
+            <th>W</th>
+            <th>SV</th>
+            <th>K</th>
+            <th>ERA</th>
+            <th>WHIP</th>
+            <th>IP</th>
+            <th>K/IP</th>
+        </tr>
+        <tbody>
+        {% for pitcher in top_fa.PitchingFAs %}
+        <tr>
+            <td>${{pitcher.dollarValue|floatformat:2}}</td>
+            <td><a href="https://baseball.fantasysports.yahoo.com/b1/5091/playersearch?&search={{pitcher.name|url_safe_spaces}}" target="_blank">{{pitcher.name}}</a></td>
+            <td>{{pitcher.team}}</td>
+            <td>{{pitcher.pos}}</td>
+            {% if 'DL' in pitcher.status %}
+            <td style="color:red">{{pitcher.status}}</td>
+            {% elif 'MiLB' in pitcher.status %}
+            <td style="color:blue">{{pitcher.status}}</td>
+            {% else %}
+            <td></td>
+            {% endif %}
+            <td>{{pitcher.w|floatformat:2}}</td>
+            <td>{{pitcher.sv|floatformat:2}}</td>
+            <td>{{pitcher.k|floatformat:2}}</td>
+            <td>{{pitcher.era|floatformat:2}}</td>
+            <td>{{pitcher.whip|floatformat:2}}</td>
+            <td>{{pitcher.ip|floatformat}}</td>
+            <td>{{pitcher.kip|floatformat:2}}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <h4>Team Pitchers</h4>
+    <table>
+        <tr>
+            <th>Value</th>
+            <th>Player Name</th>
+            <th>Team</th>
+            <th>Position</th>
+            <th>Status</th>
+            <th>W</th>
+            <th>SV</th>
+            <th>K</th>
+            <th>ERA</th>
+            <th>WHIP</th>
+            <th>IP</th>
+            <th>K/IP</th>
+        </tr>
+        <tbody>
+        {% for pitcher in top_fa.PitchingTeam %}
+        <tr>
+            <td>${{pitcher.dollarValue|floatformat:2}}</td>
+            <td>{{pitcher.name}}</td>
+            <td>{{pitcher.team}}</td>
+            <td>{{pitcher.pos}}</td>
+            {% if 'DL' in pitcher.status %}
+            <td style="color:red">{{pitcher.status}}</td>
+            {% elif 'MiLB' in pitcher.status %}
+            <td style="color:blue">{{pitcher.status}}</td>
+            {% else %}
+            <td></td>
+            {% endif %}
+            <td>{{pitcher.w|floatformat:2}}</td>
+            <td>{{pitcher.sv|floatformat:2}}</td>
+            <td>{{pitcher.k|floatformat:2}}</td>
+            <td>{{pitcher.era|floatformat:2}}</td>
+            <td>{{pitcher.whip|floatformat:2}}</td>
+            <td>{{pitcher.ip|floatformat:2}}</td>
+            <td>{{pitcher.kip|floatformat:2}}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <h4>Top FA Batters</h4>
+    <table>
+        <tr>
+            <th>Value</th>
+            <th>Player Name</th>
+            <th>Team</th>
+            <th>Position</th>
+            <th>Status</th>
+            <th>R</th>
+            <th>HR</th>
+            <th>RBI</th>
+            <th>SB</th>
+            <th>OPS</th>
+        </tr>
+        <tbody>
+        {% for batter in top_fa.BattingFAs %}
+        <tr>
+            <td>${{batter.dollarValue|floatformat:2}}</td>
+            <td><a href="https://baseball.fantasysports.yahoo.com/b1/5091/playersearch?&search={{batter.name|url_safe_spaces}}" target="_blank">{{batter.name}}</a></td>
+            <td>{{batter.team}}</td>
+            <td>{{batter.pos}}</td>
+            {% if 'DL' in batter.status %}
+            <td style="color:red">{{batter.status}}</td>
+            {% elif 'MiLB' in batter.status %}
+            <td style="color:blue">{{batter.status}}</td>
+            {% else %}
+            <td></td>
+            {% endif %}
+            <td>{{batter.run|floatformat}}</td>
+            <td>{{batter.hr|floatformat}}</td>
+            <td>{{batter.rbi|floatformat}}</td>
+            <td>{{batter.sb|floatformat}}</td>
+            <td>{{batter.ops|floatformat:3}}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <h4>Team Batters</h4>
+    <table>
+        <tr>
+            <th>Value</th>
+            <th>Player Name</th>
+            <th>Team</th>
+            <th>Position</th>
+            <th>Status</th>
+            <th>R</th>
+            <th>HR</th>
+            <th>RBI</th>
+            <th>SB</th>
+            <th>OPS</th>
+        </tr>
+        <tbody>
+        {% for batter in top_fa.BattingTeam %}
+        <tr>
+            <td>${{batter.dollarValue|floatformat:2}}</td>
+            <td>{{batter.name}}</td>
+            <td>{{batter.team}}</td>
+            <td>{{batter.pos}}</td>
+            {% if 'DL' in batter.status %}
+            <td style="color:red">{{batter.status}}</td>
+            {% elif 'MiLB' in batter.status %}
+            <td style="color:blue">{{batter.status}}</td>
+            {% else %}
+            <td></td>
+            {% endif %}
+            <td>{{batter.r|floatformat}}</td>
+            <td>{{batter.hr|floatformat}}</td>
+            <td>{{batter.rbi|floatformat}}</td>
+            <td>{{batter.sb|floatformat}}</td>
+            <td>{{batter.ops|floatformat:3}}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block content %}
+{% load projection_filters %}
+<div>
+    <h2>Single Player Search</h2>
+    <table>
+        <tr>
+            <th>Value</th>
+            <th>Player Name</th>
+            <th>Team</th>
+            <th>Position</th>
+            <th>Status</th>
+            {% if player.category == 'pitcher' %}
+            <th>W</th>
+            <th>SV</th>
+            <th>K</th>
+            <th>ERA</th>
+            <th>WHIP</th>
+            <th>IP</th>
+            <th>K/IP</th>
+            {% else %}
+            <th>R</th>
+            <th>HR</th>
+            <th>RBI</th>
+            <th>SB</th>
+            <th>OPS</th>
+            <th>AVG</th>
+            {% endif %}
+        </tr>
+        <tbody>
+        <tr>
+            <td>${{player.dollarValue|floatformat:2}}</td>
+            <td><a href="https://baseball.fantasysports.yahoo.com/b1/5091/playersearch?&search={{player.name|url_safe_spaces}}" target="_blank">{{player.name}}</a></td>
+            <td>{{player.team}}</td>
+            <td>{{player.pos}}</td>
+            {% if 'DL' in player.status %}
+            <td style="color:red">{{player.status}}</td>
+            {% elif 'MiLB' in player.status %}
+            <td style="color:blue">{{player.status}}</td>
+            {% else %}
+            <td></td>
+            {% endif %}
+            {% if player.category == 'pitcher' %}
+            <td>{{player.w|floatformat:2}}</td>
+            <td>{{player.sv|floatformat:2}}</td>
+            <td>{{player.k|floatformat:2}}</td>
+            <td>{{player.era|floatformat:2}}</td>
+            <td>{{player.whip|floatformat:2}}</td>
+            <td>{{player.ip|floatformat}}</td>
+            <td>{{player.kip|floatformat:2}}</td>
+            {% else %}
+            <td>{{player.r|floatformat}}</td>
+            <td>{{player.hr|floatformat}}</td>
+            <td>{{player.rbi|floatformat}}</td>
+            <td>{{player.sb|floatformat}}</td>
+            <td>{{player.ops|floatformat:3}}</td>
+            <td>{{player.avg|floatformat:3}}</td>
+            {% endif %}
+        </tr>
+        </tbody>
+    </table>
+    <p>{{single_player|safe}}</p>
+</div>
+{% endblock %}
