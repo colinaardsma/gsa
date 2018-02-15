@@ -2,16 +2,25 @@
 {% block content %}
 {% load projection_filters %}
 <div>
-    <a href="{{yahoo_link}}">Link Yahoo! Account</a>
-    <br/>
+    <h2>Helpful Links</h2>
+    <p><a href="{{yahoo_link}}">Link Yahoo! Account</a>
+        <br/>
+        <a href="/get_leagues">Get Yahoo! Leagues</a></p>
+    <p><a href="https://baseball.fantasysports.yahoo.com/league/{{main_league.league_name|remove_spaces}}/{{main_league.season}}">
+        {{main_league.season}} - {{main_league.league_name}} - League Page</a></p>
+    <p><a href="https://razzball.com/steamer-hitter-projections/">Razzball Hitter Projections</a>
+        <br/>
+        <a href="https://razzball.com/steamer-pitcher-projections/">Razzball Hitter Projections</a></p>
 </div>
 <div>
-    <a href="/get_leagues">Get Yahoo! Leagues</a>
-    <br/>
-</div>
-<div>
-    <a href="https://razzball.com/steamer-hitter-projections/">Razzball Projections</a>
     <h2>Update Database Player Projections</h2>
+    <p>
+        {% if razzball_proj_update_datetime %}
+        <strong>NEW PROJECTIONS AVAILABLE AS OF {{razzball_proj_update_datetime|date:'n.j.Y'}}</strong>
+        {% else %}
+        Projections are up to date
+        {% endif %}
+    </p>
     {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
     <form action="/projections/process_players/" method="post" enctype="multipart/form-data" encoding='multipart/form-data'>
         {% csrf_token %}

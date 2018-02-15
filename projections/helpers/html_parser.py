@@ -1,11 +1,13 @@
 """Projection HTML Parsing"""
 import unicodedata
-from lxml import html
-from http.client import HTTPException
 import urllib
+from datetime import datetime
+from http.client import HTTPException
+import pytz
+from lxml import html
 
 
-def html_to_document(url):
+def html_to_document(url, headers=None):
     """Get league standings\n
     Args:\n
         url: the url.\n
@@ -14,7 +16,7 @@ def html_to_document(url):
     Raises:\n
         None.
     """
-    request = urllib.request.Request(url)
+    request = urllib.request.Request(url, headers=headers)
     while True:
         try:
             content = urllib.request.urlopen(request).read().decode('utf-8')
@@ -111,3 +113,38 @@ def parse_pos_from_url(playerid):
     raw_pos = document.xpath('.//strong[text()="Position:"]')[0].tail
     pos = raw_pos.strip().split("/")
     return pos
+
+
+def razzball_get_projection_page():
+    url = "http://razzball.com/steamer-hitter-projections"
+    headers = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',
+               'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+               'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
+               'Accept-Encoding': 'none',
+               'Accept-Language': 'en-US,en;q=0.8',
+               'Connection': 'keep-alive'}
+    document = html_to_document(url, headers)
+    return document
+
+
+def razzball_get_update_datetime():
+    document = razzball_get_projection_page()
+    update_string = document.xpath("//abbr[@class='entry-date published updated']")[0].text
+
+    tz_offest = timezone_switch_case(update_string[-3:])
+    offset_string = update_string[:-3] + tz_offest
+    update_datetime = datetime.strptime(offset_string, '%Y-%m-%d %I:%M:%S %p %z')
+
+    return update_datetime
+
+
+def timezone_switch_case(tz_string):
+    switcher = {"EDT": '-0400',
+                "EST": '-0500',
+                "CDT": '-0500',
+                "CST": '-0600',
+                'MDT': '-0600',
+                'MST': '-0700',
+                'PDT': '-0700',
+                'PST': '-0800'}
+    return switcher.get(tz_string, '-0000')

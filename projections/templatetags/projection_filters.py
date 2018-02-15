@@ -14,3 +14,9 @@ def url_safe_spaces(value):
 def divide(value, denom):
     """Divides a value by another value"""
     return value / denom
+
+@register.filter
+@stringfilter
+def remove_spaces(value):
+    """Replaces a string with another string"""
+    return value.replace(' ', '')

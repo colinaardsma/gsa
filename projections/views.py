@@ -2,19 +2,23 @@ import time
 import cgi
 import logging
 from io import StringIO
+from datetime import datetime
+import pytz
 
 from django.shortcuts import render, redirect
 from django.utils.datastructures import MultiValueDictKeyError
 from django.views import generic
 
+from gsa.settings import TOKEN_REDIRECT_PATH, TEAM_TOOLS_REDIRECT, USER_REDIRECT
 from leagues.helpers.api_connector import request_auth, get_token
 from leagues.models import League, dummy_league, update_profile
-from .helpers.team_tools import pull_batters, pull_pitchers, fa_finder, final_standing_projection, single_player_rater, get_keeper_costs, get_projected_keepers, trade_analyzer_, batter_projections, pitcher_projections
 from leagues.helpers.yql_queries import get_leagues, get_current_leagues, get_all_team_rosters
 from leagues.helpers.html_parser import get_single_yahoo_team
-from .helpers.keepers import project_keepers
-from gsa.settings import TOKEN_REDIRECT_PATH, TEAM_TOOLS_REDIRECT, USER_REDIRECT
 from leagues.views import max_year_leagues
+from .helpers.team_tools import pull_batters, pull_pitchers, fa_finder, final_standing_projection, single_player_rater, \
+    get_keeper_costs, get_projected_keepers, trade_analyzer_, batter_projections, pitcher_projections
+from .helpers.html_parser import razzball_get_update_datetime
+from .helpers.keepers import project_keepers
 
 
 class IndexView(generic.ListView):
@@ -146,9 +150,24 @@ def user_(request):
         elapsed = request.POST['elapsed']
         yahoo_link = request.POST['yahoo_link']
     else:
-    # question = get_object_or_404(Question, pk=question_id)
-    # return render(request, 'index.html', {'question': question})
+        # question = get_object_or_404(Question, pk=question_id)
+        # return render(request, 'index.html', {'question': question})
         yahoo_link = request_auth(TOKEN_REDIRECT_PATH)
         elapsed = None
+
     max_year_leagues_ = max_year_leagues(request.user)
-    return render(request, 'user.html', {'yahoo_link': yahoo_link, 'elapsed': elapsed, 'max_year_leagues': max_year_leagues_})
+
+    razzball_proj_update_datetime = razzball_get_update_datetime()
+    now = datetime.now(pytz.utc)
+    if razzball_proj_update_datetime < now:
+        razzball_proj_update_datetime = None
+
+    try:
+        main_league = League.objects.get(league_key=request.user.profile.main_league)
+    except League.DoesNotExist:
+        main_league = None
+
+    return render(request, 'user.html', {'yahoo_link': yahoo_link, 'elapsed': elapsed,
+                                         'max_year_leagues': max_year_leagues_,
+                                         'razzball_proj_update_datetime': razzball_proj_update_datetime,
+                                         'main_league': main_league})

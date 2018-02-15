@@ -8,6 +8,7 @@ from django.shortcuts import render, redirect
 from django.views import generic
 from django.http import HttpResponse
 from django.db.models import Max
+from django.contrib.auth.models import User
 
 from .helpers.api_connector import request_auth, get_token
 from .models import League, update_profile, save_league, calc_three_year_avgs
@@ -143,7 +144,13 @@ def get_leagues_from_yahoo(user):
 
 
 def max_year_leagues(user):
-    user_leagues = user.profile.leagues.all()
+    try:
+        user_leagues = user.profile.leagues.all()
+    except User.DoesNotExist:
+        user_leagues = None
+    if not user_leagues:
+        return None
+
     max_year = user_leagues.aggregate(Max('season'))['season__max']
     return user_leagues.filter(season=max_year)
 
