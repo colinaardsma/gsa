@@ -21,9 +21,11 @@ UPDATE DATABASE:
 python3 manage.py migrate
 
 RUN SERVER:
-python3 manage.py runserver 8080
+python3 manage.py runserver localhost:8080
+python3 manage.py runserver 10.211.55.2:8080
 """
 import os
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -31,14 +33,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'em0q#e0^ulf%d9%qy+32m9wyj&#_(fn884va^i%ve9(c3x6__#'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -83,24 +77,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'gsa.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/2.0/ref/settings/#databases
-
-#TODO: move to environment settings
-DATABASES = {
-    'default': {
-        # 'ENGINE': 'django.db.backends.sqlite3',
-        # 'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": "colin.aardsma",
-        "USER": "colin.aardsma",
-        "PASSWORD": "",
-        "HOST": "localhost",
-        "PORT": "",
-    }
-}
 
 
 # Password validation
@@ -155,5 +131,6 @@ STATICFILES_FINDERS = (
     #'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
+# Global Variables
 TEAM_TOOLS_REDIRECT = '/team_tools'
 USER_REDIRECT = '/user'
