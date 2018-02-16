@@ -17,6 +17,6 @@ def divide(value, denom):
 
 @register.filter
 @stringfilter
-def remove_spaces(value):
+def lower_and_remove_spaces(value):
     """Replaces a string with another string"""
-    return value.replace(' ', '')
+    return value.lower().replace(' ', '')
