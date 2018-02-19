@@ -75,6 +75,7 @@ class BatterValue(models.Model):
     batter = models.ForeignKey(BatterProjection, on_delete=models.CASCADE)
     league = models.ForeignKey(league_models.League, on_delete=models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    yahoo_guid = models.CharField(max_length=200)
     # Descriptive Properties
     name = models.CharField(max_length=200)
     normalized_first_name = models.CharField(max_length=200)
@@ -84,7 +85,6 @@ class BatterValue(models.Model):
     last_modified = models.DateTimeField(auto_now=True)
     category = models.CharField(max_length=200)
     league_key = models.CharField(max_length=200)
-    yahoo_guid = models.CharField(max_length=200)
     # Initial zScore Properties
     zScoreR = models.FloatField()
     zScoreHr = models.FloatField()

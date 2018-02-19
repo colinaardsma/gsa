@@ -104,18 +104,23 @@ def trade_projection(request):
             team_list = get_all_team_rosters(league_key, request.user, TEAM_TOOLS_REDIRECT)
             team_a = [team for team in team_list if team['TEAM_NAME'].lower() == team_a_name.lower()][0]
             team_b = [team for team in team_list if team['TEAM_NAME'].lower() == team_b_name.lower()][0]
-            return render(request, 'trade_projection.html', {'team_a': team_a, 'team_b': team_b, 'league_key': league_key, 'team_list': team_list, 'league_no': league_no, 'redirect': TEAM_TOOLS_REDIRECT})
+            return render(request, 'trade_projection.html', {'team_a': team_a, 'team_b': team_b,
+                                                             'league_key': league_key, 'team_list': team_list,
+                                                             'league_no': league_no, 'redirect': TEAM_TOOLS_REDIRECT})
         else:
-            trade_result = trade_analyzer_(league_key, request.user, TEAM_TOOLS_REDIRECT, team_a, team_a_players, team_b, team_b_players, team_list)
+            trade_result = trade_analyzer_(league_key, request.user, TEAM_TOOLS_REDIRECT, team_a, team_a_players,
+                                           team_b, team_b_players, team_list)
             return render(request, 'trade_projection.html',
-                          {'team_a': team_a, 'team_b': team_b, 'league_key': league_key, 'league_no': league_no, 'trade_result': trade_result, 'redirect': TEAM_TOOLS_REDIRECT})
+                          {'team_a': team_a, 'team_b': team_b, 'league_key': league_key, 'league_no': league_no,
+                           'trade_result': trade_result, 'redirect': TEAM_TOOLS_REDIRECT})
 
 
 def projected_standings(request):
     if request.method == 'POST':
         proj_league_key = request.POST["proj_league_key"]
         projected_standings_ = final_standing_projection(proj_league_key, request.user, TEAM_TOOLS_REDIRECT)
-    return render(request, 'projected_standings.html', {'projected_standings': projected_standings_, 'redirect': TEAM_TOOLS_REDIRECT})
+    return render(request, 'projected_standings.html', {'projected_standings': projected_standings_,
+                                                        'redirect': TEAM_TOOLS_REDIRECT})
 
 
 def all_keepers(request):
@@ -131,7 +136,8 @@ def projected_keepers(request):
         proj_keepers_key = request.POST["proj_keepers_key"]
         league_settings = League.objects.get(league_key=proj_keepers_key)
         proj_keepers = get_projected_keepers(proj_keepers_key, request.user, TEAM_TOOLS_REDIRECT)
-    return render(request, 'projected_keepers.html', {'proj_keepers': proj_keepers, 'league_settings': league_settings, 'redirect': TEAM_TOOLS_REDIRECT})
+    return render(request, 'projected_keepers.html', {'proj_keepers': proj_keepers, 'league_settings': league_settings,
+                                                      'redirect': TEAM_TOOLS_REDIRECT})
 
 
 def batting_projections(request):
@@ -144,6 +150,7 @@ def pitching_projections(request):
     return render(request, 'spreadsheet.html', {'players': players, 'cat': "pitcher"})
 
 
+# TODO: change to update pitching and batting at same time
 def user_(request):
     # TODO: this POST/GET logic is correct syntax, but currently does nothing
     if request.method == 'POST':

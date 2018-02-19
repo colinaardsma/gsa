@@ -140,6 +140,7 @@ def project_keepers(batter_projections_, pitcher_projections_, potential_keepers
                                 total_batters_kept, total_pitchers_kept, b_over_zero, p_over_zero, b_one_dollar,
                                 p_one_dollar, b_dollar_per_fvaaz, p_dollar_per_fvaaz, b_mult, p_mult,
                                 all_projected_keepers, passes)
+    pprint.pprint(keepers)
     return keepers
 
 
