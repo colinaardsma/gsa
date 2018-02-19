@@ -1,6 +1,7 @@
 """CSV Parser"""
 import csv
 import pprint
+import re
 
 from .normalizer import team_normalizer, name_normalizer
 
@@ -38,7 +39,7 @@ def parse_batters_from_csv(user, league, csv_file):
         status = ""
 
         if 'YAHOO' in row:
-            pos = row['YAHOO'].split('/')
+            pos = re.split('\W+', row['YAHOO'])
             # pos = row['YAHOO'].decode('utf-8').split('/')
         batter['isFA'] = False
         batter['keeper'] = 0.0
@@ -119,7 +120,7 @@ def parse_pitchers_from_csv(user, league, csv_file):
 
         if 'POS' in row:
             # pos = row['POS'].decode('utf-8')
-            pos = row['POS']
+            pos = re.split('\W+', row['POS'])
         pitcher['isFA'] = False
         pitcher['keeper'] = 0.0
         pitcher['name'] = name

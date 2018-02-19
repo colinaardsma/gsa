@@ -5,6 +5,7 @@ import json
 
 from django.db import models
 from django.conf import settings
+from django.contrib.postgres.fields import ArrayField
 
 from leagues import models as league_models
 from .helpers.player_creator import calc_batter_z_score, calc_pitcher_z_score
@@ -19,7 +20,7 @@ class BatterProjection(models.Model):
     normalized_first_name = models.CharField(max_length=200)
     last_name = models.CharField(max_length=200)
     team = models.CharField(max_length=200)
-    pos = models.CharField(max_length=200)
+    pos = ArrayField(models.CharField(max_length=200, blank=True), blank=True, default=list)
     status = models.CharField(max_length=200)
     last_modified = models.DateTimeField(auto_now=True)
     category = models.CharField(max_length=200)
@@ -81,7 +82,7 @@ class BatterValue(models.Model):
     normalized_first_name = models.CharField(max_length=200)
     last_name = models.CharField(max_length=200)
     team = models.CharField(max_length=200)
-    pos = models.CharField(max_length=200)
+    pos = ArrayField(models.CharField(max_length=200, blank=True), blank=True, default=list)
     last_modified = models.DateTimeField(auto_now=True)
     category = models.CharField(max_length=200)
     league_key = models.CharField(max_length=200)
@@ -192,7 +193,7 @@ class PitcherProjection(models.Model):
     normalized_first_name = models.CharField(max_length=200)
     last_name = models.CharField(max_length=200)
     team = models.CharField(max_length=200)
-    pos = models.CharField(max_length=200)
+    pos = ArrayField(models.CharField(max_length=200, blank=True), blank=True, default=list)
     is_sp = models.BooleanField()
     status = models.CharField(max_length=200)
     last_modified = models.DateTimeField(auto_now=True)
@@ -252,7 +253,7 @@ class PitcherValue(models.Model):
     normalized_first_name = models.CharField(max_length=200)
     last_name = models.CharField(max_length=200)
     team = models.CharField(max_length=200)
-    pos = models.CharField(max_length=200)
+    pos = ArrayField(models.CharField(max_length=200, blank=True), blank=True, default=list)
     last_modified = models.DateTimeField(auto_now=True)
     category = models.CharField(max_length=200)
     league_key = models.CharField(max_length=200)

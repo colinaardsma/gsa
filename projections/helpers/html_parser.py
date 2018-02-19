@@ -115,8 +115,7 @@ def parse_pos_from_url(playerid):
     return pos
 
 
-def razzball_get_projection_page():
-    url = "http://razzball.com/steamer-hitter-projections"
+def razzball_get_projection_page(url):
     headers = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',
                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
@@ -128,8 +127,8 @@ def razzball_get_projection_page():
 
 
 # TODO: this would be a great async test, render the user page in foreground and wait on razzball reply
-def razzball_get_update_datetime():
-    document = razzball_get_projection_page()
+def razzball_get_update_datetime(url):
+    document = razzball_get_projection_page(url)
     # update_string = document.xpath("//abbr[@class='entry-date published updated']")[0].text
     update_string = document.xpath("//abbr[@class='entry-date published updated']/text()")[0]
     tz_offest = timezone_switch_case(update_string[-3:])

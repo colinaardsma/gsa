@@ -163,22 +163,33 @@ def user_(request):
         elapsed = None
 
     max_year_leagues_ = max_year_leagues(request.user)
-    batter_projection_date = BatterProjection.objects.all().first().last_modified
-    pitcher_projection_date = PitcherProjection.objects.all().first().last_modified
-    oldest_last_mod_date = min(batter_projection_date, pitcher_projection_date)
 
-    razzball_proj_update_datetime = razzball_get_update_datetime()
-    now = datetime.now(pytz.utc)
-    if razzball_proj_update_datetime < oldest_last_mod_date:
-        razzball_proj_update_datetime = None
-
-    print("Date: %s" % razzball_proj_update_datetime)
     try:
         main_league = League.objects.get(league_key=request.user.profile.main_league)
     except League.DoesNotExist:
         main_league = None
 
+    try:
+        batter_projection_date = BatterProjection.objects.all().first().last_modified
+        pitcher_projection_date = PitcherProjection.objects.all().first().last_modified
+        oldest_last_mod_date = min(batter_projection_date, pitcher_projection_date)
+    except AttributeError or BatterProjection.DoesNotExist or PitcherProjection.DoesNotExist:
+        oldest_last_mod_date = datetime(2000, 1, 1, tzinfo=pytz.utc)
+
+    now = datetime.now(pytz.utc)
+    if main_league and main_league.end_date > now:
+        batter_url = 'http://razzball.com/restofseason-hitterprojections/'
+        pitcher_url = 'http://razzball.com/restofseason-pitcherprojections/'
+        razzball_proj_update_datetime = None
+    else:
+        batter_url = 'http://razzball.com/steamer-hitter-projections/'
+        pitcher_url = 'http://razzball.com/steamer-pitcher-projections/'
+        razzball_proj_update_datetime = razzball_get_update_datetime(batter_url)
+        if razzball_proj_update_datetime < oldest_last_mod_date:
+            razzball_proj_update_datetime = None
+
     return render(request, 'user.html', {'yahoo_link': yahoo_link, 'elapsed': elapsed,
                                          'max_year_leagues': max_year_leagues_,
                                          'razzball_proj_update_datetime': razzball_proj_update_datetime,
-                                         'main_league': main_league})
+                                         'main_league': main_league, 'batter_url': batter_url,
+                                         'pitcher_url': pitcher_url})
