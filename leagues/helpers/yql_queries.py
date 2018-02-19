@@ -1,11 +1,12 @@
 import json
 from operator import itemgetter
-import datetime
+from datetime import datetime
 import pprint
 import heapq
+import pytz
 
 from .api_connector import get_json_data, yql_query, check_token_expiration
-from ..models import League, calc_three_year_avgs, save_league, update_profile
+from ..models import League, calc_three_year_avgs, save_league, update_profile, update_league
 
 from projections.helpers.normalizer import team_normalizer, name_normalizer
 from projections.helpers.advanced_stat_calc import calc_sgp, get_sgp
@@ -84,7 +85,6 @@ def get_user_query(user, redirect, endpoint, game_id = "mlb"):
     return user_base_dict
 
 
-# TODO: handle if current league is pre-season
 def get_leagues(user, redirect):
     updated_user = check_token_expiration(user, redirect)
     if updated_user:
@@ -92,9 +92,9 @@ def get_leagues(user, redirect):
     current_year_dict = get_user_query(user, redirect, "/leagues")
     current_year_league_list = []
     current_year_league_base = (current_year_dict['fantasy_content']['users']['0']
-                                                 ['user'][1]['games']['0']['game'][1]['leagues'])
+    ['user'][1]['games']['0']['game'][1]['leagues'])
     if not current_year_league_base:
-        current_year = datetime.datetime.now().year
+        current_year = datetime.now().year
         prev_year_game_id = GAME_ID_DICT[current_year]
         current_year_dict = get_user_query(user, redirect, "/leagues", prev_year_game_id)
         current_year_league_base = (current_year_dict['fantasy_content']['users']['0']
@@ -104,6 +104,7 @@ def get_leagues(user, redirect):
         league_dict = current_year_league_base['{}'.format(i)]['league'][0]
         current_year_league_list.append(league_dict)
     league_history_list = []
+    # TODO: refactor this to be a loop (or separate method) instead of 3-4 individual calls
     for current_year_league in current_year_league_list:
         current_year_league_dict = {}
         current_year_league_key = current_year_league['league_key']
@@ -119,10 +120,8 @@ def get_leagues(user, redirect):
 
         one_year_prior_league_dict = {}
         one_year_prior_league_key = current_year_league_dict['prev_year']
-        one_year_prior_dict_base = get_league_query(one_year_prior_league_key,
-                                                    user, redirect, "")
-        one_year_prior_dict = (one_year_prior_dict_base['fantasy_content']['leagues']['0']
-        ['league'][0])
+        one_year_prior_dict_base = get_league_query(one_year_prior_league_key, user, redirect, "")
+        one_year_prior_dict = (one_year_prior_dict_base['fantasy_content']['leagues']['0']['league'][0])
         one_year_prior_league_dict['league_key'] = one_year_prior_league_key
         one_year_prior_league_dict['season'] = one_year_prior_dict['season']
         one_year_prior_league_dict['name'] = one_year_prior_dict['name']
@@ -135,10 +134,8 @@ def get_leagues(user, redirect):
 
         two_years_prior_league_dict = {}
         two_years_prior_league_key = one_year_prior_league_dict['prev_year']
-        two_years_prior_dict_base = get_league_query(two_years_prior_league_key, user,
-                                                     redirect, "")
-        two_years_prior_dict = (two_years_prior_dict_base['fantasy_content']['leagues']['0']
-        ['league'][0])
+        two_years_prior_dict_base = get_league_query(two_years_prior_league_key, user, redirect, "")
+        two_years_prior_dict = (two_years_prior_dict_base['fantasy_content']['leagues']['0']['league'][0])
         two_years_prior_league_dict['league_key'] = two_years_prior_league_key
         two_years_prior_league_dict['season'] = two_years_prior_dict['season']
         two_years_prior_league_dict['name'] = two_years_prior_dict['name']
@@ -148,12 +145,30 @@ def get_leagues(user, redirect):
             continue
         two_years_prior_league_dict['prev_year'] = two_years_prior_dict['renew'].replace("_", ".l.")
         league_history_list.append(two_years_prior_league_dict)
+
+        current_league_start_datetime = datetime.strptime(current_year_league['start_date'], '%Y-%m-%d')
+        now = datetime.now()
+        if current_league_start_datetime > now:
+            three_years_prior_league_dict = {}
+            three_years_prior_league_key = two_years_prior_league_dict['prev_year']
+            three_years_prior_dict_base = get_league_query(three_years_prior_league_key, user, redirect, "")
+            three_years_prior_dict = (three_years_prior_dict_base['fantasy_content']['leagues']['0']['league'][0])
+            three_years_prior_league_dict['league_key'] = three_years_prior_league_key
+            three_years_prior_league_dict['season'] = three_years_prior_dict['season']
+            three_years_prior_league_dict['name'] = three_years_prior_dict['name']
+            if three_years_prior_dict['renew'] == '':
+                three_years_prior_league_dict['prev_year'] = None
+                league_history_list.append(three_years_prior_league_dict)
+                continue
+            three_years_prior_league_dict['prev_year'] = three_years_prior_dict['renew'].replace("_", ".l.")
+            league_history_list.append(three_years_prior_league_dict)
+
     sorted_league_history_list = sorted(league_history_list, key=itemgetter('season'), reverse=False)
     return sorted_league_history_list
 
 
 def get_current_leagues(league_list):
-    season = datetime.datetime.now().year
+    season = datetime.now().year
     current_leagues = []
     while len(current_leagues) < 1:
         current_leagues = [l for l in league_list if l['season'] == str(season)]
@@ -252,6 +267,7 @@ def format_league_settings_dict(league_settings_base_dict):
     formatted_settings['Max Innings Pitched'] = int(league_settings_base_dict[1]['settings'][1]['max_innings_pitched'])
     formatted_settings['start_date'] = league_settings_base_dict[0]['start_date']
     formatted_settings['end_date'] = league_settings_base_dict[0]['end_date']
+    formatted_settings['draft_status'] = league_settings_base_dict[0]['draft_status']
     return formatted_settings
 
 
@@ -511,7 +527,7 @@ def get_auction_results(league_key, user, redirect):
 # http://fantasysports.yahooapis.com/fantasy/v2/leagues;league_keys=370.l.5091/teams/roster;date=2017-11-28
 def get_current_rosters(league_key, user, redirect):
     current_rosters = []
-    now = datetime.datetime.now()
+    now = datetime.now()
     date = '{year}-{month}-{day}'.format(year=now.year, month=now.month, day=now.day)
     endpoint = '/teams/roster;date={date}'.format(date=date)
     roster_query_results_dict = get_league_query(league_key, user, redirect, endpoint)
@@ -592,7 +608,7 @@ def get_league_transactions(league_key, user, redirect):
         transaction_list = transactions_dict['{}'.format(i)]['transaction']
         transaction_data = transaction_list[0]
         transaction['transaction_type'] = transaction_data['type']
-        transaction['transaction_datetime'] = datetime.datetime.fromtimestamp(int(transaction_data['timestamp'])).strftime('%Y-%m-%d %H:%M:%S')
+        transaction['transaction_datetime'] = datetime.fromtimestamp(int(transaction_data['timestamp'])).strftime('%Y-%m-%d %H:%M:%S')
         if 'faab_bid' in transaction_data:
             transaction['faab_bid'] = transaction_data['faab_bid']
         if 'players' in transaction_list[1]:
@@ -682,51 +698,172 @@ def update_leagues(user, redirect):
     for pitcher in pitchers:
         pitcher_fvaaz_list.append(pitcher.fvaaz)
     main_league = None
+    # TODO: i have no doubt this can be simplified
     for league in leagues:
         db_league = [db_lg for db_lg in db_leagues if db_lg.league_key == league['league_key']]
+        now = datetime.now()
+        #if no league
         if not db_league:
             settings = get_league_settings(league['league_key'], user, redirect)
-            league_status, standings = get_league_standings(league['league_key'], user, redirect)
-            results = get_auction_results(league['league_key'], user, redirect)
-            sgp = get_sgp(standings)
-            avg_sgp = 0.00
-            ops_sgp = 0.00
-            drafted_batters_over_one_dollar = (results['total_batters_drafted'] - results['one_dollar_batters'])
-            drafted_pitchers_over_one_dollar = (results['total_pitchers_drafted'] - results['one_dollar_pitchers'])
+            league_start_datetime = datetime.strptime(settings['start_date'], '%Y-%m-%d')
 
-            batter_fvaaz_over_one_dollar = heapq.nlargest(drafted_batters_over_one_dollar, batter_fvaaz_list)
-            pitcher_fvaaz_over_one_dollar = heapq.nlargest(drafted_pitchers_over_one_dollar, pitcher_fvaaz_list)
-            total_batter_fvaaz_over_one_dollar = sum(batter_fvaaz_over_one_dollar)
-            total_pitcher_fvaaz_over_one_dollar = sum(pitcher_fvaaz_over_one_dollar)
+            # if no league & preseason
+            if league_start_datetime > now:
+                # if preseason & predraft
+                if settings['draft_status'] == 'predraft':
+                    save_league(user=user, league_name=settings['Name'], league_key=settings['League Key'],
+                                team_count=settings['Max Teams'], max_ip=settings['Max Innings Pitched'],
+                                batting_pos=settings['Batting POS'], pitcher_pos=settings['Pitching POS'],
+                                bench_pos=settings['Bench POS'], dl_pos=settings['DL POS'], na_pos=settings['NA POS'],
+                                draft_status=settings['draft_status'], start_date=settings['start_date'],
+                                end_date=settings['end_date'], prev_year_key=settings['Prev Year Key'],
+                                season=settings['Season'])
+                # if preseason & postdraft
+                else:
+                    results = get_auction_results(league['league_key'], user, redirect)
+                    drafted_batters_over_one_dollar = (results['total_batters_drafted'] - results['one_dollar_batters'])
+                    drafted_pitchers_over_one_dollar = (
+                                results['total_pitchers_drafted'] - results['one_dollar_pitchers'])
 
-            batter_budget_over_one_dollar = (results['money_spent_on_batters'] - results['one_dollar_batters'])
-            pitcher_budget_over_one_dollar = (results['money_spent_on_pitchers'] - results['one_dollar_pitchers'])
+                    batter_fvaaz_over_one_dollar = heapq.nlargest(drafted_batters_over_one_dollar, batter_fvaaz_list)
+                    pitcher_fvaaz_over_one_dollar = heapq.nlargest(drafted_pitchers_over_one_dollar, pitcher_fvaaz_list)
+                    total_batter_fvaaz_over_one_dollar = sum(batter_fvaaz_over_one_dollar)
+                    total_pitcher_fvaaz_over_one_dollar = sum(pitcher_fvaaz_over_one_dollar)
 
-            batter_dollar_per_fvaaz = (batter_budget_over_one_dollar / total_batter_fvaaz_over_one_dollar)
-            pitcher_dollar_per_fvaaz = (pitcher_budget_over_one_dollar / total_pitcher_fvaaz_over_one_dollar)
+                    batter_budget_over_one_dollar = (results['money_spent_on_batters'] - results['one_dollar_batters'])
+                    pitcher_budget_over_one_dollar = (
+                                results['money_spent_on_pitchers'] - results['one_dollar_pitchers'])
 
-            b_player_pool_mult = 2.375
-            p_player_pool_mult = 4.45
+                    batter_dollar_per_fvaaz = (batter_budget_over_one_dollar / total_batter_fvaaz_over_one_dollar)
+                    pitcher_dollar_per_fvaaz = (pitcher_budget_over_one_dollar / total_pitcher_fvaaz_over_one_dollar)
 
-            if 'AVG' in sgp:
-                avg_sgp = sgp['AVG']
-            if 'OPS' in sgp:
-                ops_sgp = sgp['OPS']
+                    b_player_pool_mult = 2.375
+                    p_player_pool_mult = 4.45
 
-            save_league(user, settings['Name'], settings['League Key'], settings['Max Teams'],
-                        settings['Max Innings Pitched'], settings['Batting POS'], settings['Pitching POS'],
-                        settings['Bench POS'], settings['DL POS'], settings['NA POS'], league_status,
-                        settings['start_date'], settings['end_date'], settings['Prev Year Key'], settings['Season'],
-                        sgp['R'], sgp['HR'], sgp['RBI'], sgp['SB'], ops_sgp, avg_sgp, sgp['W'], sgp['SV'], sgp['K'],
-                        sgp['ERA'], sgp['WHIP'], results['total_batters_drafted'], results['total_pitchers_drafted'],
-                        results['one_dollar_batters'], results['one_dollar_pitchers'],
-                        results['total_money_spent'], results['money_spent_on_batters'],
-                        results['money_spent_on_pitchers'], results['batter_budget_pct'], results['pitcher_budget_pct'],
-                        batter_dollar_per_fvaaz, pitcher_dollar_per_fvaaz, b_player_pool_mult, p_player_pool_mult)
+                    save_league(user=user, league_name=settings['Name'], league_key=settings['League Key'],
+                                team_count=settings['Max Teams'], max_ip=settings['Max Innings Pitched'],
+                                batting_pos=settings['Batting POS'], pitcher_pos=settings['Pitching POS'],
+                                bench_pos=settings['Bench POS'], dl_pos=settings['DL POS'], na_pos=settings['NA POS'],
+                                draft_status=settings['draft_status'], start_date=settings['start_date'],
+                                end_date=settings['end_date'], prev_year_key=settings['Prev Year Key'],
+                                season=settings['Season'], batters_over_zero_dollars=results['total_batters_drafted'],
+                                pitchers_over_zero_dollars=results['total_pitchers_drafted'],
+                                one_dollar_batters=results['one_dollar_batters'],
+                                one_dollar_pitchers=results['one_dollar_pitchers'],
+                                total_money_spent=results['total_money_spent'],
+                                money_spent_on_batters=results['money_spent_on_batters'],
+                                money_spent_on_pitchers=results['money_spent_on_pitchers'],
+                                batter_budget_pct=results['batter_budget_pct'],
+                                pitcher_budget_pct=results['pitcher_budget_pct'],
+                                b_dollar_per_fvaaz=batter_dollar_per_fvaaz, p_dollar_per_fvaaz=pitcher_dollar_per_fvaaz,
+                                b_player_pool_mult=b_player_pool_mult, p_player_pool_mult=p_player_pool_mult)
 
-            calc_three_year_avgs(settings['League Key'])
+            # if no league & in season
+            else:
+                league_status, standings = get_league_standings(league['league_key'], user, redirect)
+                results = get_auction_results(league['league_key'], user, redirect)
+                sgp = get_sgp(standings)
+                avg_sgp = 0.00
+                ops_sgp = 0.00
+                drafted_batters_over_one_dollar = (results['total_batters_drafted'] - results['one_dollar_batters'])
+                drafted_pitchers_over_one_dollar = (results['total_pitchers_drafted'] - results['one_dollar_pitchers'])
+
+                batter_fvaaz_over_one_dollar = heapq.nlargest(drafted_batters_over_one_dollar, batter_fvaaz_list)
+                pitcher_fvaaz_over_one_dollar = heapq.nlargest(drafted_pitchers_over_one_dollar, pitcher_fvaaz_list)
+                total_batter_fvaaz_over_one_dollar = sum(batter_fvaaz_over_one_dollar)
+                total_pitcher_fvaaz_over_one_dollar = sum(pitcher_fvaaz_over_one_dollar)
+
+                batter_budget_over_one_dollar = (results['money_spent_on_batters'] - results['one_dollar_batters'])
+                pitcher_budget_over_one_dollar = (results['money_spent_on_pitchers'] - results['one_dollar_pitchers'])
+
+                batter_dollar_per_fvaaz = (batter_budget_over_one_dollar / total_batter_fvaaz_over_one_dollar)
+                pitcher_dollar_per_fvaaz = (pitcher_budget_over_one_dollar / total_pitcher_fvaaz_over_one_dollar)
+
+                b_player_pool_mult = 2.375
+                p_player_pool_mult = 4.45
+
+                if 'AVG' in sgp:
+                    avg_sgp = sgp['AVG']
+                if 'OPS' in sgp:
+                    ops_sgp = sgp['OPS']
+
+                save_league(user=user, league_name=settings['Name'], league_key=settings['League Key'],
+                            team_count=settings['Max Teams'], max_ip=settings['Max Innings Pitched'],
+                            batting_pos=settings['Batting POS'], pitcher_pos=settings['Pitching POS'],
+                            bench_pos=settings['Bench POS'], dl_pos=settings['DL POS'], na_pos=settings['NA POS'],
+                            draft_status=settings['draft_status'], start_date=settings['start_date'],
+                            end_date=settings['end_date'], prev_year_key=settings['Prev Year Key'],
+                            season=settings['Season'], r_sgp=sgp['R'], hr_sgp=sgp['HR'], rbi_sgp=sgp['RBI'],
+                            sb_sgp=sgp['SB'], ops_sgp=ops_sgp, avg_sgp=avg_sgp, w_sgp=sgp['W'], sv_sgp=sgp['SV'],
+                            k_sgp=sgp['K'], era_sgp=sgp['ERA'], whip_sgp=sgp['WHIP'],
+                            batters_over_zero_dollars=results['total_batters_drafted'],
+                            pitchers_over_zero_dollars=results['total_pitchers_drafted'],
+                            one_dollar_batters=results['one_dollar_batters'],
+                            one_dollar_pitchers=results['one_dollar_pitchers'],
+                            total_money_spent=results['total_money_spent'],
+                            money_spent_on_batters=results['money_spent_on_batters'],
+                            money_spent_on_pitchers=results['money_spent_on_pitchers'],
+                            batter_budget_pct=results['batter_budget_pct'],
+                            pitcher_budget_pct=results['pitcher_budget_pct'],
+                            b_dollar_per_fvaaz=batter_dollar_per_fvaaz, p_dollar_per_fvaaz=pitcher_dollar_per_fvaaz,
+                            b_player_pool_mult=b_player_pool_mult, p_player_pool_mult=p_player_pool_mult)
+
+                calc_three_year_avgs(settings['League Key'])
+        #if is league & preseason
+        elif db_league[0].start_date.replace(tzinfo=None) > now:
+            settings = get_league_settings(league['league_key'], user, redirect)
+            # if preseason & predraft
+            if db_league[0].draft_status == 'predraft':
+                update_league(league=db_league, user=user, league_name=settings['Name'],
+                              league_key=settings['League Key'], team_count=settings['Max Teams'],
+                              max_ip=settings['Max Innings Pitched'], batting_pos=settings['Batting POS'],
+                              pitcher_pos=settings['Pitching POS'], bench_pos=settings['Bench POS'],
+                              dl_pos=settings['DL POS'], na_pos=settings['NA POS'],
+                              draft_status=settings['draft_status'], start_date=settings['start_date'],
+                              end_date=settings['end_date'], prev_year_key=settings['Prev Year Key'],
+                              season=settings['Season'])
+            # if preseason & postdraft
+            else:
+                results = get_auction_results(league['league_key'], user, redirect)
+                drafted_batters_over_one_dollar = (results['total_batters_drafted'] - results['one_dollar_batters'])
+                drafted_pitchers_over_one_dollar = (results['total_pitchers_drafted'] - results['one_dollar_pitchers'])
+
+                batter_fvaaz_over_one_dollar = heapq.nlargest(drafted_batters_over_one_dollar, batter_fvaaz_list)
+                pitcher_fvaaz_over_one_dollar = heapq.nlargest(drafted_pitchers_over_one_dollar, pitcher_fvaaz_list)
+                total_batter_fvaaz_over_one_dollar = sum(batter_fvaaz_over_one_dollar)
+                total_pitcher_fvaaz_over_one_dollar = sum(pitcher_fvaaz_over_one_dollar)
+
+                batter_budget_over_one_dollar = (results['money_spent_on_batters'] - results['one_dollar_batters'])
+                pitcher_budget_over_one_dollar = (results['money_spent_on_pitchers'] - results['one_dollar_pitchers'])
+
+                batter_dollar_per_fvaaz = (batter_budget_over_one_dollar / total_batter_fvaaz_over_one_dollar)
+                pitcher_dollar_per_fvaaz = (pitcher_budget_over_one_dollar / total_pitcher_fvaaz_over_one_dollar)
+
+                b_player_pool_mult = 2.375
+                p_player_pool_mult = 4.45
+
+                update_league(league=db_league, user=user, league_name=settings['Name'],
+                              league_key=settings['League Key'], team_count=settings['Max Teams'],
+                              max_ip=settings['Max Innings Pitched'], batting_pos=settings['Batting POS'],
+                              pitcher_pos=settings['Pitching POS'], bench_pos=settings['Bench POS'],
+                              dl_pos=settings['DL POS'], na_pos=settings['NA POS'],
+                              draft_status=settings['draft_status'], start_date=settings['start_date'],
+                              end_date=settings['end_date'], prev_year_key=settings['Prev Year Key'],
+                              season=settings['Season'], batters_over_zero_dollars=results['total_batters_drafted'],
+                              pitchers_over_zero_dollars=results['total_pitchers_drafted'],
+                              one_dollar_batters=results['one_dollar_batters'],
+                              one_dollar_pitchers=results['one_dollar_pitchers'],
+                              total_money_spent=results['total_money_spent'],
+                              money_spent_on_batters=results['money_spent_on_batters'],
+                              money_spent_on_pitchers=results['money_spent_on_pitchers'],
+                              batter_budget_pct=results['batter_budget_pct'],
+                              pitcher_budget_pct=results['pitcher_budget_pct'],
+                              b_dollar_per_fvaaz=batter_dollar_per_fvaaz, p_dollar_per_fvaaz=pitcher_dollar_per_fvaaz,
+                              b_player_pool_mult=b_player_pool_mult, p_player_pool_mult=p_player_pool_mult)
+
+        # if league & in season
         else:
-            db_league.users.add(user)
+            db_league[0].users.add(user)
         main_league = league
     update_profile(user, main_league=main_league['league_key'])
 

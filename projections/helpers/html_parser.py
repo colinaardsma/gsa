@@ -132,7 +132,6 @@ def razzball_get_update_datetime():
     document = razzball_get_projection_page()
     # update_string = document.xpath("//abbr[@class='entry-date published updated']")[0].text
     update_string = document.xpath("//abbr[@class='entry-date published updated']/text()")[0]
-
     tz_offest = timezone_switch_case(update_string[-3:])
     offset_string = update_string[:-3] + tz_offest
     update_datetime = datetime.strptime(offset_string, '%Y-%m-%d %I:%M:%S %p %z')

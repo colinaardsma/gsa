@@ -19,6 +19,7 @@ from .helpers.team_tools import pull_batters, pull_pitchers, fa_finder, final_st
     get_keeper_costs, get_projected_keepers, trade_analyzer_, batter_projections, pitcher_projections
 from .helpers.html_parser import razzball_get_update_datetime
 from .helpers.keepers import project_keepers
+from .models import BatterProjection, PitcherProjection
 
 
 class IndexView(generic.ListView):
@@ -156,12 +157,16 @@ def user_(request):
         elapsed = None
 
     max_year_leagues_ = max_year_leagues(request.user)
+    batter_projection_date = BatterProjection.objects.all().first().last_modified
+    pitcher_projection_date = PitcherProjection.objects.all().first().last_modified
+    oldest_last_mod_date = min(batter_projection_date, pitcher_projection_date)
 
     razzball_proj_update_datetime = razzball_get_update_datetime()
     now = datetime.now(pytz.utc)
-    if razzball_proj_update_datetime < now:
+    if razzball_proj_update_datetime < oldest_last_mod_date:
         razzball_proj_update_datetime = None
 
+    print("Date: %s" % razzball_proj_update_datetime)
     try:
         main_league = League.objects.get(league_key=request.user.profile.main_league)
     except League.DoesNotExist:

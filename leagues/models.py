@@ -118,7 +118,7 @@ def save_league(user, league_name, league_key, team_count, max_ip, batting_pos, 
 
 
 def update_league(league, user=None, league_name=None, league_key=None, team_count=None, max_ip=None, batting_pos=None,
-                  pitcher_pos=None, bench_pos=None, dl_pos=None, na_pos=None, league_status=None, start_date=None,
+                  pitcher_pos=None, bench_pos=None, dl_pos=None, na_pos=None, draft_status=None, start_date=None,
                   end_date=None, prev_year_key=None, season=None, r_sgp=None, hr_sgp=None, rbi_sgp=None, sb_sgp=None,
                   ops_sgp=None, avg_sgp=None, w_sgp=None, sv_sgp=None, k_sgp=None, era_sgp=None, whip_sgp=None,
                   batters_over_zero_dollars=None, pitchers_over_zero_dollars=None, one_dollar_batters=None,
