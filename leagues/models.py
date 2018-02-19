@@ -145,8 +145,8 @@ def update_league(league, user=None, league_name=None, league_key=None, team_cou
         league.dl_pos = dl_pos
     if na_pos:
         league.na_pos = na_pos
-    if league_status:
-        league.league_status = league_status
+    if draft_status:
+        league.draft_status = draft_status
     if start_date:
         league.start_date = start_date
     if end_date:

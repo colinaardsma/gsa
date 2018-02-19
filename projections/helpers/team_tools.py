@@ -140,9 +140,9 @@ def final_standing_projection(league_key, user, redirect):
     ros_proj_p_list = PitcherProjection.objects.all()
     # TODO: change to db call
     league_settings = get_league_settings(league_key, user, redirect)
-    league_status, current_standings = get_league_standings(league_key, user, redirect)
+    draft_status, current_standings = get_league_standings(league_key, user, redirect)
     league = user.profile.leagues.get(league_key=league_key)
-    update_league(league, status=league_status)
+    update_league(league, draft_status=league_settings['draft_status'])
 
     team_list = get_all_team_rosters(league_key, user, redirect)
     final_stats = final_stats_projection(team_list, ros_proj_b_list, ros_proj_p_list, current_standings, league_settings)
