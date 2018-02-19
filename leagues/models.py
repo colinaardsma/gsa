@@ -5,9 +5,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-
-
-# Create your models here.
+from django.db.models import Max
 
 
 class League(models.Model):
@@ -208,6 +206,19 @@ def update_league(league, user=None, league_name=None, league_key=None, team_cou
 
     league.save()
     return league
+
+
+# TODO: this needs to be refactored to include multiple years in case of user with multiple leagues and some that have not yet drafted
+def max_year_leagues(user):
+    try:
+        user_leagues = user.profile.leagues.filter(draft_status='postdraft')
+    except User.DoesNotExist:
+        user_leagues = None
+    if not user_leagues:
+        return None
+
+    max_year = user_leagues.aggregate(Max('season'))['season__max']
+    return user_leagues.filter(season=max_year)
 
 
 # TODO: how to incorporate/update current and/or undrafted leagues

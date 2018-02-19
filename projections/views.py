@@ -11,10 +11,9 @@ from django.views import generic
 
 from gsa.settings import TOKEN_REDIRECT_PATH, TEAM_TOOLS_REDIRECT, USER_REDIRECT
 from leagues.helpers.api_connector import request_auth, get_token
-from leagues.models import League, dummy_league, update_profile
+from leagues.models import League, dummy_league, update_profile, max_year_leagues
 from leagues.helpers.yql_queries import get_leagues, get_current_leagues, get_all_team_rosters
 from leagues.helpers.html_parser import get_single_yahoo_team
-from leagues.views import max_year_leagues
 from .helpers.team_tools import pull_batters, pull_pitchers, fa_finder, final_standing_projection, single_player_rater, \
     get_keeper_costs, get_projected_keepers, trade_analyzer_, batter_projections, pitcher_projections
 from .helpers.html_parser import razzball_get_update_datetime

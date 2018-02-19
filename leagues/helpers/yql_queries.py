@@ -757,6 +757,7 @@ def update_leagues(user, redirect):
                                 pitcher_budget_pct=results['pitcher_budget_pct'],
                                 b_dollar_per_fvaaz=batter_dollar_per_fvaaz, p_dollar_per_fvaaz=pitcher_dollar_per_fvaaz,
                                 b_player_pool_mult=b_player_pool_mult, p_player_pool_mult=p_player_pool_mult)
+                    main_league = league
 
             # if no league & in season
             else:
@@ -809,6 +810,7 @@ def update_leagues(user, redirect):
                             b_player_pool_mult=b_player_pool_mult, p_player_pool_mult=p_player_pool_mult)
 
                 calc_three_year_avgs(settings['League Key'])
+                main_league = league
         #if is league & preseason
         elif db_league[0].start_date.replace(tzinfo=None) > now:
             settings = get_league_settings(league['league_key'], user, redirect)
@@ -860,11 +862,13 @@ def update_leagues(user, redirect):
                               pitcher_budget_pct=results['pitcher_budget_pct'],
                               b_dollar_per_fvaaz=batter_dollar_per_fvaaz, p_dollar_per_fvaaz=pitcher_dollar_per_fvaaz,
                               b_player_pool_mult=b_player_pool_mult, p_player_pool_mult=p_player_pool_mult)
+                main_league = league
 
         # if league & in season
         else:
             db_league[0].users.add(user)
-        main_league = league
+            calc_three_year_avgs(settings['League Key'])
+            main_league = league
     update_profile(user, main_league=main_league['league_key'])
 
 

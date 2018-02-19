@@ -7,11 +7,10 @@ import heapq
 from django.shortcuts import render, redirect
 from django.views import generic
 from django.http import HttpResponse
-from django.db.models import Max
 from django.contrib.auth.models import User
 
 from .helpers.api_connector import request_auth, get_token
-from .models import League, update_profile, save_league, calc_three_year_avgs
+from .models import League, update_profile, save_league, calc_three_year_avgs, max_year_leagues
 from .helpers.yql_queries import update_leagues, get_leagues, get_league_settings, get_league_standings, get_auction_results
 from projections.helpers.advanced_stat_calc import get_sgp
 from projections.models import BatterProjection, BatterValue, PitcherProjection, PitcherValue
@@ -69,18 +68,6 @@ def get_token_(request):
 def get_leagues_(request):
     update_leagues(request.user, USER_REDIRECT)
     return redirect('/user')
-
-
-def max_year_leagues(user):
-    try:
-        user_leagues = user.profile.leagues.all()
-    except User.DoesNotExist:
-        user_leagues = None
-    if not user_leagues:
-        return None
-
-    max_year = user_leagues.aggregate(Max('season'))['season__max']
-    return user_leagues.filter(season=max_year)
 
 
 def update_main_league(request):
