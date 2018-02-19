@@ -59,7 +59,7 @@ class BatterProjectionAdmin(admin.ModelAdmin):
                        'weightedZscoreAvg', 'weightedZscoreOps', ], 'classes': ['collapse']}),
     ]
     list_display = ('name', 'team', 'pos', 'status', 'dollarValue', 'fvaaz', 'ab', 'r', 'hr', 'rbi', 'sb', 'avg', 'ops')
-    list_filter = ['team', PosListFilter, ]
+    list_filter = [PosListFilter, 'team', ]
     search_fields = ['pos']
 
     def get_ordering(self, request):
@@ -86,7 +86,7 @@ class PitcherProjectionAdmin(admin.ModelAdmin):
     ]
     list_display = ('name', 'team', 'pos', 'status', 'dollarValue', 'fvaaz', 'ip', 'w', 'sv', 'k', 'era', 'whip', 'kip',
                     'winsip')
-    list_filter = ['team', PosListFilter, ]
+    list_filter = [PosListFilter, 'team', ]
     search_fields = ['pos']
 
     def get_ordering(self, request):
@@ -113,7 +113,7 @@ class BatterValueAdmin(admin.ModelAdmin):
                        'weightedZscoreAvg', 'weightedZscoreOps', ], 'classes': ['collapse']}),
     ]
     list_display = ('name', 'team', 'pos', 'dollarValue', 'fvaaz')
-    list_filter = ['team', PosListFilter, ]
+    list_filter = [PosListFilter, 'team', ]
     search_fields = ['pos']
 
     def get_ordering(self, request):
@@ -137,7 +137,7 @@ class PitcherValueAdmin(admin.ModelAdmin):
                        'weightedZscoreWhip', ], 'classes': ['collapse']}),
     ]
     list_display = ('name', 'team', 'pos', 'dollarValue', 'fvaaz')
-    list_filter = ['team', PosListFilter, ]
+    list_filter = [PosListFilter, 'team', ]
     search_fields = ['pos']
 
     def get_ordering(self, request):
