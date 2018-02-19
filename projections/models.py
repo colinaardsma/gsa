@@ -290,9 +290,8 @@ class PitcherValue(models.Model):
 def save_pitcher(pitcher):
     pitcher = PitcherProjection(name=pitcher['name'], normalized_first_name=pitcher['normalized_first_name'],
                                 last_name=pitcher['last_name'], team=pitcher['team'], pos=pitcher['pos'],
-                                is_sp=pitcher['is_sp'], status=pitcher['status'],
-                                category=pitcher['category'], ip=pitcher['ip'],
-                                w=pitcher['w'], sv=pitcher['sv'], k=pitcher['w'], era=pitcher['era'],
+                                is_sp=pitcher['is_sp'], status=pitcher['status'], category=pitcher['category'],
+                                ip=pitcher['ip'], w=pitcher['w'], sv=pitcher['sv'], k=pitcher['k'], era=pitcher['era'],
                                 whip=pitcher['whip'], kip=pitcher['kip'], winsip=pitcher['winsip'],
                                 zScoreW=pitcher['zScoreW'], zScoreSv=pitcher['zScoreSv'],
                                 zScoreK=pitcher['zScoreK'], zScoreEra=pitcher['zScoreEra'],
@@ -303,8 +302,8 @@ def save_pitcher(pitcher):
                                 weightedZscoreSv=pitcher['weightedZscoreSv'],
                                 weightedZscoreK=pitcher['weightedZscoreK'],
                                 weightedZscoreEra=pitcher['weightedZscoreEra'],
-                                weightedZscoreWhip=pitcher['weightedZscoreWhip'],
-                                fvaaz=pitcher['fvaaz'], dollarValue=pitcher['dollarValue'], keeper=pitcher.get('keeper'),
+                                weightedZscoreWhip=pitcher['weightedZscoreWhip'], fvaaz=pitcher['fvaaz'],
+                                dollarValue=pitcher['dollarValue'], keeper=pitcher.get('keeper'),
                                 isFA=pitcher.get('isFA'))
     pitcher.save()
     return pitcher

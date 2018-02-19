@@ -98,10 +98,15 @@ def parse_pitchers_from_csv(user, league, csv_file):
             name = row['\xef\xbb\xbf"Name"']
             # name = row['\xef\xbb\xbf"Name"'].decode('utf-8').replace(u"\u2018", "'").replace(u"\u2019", "'").replace(u"\u201c", "").replace(u"\u201d", "")
 
+        if 'SO' in row:
+            k = float(row['SO'])
+        else:
+            k = float(row['K'])
+
         if (row['IP'] is None or float(row['IP']) <= (max_ip * 0.05) or
                 row['W'] is None or float(row['W']) < 0.0 or
                 row['SV'] is None or float(row['SV']) < 0.0 or
-                row['K'] is None or float(row['K']) < 0.0 or
+                k is None or k < 0.0 or
                 row['ERA'] is None or float(row['ERA']) <= 0.0 or
                 row['WHIP'] is None or float(row['WHIP']) <= 0.0 or
                 (name is None or name == '') or float(row['G']) <= 0.0):
@@ -134,10 +139,6 @@ def parse_pitchers_from_csv(user, league, csv_file):
         pitcher['w'] = w
         pitcher['g'] = float(row['G'])
         pitcher['sv'] = float(row['SV'])
-        if 'SO' in row:
-            k = float(row['SO'])
-        else:
-            k = float(row['K'])
         pitcher['k'] = k
         pitcher['kip'] = k / ip
         pitcher['winsip'] = w / ip
