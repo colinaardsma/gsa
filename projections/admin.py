@@ -17,24 +17,15 @@ class PosListFilter(admin.SimpleListFilter):
 
         if isinstance(model_admin, BatterProjectionAdmin):
             positions = BatterProjection.objects.values_list("pos", flat=True)
-            positions = [(pos, pos) for sublist in positions for pos in sublist if pos]
-            positions = sorted(set(positions))
-            return positions
         if isinstance(model_admin, BatterValueAdmin):
             positions = BatterValue.objects.values_list("pos", flat=True)
-            positions = [(pos, pos) for sublist in positions for pos in sublist if pos]
-            positions = sorted(set(positions))
-            return positions
         if isinstance(model_admin, PitcherProjectionAdmin):
             positions = PitcherProjection.objects.values_list("pos", flat=True)
-            positions = [(pos, pos) for sublist in positions for pos in sublist if pos]
-            positions = sorted(set(positions))
-            return positions
         if isinstance(model_admin, PitcherValueAdmin):
             positions = PitcherValue.objects.values_list("pos", flat=True)
-            positions = [(pos, pos) for sublist in positions for pos in sublist if pos]
-            positions = sorted(set(positions))
-            return positions
+        positions = [(pos, pos) for sublist in positions for pos in sublist if pos]
+        positions = sorted(set(positions))
+        return positions
 
     def queryset(self, request, queryset):
         # when a user clicks on a filter, this method gets called. The
