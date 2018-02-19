@@ -15,7 +15,7 @@ from leagues.models import League, dummy_league, update_profile, max_year_league
 from leagues.helpers.yql_queries import get_leagues, get_current_leagues, get_all_team_rosters
 from leagues.helpers.html_parser import get_single_yahoo_team
 from .helpers.team_tools import pull_batters, pull_pitchers, fa_finder, final_standing_projection, single_player_rater, \
-    get_keeper_costs, get_projected_keepers, trade_analyzer_, batter_projections, pitcher_projections
+    get_keeper_costs, get_projected_keepers, trade_analyzer_
 from .helpers.html_parser import razzball_get_update_datetime
 from .helpers.keepers import project_keepers
 from .models import BatterProjection, PitcherProjection
@@ -135,12 +135,12 @@ def projected_keepers(request):
 
 
 def batting_projections(request):
-    players = batter_projections()
+    players = BatterProjection.objects.all().order_by('-fvaaz')
     return render(request, 'spreadsheet.html', {'players': players, 'cat': "batter"})
 
 
 def pitching_projections(request):
-    players = pitcher_projections()
+    players = PitcherProjection.objects.all().order_by('-fvaaz')
     return render(request, 'spreadsheet.html', {'players': players, 'cat': "pitcher"})
 
 

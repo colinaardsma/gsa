@@ -160,7 +160,8 @@ def get_keeper_costs(league_key, user, redirect):
     Raises:\n
         None.
     """
-    keepers = get_keepers(league_key, user, redirect)
+    league = League.objects.get(league_key=league_key)
+    keepers = get_keepers(league_key, league, user, redirect)
     return keepers
 
 
@@ -195,7 +196,7 @@ def get_projected_keepers(league_key, user, redirect):
     ros_proj_b_list = BatterProjection.objects.all()
     ros_proj_p_list = PitcherProjection.objects.all()
     league = League.objects.get(league_key=league_key)
-    potential_keepers = get_keepers(league_key, user, redirect)
+    potential_keepers = get_keepers(league_key, league, user, redirect)
     projected_keepers = project_keepers(ros_proj_b_list, ros_proj_p_list, potential_keepers, league)
     end = time.time()
     elapsed = end - start
@@ -215,28 +216,6 @@ def trade_analyzer_(league_key, user, redirect, team_a, team_a_players, team_b, 
     new_standings = trade_analyzer(team_a, team_a_players, team_b, team_b_players, team_list, ros_proj_b_list,
                                    ros_proj_p_list, current_standings, league_settings, SGP_DICT)
     return new_standings
-
-
-def batter_projections():
-    start = time.time()
-    projections = BatterProjection.objects.all()
-    end = time.time()
-    elapsed = end - start
-    logging.info("\r\n***************\r\nGet Batter in %f seconds", elapsed)
-
-    # sorted_proj = sorted(projections, key=lambda x: x.dollarValue, reverse=True)
-    return projections
-
-
-def pitcher_projections():
-    start = time.time()
-    projections = PitcherProjection.objects.all()
-    end = time.time()
-    elapsed = end - start
-    logging.info("\r\n***************\r\nGet Pitcher in %f seconds", elapsed)
-
-    # sorted_proj = sorted(projections, key=lambda x: x.dollarValue, reverse=True)
-    return projections
 
 
 def pull_batters(user, league, csv):

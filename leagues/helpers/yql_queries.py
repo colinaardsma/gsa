@@ -4,6 +4,7 @@ from datetime import datetime
 import pprint
 import heapq
 import pytz
+import math
 
 from .api_connector import get_json_data, yql_query, check_token_expiration
 from ..models import League, calc_three_year_avgs, save_league, update_profile, update_league
@@ -608,7 +609,7 @@ def get_league_transactions(league_key, user, redirect):
         transaction_list = transactions_dict['{}'.format(i)]['transaction']
         transaction_data = transaction_list[0]
         transaction['transaction_type'] = transaction_data['type']
-        transaction['transaction_datetime'] = datetime.fromtimestamp(int(transaction_data['timestamp'])).strftime('%Y-%m-%d %H:%M:%S')
+        transaction['transaction_datetime'] = datetime.fromtimestamp(int(transaction_data['timestamp']))
         if 'faab_bid' in transaction_data:
             transaction['faab_bid'] = transaction_data['faab_bid']
         if 'players' in transaction_list[1]:
@@ -652,34 +653,71 @@ def get_league_transactions(league_key, user, redirect):
     return transactions
 
 
-def get_keepers(league_key, user, redirect):
+def get_keepers(league_key, league, user, redirect):
     current_rosters = get_current_rosters(league_key, user, redirect)
     auction_results = get_auction_results(league_key, user, redirect)
     league_transactions = get_league_transactions(league_key, user, redirect)
-
     for team in current_rosters:
         for player in team['roster']:
+            # TODO: this is super custom
             player['keeper_cost'] = 5
             player['keeper_found'] = False
-            transaction_found = False
+            player['preseason_trade'] = False
+            player['postseason_trade'] = False
+            pickup_found = False
             for transaction in league_transactions:
                 for plyr in transaction['players']:
                     if plyr['player_key'] == player['player_key']:
                         # FA pickup
                         if plyr['source_type'] == 'freeagents':
-                            transaction_found = True
+                            pickup_found = True
                             player['keeper_found'] = True
                             continue
                         # Waiver Claim
                         if plyr['source_type'] == 'waivers':
                             if 'faab_bid' in transaction:
                                 player['keeper_cost'] += int(transaction['faab_bid'])
-                            transaction_found = True
+                            pickup_found = True
                             player['keeper_found'] = True
                             continue
-                if transaction_found:
+                        # # TODO: this is super custom, and also could be refactored, not sure this is even possible with how yahoo handles offseason trades, below doesnt work
+                        # # Off-season trade
+                        # if (not player['preseason_trade'] and transaction['transaction_type'] == 'trade' and
+                        #         transaction['transaction_datetime'] < league.start_date.replace(tzinfo=None)):
+                        #     player['preseason_trade'] = True
+                        #     print(transaction['transaction_datetime'])
+                        #     print(league.start_date.replace(tzinfo=None))
+                        #     print("PRESEASON TRADE:")
+                        #     current_cost = [int(result['cost']) for result in auction_results['results']
+                        #                     if result['player_key'] == player['player_key']][0]
+                        #     print(current_cost)
+                        #     if current_cost <= 10:
+                        #         continue
+                        #     else:
+                        #         player['keeper_found'] = True
+                        #         reduction = int(math.floor(int(current_cost) / 10.0))
+                        #         keeper_cost = int(current_cost) - reduction
+                        #     player['keeper_cost'] = keeper_cost
+                        #
+                        # if (not player['postseason_trade'] and transaction['transaction_type'] == 'trade' and
+                        #         transaction['transaction_datetime'] > league.end_date.replace(tzinfo=None)):
+                        #     player['postseason_trade'] = True
+                        #     print(transaction['transaction_datetime'])
+                        #     print(league.end_date.replace(tzinfo=None))
+                        #     print("POSTSEASON TRADE:")
+                        #     current_cost = [int(result['cost']) for result in auction_results['results']
+                        #                     if result['player_key'] == player['player_key']][0]
+                        #     print(current_cost)
+                        #     if current_cost <= 10:
+                        #         continue
+                        #     else:
+                        #         player['keeper_found'] = True
+                        #         reduction = int(math.floor(int(current_cost) / 10.0))
+                        #         keeper_cost = int(current_cost) - reduction
+                        #     player['keeper_cost'] = keeper_cost
+                if pickup_found:
                     continue
-            if not transaction_found:
+            if not pickup_found:
                 player['keeper_cost'] += [int(result['cost']) for result in auction_results['results']
                                           if result['player_key'] == player['player_key']][0]
                 player['keeper_found'] = True
