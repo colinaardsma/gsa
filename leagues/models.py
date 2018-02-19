@@ -26,6 +26,9 @@ class League(models.Model):
     dl_pos = models.CharField(max_length=200)
     na_pos = models.CharField(max_length=200)
     last_modified = models.DateTimeField(auto_now=True)
+    draft_status = models.CharField(max_length=200)
+    start_date = models.DateTimeField(blank=True, null=True)
+    end_date = models.DateTimeField(blank=True, null=True)
     # Advanced Stats
     total_money_spent = models.IntegerField(blank=True, null=True)
     money_spent_on_batters = models.IntegerField(blank=True, null=True)
@@ -86,22 +89,18 @@ class League(models.Model):
         return name
 
 
-def save_league(user, league_name, league_key, team_count, max_ip, batting_pos, pitcher_pos,
-                bench_pos, dl_pos, na_pos, prev_year_key, season, r_sgp=0.00, hr_sgp=0.00,
-                rbi_sgp=0.00, sb_sgp=0.00, ops_sgp=0.00, avg_sgp=0.00, w_sgp=0.00,
-                sv_sgp=0.00, k_sgp=0.00, era_sgp=0.00, whip_sgp=0.00,
-                batters_over_zero_dollars=0.00, pitchers_over_zero_dollars=0.00,
-                one_dollar_batters=0.00, one_dollar_pitchers=0.00, total_money_spent=0,
-                money_spent_on_batters=0.00, money_spent_on_pitchers=0.00,
-                batter_budget_pct=0.00, pitcher_budget_pct=0.00,
-                b_dollar_per_fvaaz=0.00, p_dollar_per_fvaaz=0.00,
-                b_player_pool_mult=0.00, p_player_pool_mult=0.00):
-    league = League(league_name=league_name, league_key=league_key, team_count=team_count,
-                    max_ip=max_ip, batting_pos=batting_pos, pitcher_pos=pitcher_pos,
-                    bench_pos=bench_pos, dl_pos=dl_pos, na_pos=na_pos, prev_year_key=prev_year_key,
-                    season=season, r_sgp=r_sgp, hr_sgp=hr_sgp, rbi_sgp=rbi_sgp, sb_sgp=sb_sgp,
-                    ops_sgp=ops_sgp, avg_sgp=avg_sgp, w_sgp=w_sgp, sv_sgp=sv_sgp, k_sgp=k_sgp,
-                    era_sgp=era_sgp, whip_sgp=whip_sgp,
+def save_league(user, league_name, league_key, team_count, max_ip, batting_pos, pitcher_pos, bench_pos, dl_pos, na_pos,
+                draft_status, start_date, end_date, prev_year_key, season, r_sgp=0.00, hr_sgp=0.00, rbi_sgp=0.00,
+                sb_sgp=0.00, ops_sgp=0.00, avg_sgp=0.00, w_sgp=0.00, sv_sgp=0.00, k_sgp=0.00, era_sgp=0.00,
+                whip_sgp=0.00, batters_over_zero_dollars=0.00, pitchers_over_zero_dollars=0.00, one_dollar_batters=0.00,
+                one_dollar_pitchers=0.00, total_money_spent=0, money_spent_on_batters=0.00,
+                money_spent_on_pitchers=0.00, batter_budget_pct=0.00, pitcher_budget_pct=0.00, b_dollar_per_fvaaz=0.00,
+                p_dollar_per_fvaaz=0.00, b_player_pool_mult=0.00, p_player_pool_mult=0.00):
+    league = League(league_name=league_name, league_key=league_key, team_count=team_count, max_ip=max_ip,
+                    batting_pos=batting_pos, pitcher_pos=pitcher_pos, bench_pos=bench_pos, dl_pos=dl_pos, na_pos=na_pos,
+                    draft_status=draft_status, start_date=start_date, end_date=end_date, prev_year_key=prev_year_key,
+                    season=season, r_sgp=r_sgp, hr_sgp=hr_sgp, rbi_sgp=rbi_sgp, sb_sgp=sb_sgp, ops_sgp=ops_sgp,
+                    avg_sgp=avg_sgp, w_sgp=w_sgp, sv_sgp=sv_sgp, k_sgp=k_sgp, era_sgp=era_sgp, whip_sgp=whip_sgp,
                     batters_over_zero_dollars=batters_over_zero_dollars,
                     pitchers_over_zero_dollars=pitchers_over_zero_dollars,
                     one_dollar_batters=one_dollar_batters, one_dollar_pitchers=one_dollar_pitchers,
@@ -118,6 +117,100 @@ def save_league(user, league_name, league_key, team_count, max_ip, batting_pos, 
     return league
 
 
+def update_league(league, user=None, league_name=None, league_key=None, team_count=None, max_ip=None, batting_pos=None,
+                  pitcher_pos=None, bench_pos=None, dl_pos=None, na_pos=None, league_status=None, start_date=None,
+                  end_date=None, prev_year_key=None, season=None, r_sgp=None, hr_sgp=None, rbi_sgp=None, sb_sgp=None,
+                  ops_sgp=None, avg_sgp=None, w_sgp=None, sv_sgp=None, k_sgp=None, era_sgp=None, whip_sgp=None,
+                  batters_over_zero_dollars=None, pitchers_over_zero_dollars=None, one_dollar_batters=None,
+                  one_dollar_pitchers=None, total_money_spent=None, money_spent_on_batters=None,
+                  money_spent_on_pitchers=None, batter_budget_pct=None, pitcher_budget_pct=None,
+                  b_dollar_per_fvaaz=None, p_dollar_per_fvaaz=None, b_player_pool_mult=None, p_player_pool_mult=None):
+    if user:
+        league.users.add(user)
+        user.profile.leagues.add(league)
+        user.profile.save()
+    if league_name:
+        league.league_name = league_name
+    if league_key:
+        league.league_key = league_key
+    if team_count:
+        league.team_count = team_count
+    if max_ip:
+        league.max_ip = max_ip
+    if batting_pos:
+        league.batting_pos = batting_pos
+    if pitcher_pos:
+        league.pitcher_pos = pitcher_pos
+    if bench_pos:
+        league.bench_pos = bench_pos
+    if dl_pos:
+        league.dl_pos = dl_pos
+    if na_pos:
+        league.na_pos = na_pos
+    if league_status:
+        league.league_status = league_status
+    if start_date:
+        league.start_date = start_date
+    if end_date:
+        league.end_date = end_date
+    if prev_year_key:
+        league.prev_year_key = prev_year_key
+    if season:
+        league.season = season
+    if r_sgp:
+        league.r_sgp = r_sgp
+    if hr_sgp:
+        league.hr_sgp = hr_sgp
+    if rbi_sgp:
+        league.rbi_sgp = rbi_sgp
+    if sb_sgp:
+        league.sb_sgp = sb_sgp
+    if ops_sgp:
+        league.ops_sgp = ops_sgp
+    if avg_sgp:
+        league.avg_sgp = avg_sgp
+    if w_sgp:
+        league.w_sgp = w_sgp
+    if sv_sgp:
+        league.sv_sgp = sv_sgp
+    if k_sgp:
+        league.k_sgp = k_sgp
+    if era_sgp:
+        league.era_sgp = era_sgp
+    if whip_sgp:
+        league.whip_sgp = whip_sgp
+    if batters_over_zero_dollars:
+        league.batters_over_zero_dollars = batters_over_zero_dollars
+    if pitchers_over_zero_dollars:
+        league.pitchers_over_zero_dollars = pitchers_over_zero_dollars
+    if one_dollar_batters:
+        league.one_dollar_batters = one_dollar_batters
+    if one_dollar_pitchers:
+        league.one_dollar_pitchers = one_dollar_pitchers
+    if total_money_spent:
+        league.total_money_spent = total_money_spent
+    if money_spent_on_batters:
+        league.money_spent_on_batters = money_spent_on_batters
+    if money_spent_on_pitchers:
+        league.money_spent_on_pitchers = money_spent_on_pitchers
+    if batter_budget_pct:
+        league.batter_budget_pct = batter_budget_pct
+    if pitcher_budget_pct:
+        league.pitcher_budget_pct = pitcher_budget_pct
+    if b_dollar_per_fvaaz:
+        league.b_dollar_per_fvaaz = b_dollar_per_fvaaz
+    if p_dollar_per_fvaaz:
+        league.p_dollar_per_fvaaz = p_dollar_per_fvaaz
+    if b_player_pool_mult:
+        league.b_player_pool_mult = b_player_pool_mult
+    if p_player_pool_mult:
+        league.p_player_pool_mult = p_player_pool_mult
+
+    league.save()
+    return league
+
+
+# TODO: how to incorporate/update current and/or undrafted leagues
 def calc_three_year_avgs(league_key):
     r_sgp_list = []
     rbi_sgp_list = []

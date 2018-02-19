@@ -10,7 +10,7 @@ from .player_creator import calc_batter_z_score, calc_pitcher_z_score, create_fu
 from ..models import BatterProjection, BatterValue, PitcherProjection, PitcherValue, save_batter, save_batter_values, save_pitcher, save_pitcher_values
 from leagues.helpers.yql_queries import get_league_settings, get_league_standings, get_all_team_rosters, get_keepers, get_players, get_single_team_roster
 from .keepers import project_keepers
-from leagues.models import League
+from leagues.models import League, update_league
 
 RUN_ASYNC = True
 
@@ -138,13 +138,14 @@ def final_standing_projection(league_key, user, redirect):
     #                                                      P_PLAYER_POOL_MULT)
     ros_proj_b_list = BatterProjection.objects.all()
     ros_proj_p_list = PitcherProjection.objects.all()
+    # TODO: change to db call
     league_settings = get_league_settings(league_key, user, redirect)
-    league_pos_dict = league_settings['Roster Positions']
-    current_standings = get_league_standings(league_key, user, redirect)
+    league_status, current_standings = get_league_standings(league_key, user, redirect)
+    league = user.profile.leagues.get(league_key=league_key)
+    update_league(league, status=league_status)
+
     team_list = get_all_team_rosters(league_key, user, redirect)
-    final_stats = final_stats_projection(team_list, ros_proj_b_list,
-                                         ros_proj_p_list, league_pos_dict,
-                                         current_standings, league_settings)
+    final_stats = final_stats_projection(team_list, ros_proj_b_list, ros_proj_p_list, current_standings, league_settings)
     volatility_standings = league_volatility(SGP_DICT, final_stats)
     ranked_standings = rank_list(volatility_standings)
     return ranked_standings
@@ -205,12 +206,14 @@ def get_projected_keepers(league_key, user, redirect):
 def trade_analyzer_(league_key, user, redirect, team_a, team_a_players, team_b, team_b_players, team_list):
     ros_proj_b_list = BatterProjection.objects.all()
     ros_proj_p_list = PitcherProjection.objects.all()
+    # TODO: change to db call
     league_settings = get_league_settings(league_key, user, redirect)
-    current_standings = get_league_standings(league_key, user, redirect)
-    new_standings = trade_analyzer(team_a, team_a_players, team_b, team_b_players,
-                                   team_list, ros_proj_b_list,
-                                   ros_proj_p_list, current_standings,
-                                   league_settings, SGP_DICT)
+    league_status, current_standings = get_league_standings(league_key, user, redirect)
+    league = user.profile.leagues.get(league_key=league_key)
+    update_league(league, status=league_status)
+
+    new_standings = trade_analyzer(team_a, team_a_players, team_b, team_b_players, team_list, ros_proj_b_list,
+                                   ros_proj_p_list, current_standings, league_settings, SGP_DICT)
     return new_standings
 
 

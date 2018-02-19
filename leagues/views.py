@@ -87,32 +87,24 @@ def get_leagues_from_yahoo(user):
         db_league = [db_lg for db_lg in db_leagues if db_lg.league_key == league['league_key']]
         if not db_league:
             settings = get_league_settings(league['league_key'], user, USER_REDIRECT)
-            standings = get_league_standings(league['league_key'], user, USER_REDIRECT)
+            league_status, standings = get_league_standings(league['league_key'], user, USER_REDIRECT)
             results = get_auction_results(league['league_key'], user, USER_REDIRECT)
             sgp = get_sgp(standings)
             avg_sgp = 0.00
             ops_sgp = 0.00
-            drafted_batters_over_one_dollar = (results['total_batters_drafted']
-                                               - results['one_dollar_batters'])
-            drafted_pitchers_over_one_dollar = (results['total_pitchers_drafted']
-                                                - results['one_dollar_pitchers'])
+            drafted_batters_over_one_dollar = (results['total_batters_drafted'] - results['one_dollar_batters'])
+            drafted_pitchers_over_one_dollar = (results['total_pitchers_drafted'] - results['one_dollar_pitchers'])
 
-            batter_fvaaz_over_one_dollar = heapq.nlargest(drafted_batters_over_one_dollar,
-                                                          batter_fvaaz_list)
-            pitcher_fvaaz_over_one_dollar = heapq.nlargest(drafted_pitchers_over_one_dollar,
-                                                           pitcher_fvaaz_list)
+            batter_fvaaz_over_one_dollar = heapq.nlargest(drafted_batters_over_one_dollar, batter_fvaaz_list)
+            pitcher_fvaaz_over_one_dollar = heapq.nlargest(drafted_pitchers_over_one_dollar, pitcher_fvaaz_list)
             total_batter_fvaaz_over_one_dollar = sum(batter_fvaaz_over_one_dollar)
             total_pitcher_fvaaz_over_one_dollar = sum(pitcher_fvaaz_over_one_dollar)
 
-            batter_budget_over_one_dollar = (results['money_spent_on_batters']
-                                             - results['one_dollar_batters'])
-            pitcher_budget_over_one_dollar = (results['money_spent_on_pitchers']
-                                              - results['one_dollar_pitchers'])
+            batter_budget_over_one_dollar = (results['money_spent_on_batters'] - results['one_dollar_batters'])
+            pitcher_budget_over_one_dollar = (results['money_spent_on_pitchers'] - results['one_dollar_pitchers'])
 
-            batter_dollar_per_fvaaz = (batter_budget_over_one_dollar
-                                       / total_batter_fvaaz_over_one_dollar)
-            pitcher_dollar_per_fvaaz = (pitcher_budget_over_one_dollar
-                                        / total_pitcher_fvaaz_over_one_dollar)
+            batter_dollar_per_fvaaz = (batter_budget_over_one_dollar / total_batter_fvaaz_over_one_dollar)
+            pitcher_dollar_per_fvaaz = (pitcher_budget_over_one_dollar / total_pitcher_fvaaz_over_one_dollar)
 
             b_player_pool_mult = 2.375
             p_player_pool_mult = 4.45
@@ -121,23 +113,16 @@ def get_leagues_from_yahoo(user):
                 avg_sgp = sgp['AVG']
             if 'OPS' in sgp:
                 ops_sgp = sgp['OPS']
-            save_league(user, settings['Name'], settings['League Key'],
-                        settings['Max Teams'], settings['Max Innings Pitched'],
-                        settings['Batting POS'], settings['Pitching POS'],
-                        settings['Bench POS'], settings['DL POS'],
-                        settings['NA POS'], settings['Prev Year Key'],
-                        settings['Season'], sgp['R'], sgp['HR'], sgp['RBI'],
-                        sgp['SB'], ops_sgp, avg_sgp, sgp['W'], sgp['SV'],
-                        sgp['K'], sgp['ERA'], sgp['WHIP'],
-                        results['total_batters_drafted'],
-                        results['total_pitchers_drafted'],
-                        results['one_dollar_batters'],
-                        results['one_dollar_pitchers'], results['total_money_spent'],
-                        results['money_spent_on_batters'],
-                        results['money_spent_on_pitchers'], results['batter_budget_pct'],
-                        results['pitcher_budget_pct'],
-                        batter_dollar_per_fvaaz, pitcher_dollar_per_fvaaz,
-                        b_player_pool_mult, p_player_pool_mult)
+            save_league(user, settings['Name'], settings['League Key'], settings['Max Teams'],
+                        settings['Max Innings Pitched'], settings['Batting POS'], settings['Pitching POS'],
+                        settings['Bench POS'], settings['DL POS'], settings['NA POS'], league_status,
+                        settings['start_date'], settings['end_date'], settings['Prev Year Key'], settings['Season'],
+                        sgp['R'], sgp['HR'], sgp['RBI'], sgp['SB'], ops_sgp, avg_sgp, sgp['W'], sgp['SV'], sgp['K'],
+                        sgp['ERA'], sgp['WHIP'], results['total_batters_drafted'], results['total_pitchers_drafted'],
+                        results['one_dollar_batters'], results['one_dollar_pitchers'], results['total_money_spent'],
+                        results['money_spent_on_batters'], results['money_spent_on_pitchers'],
+                        results['batter_budget_pct'], results['pitcher_budget_pct'], batter_dollar_per_fvaaz,
+                        pitcher_dollar_per_fvaaz, b_player_pool_mult, p_player_pool_mult)
             calc_three_year_avgs(settings['League Key'])
         main_league = league
     update_profile(user, main_league=main_league['league_key'])

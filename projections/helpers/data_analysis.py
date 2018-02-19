@@ -463,8 +463,7 @@ def single_player_rater_db(player_name):
     return player
 
 
-def final_stats_projection(team_list, ros_proj_b_list, ros_proj_p_list,
-                           current_stangings, league_settings):
+def final_stats_projection(team_list, ros_proj_b_list, ros_proj_p_list, current_stangings, league_settings):
     """Calculates final stats of the team based on an optimized lineup\n
     Args:\n
         team_list: a list of dicts of teams in the league with current rosters and stats.\n
