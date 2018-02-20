@@ -380,31 +380,24 @@ def get_players(league_key, user, redirect, total_players, pOrB, player_list_typ
         fa_dict = get_league_players(league_key, user, redirect, player_type)
         for j in range(count):
             player = fa_dict[1]['players']['{}'.format(j)]['player'][0]
-            player_name = player[2]['name']['ascii_first'] + " " + player[2]['name']['ascii_last']
+            player_data_dict = dict([(key, dct[key]) for dct in player for key in dct])
+
+            player_name = player_data_dict['name']['ascii_first'] + " " + player_data_dict['name']['ascii_last']
             player_dict = {}
             norm_name = name_normalizer(player_name)
             player_dict['NAME'] = player_name
             player_dict["NORMALIZED_FIRST_NAME"] = norm_name['First']
             player_dict["LAST_NAME"] = norm_name['Last']
-            if 'status_full' in player[3]:
-                player_dict['STATUS'] = player[3]['status_full']
+            if 'status_full' in player_data_dict:
+                player_dict['STATUS'] = player_data_dict['status_full']
             else:
                 player_dict['STATUS'] = ''
             positions = []
-            if 'eligible_positions' in player[12]:
-                for pos in player[12]['eligible_positions']:
-                    positions.append(pos['position'])
-            elif 'eligible_positions' in player[13]:
-                for pos in player[13]['eligible_positions']:
-                    positions.append(pos['position'])
-            else:
-                positions.append('')
+            for pos in player_data_dict['eligible_positions']:
+                positions.append(pos['position'])
             player_dict["POS"] = positions
-            team = ""
-            for info in player:
-                if 'editorial_team_abbr' in info:
-                    team = info['editorial_team_abbr']
-                    player_dict['TEAM'] = team_normalizer(team)
+            team = player_data_dict['editorial_team_abbr']
+            player_dict['TEAM'] = team_normalizer(team)
             formatted_fas.append(player_dict)
     return formatted_fas
 
