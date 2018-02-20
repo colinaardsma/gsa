@@ -442,14 +442,12 @@ def get_auction_results(league_key, user, redirect):
     player_query_results_dict_list = []
     for i, player_key in enumerate(all_player_keys):
         if i != 0 and i % 25 == 0:
-            player_query_results_dict_list.append(get_player_query(query_player_keys,
-                                                                   user, redirect, ''))
+            player_query_results_dict_list.append(get_player_query(query_player_keys, user, redirect, ''))
             max_list_values = i + 25
             query_player_keys[:] = []
         if i < max_list_values:
             query_player_keys.append(player_key)
-    player_query_results_dict_list.append(get_player_query(query_player_keys, user,
-                                                           redirect, ''))
+    player_query_results_dict_list.append(get_player_query(query_player_keys, user, redirect, ''))
     player_data = []
     for results_dict in player_query_results_dict_list:
         data_dict = results_dict['fantasy_content']['players']
@@ -457,40 +455,31 @@ def get_auction_results(league_key, user, redirect):
         for i in range(player_count):
             player = {}
             result = data_dict['{}'.format(i)]['player'][0]
-            player['player_key'] = result[0]['player_key']
-            ascii_first_name = result[2]['name']['ascii_first']
-            ascii_last_name = result[2]['name']['ascii_last']
+            player_dict = dict([(key, dct[key]) for dct in result for key in dct])
+
+            player['player_key'] = player_dict['player_key']
+            ascii_first_name = player_dict['name']['ascii_first']
+            ascii_last_name = player_dict['name']['ascii_last']
             normalized_name = name_normalizer(ascii_first_name + ' ' + ascii_last_name)
             player['full_name'] = normalized_name['Full']
             player['first_name'] = ascii_first_name
             player['last_name'] = ascii_last_name
-            player['status'] = result[3]['status_full'] if 'status_full' in result[3] else ''
-            if 'editorial_team_abbr' in result[6]:
-                player['team'] = result[6]['editorial_team_abbr']
-            elif 'editorial_team_abbr' in result[7]:
-                player['team'] = result[7]['editorial_team_abbr']
+            player['status'] = player_dict['status_full'] if 'status_full' in result[3] else ''
+            if 'editorial_team_abbr' in player_dict:
+                player['team'] = player_dict['editorial_team_abbr']
             else:
                 player['team'] = 'FA'
             is_pitcher = True
-            if 'position_type' in result[11]:
-                if result[11]['position_type'] == 'B':
-                    player['category'] = 'batter'
-                    is_pitcher = False
-                    total_batters_drafted += 1
-            elif 'position_type' in result[12]:
-                if result[12]['position_type'] == 'B':
-                    player['category'] = 'batter'
-                    is_pitcher = False
-                    total_batters_drafted += 1
+            if player_dict['position_type'] == 'B':
+                player['category'] = 'batter'
+                is_pitcher = False
+                total_batters_drafted += 1
             if is_pitcher:
                 player['category'] = 'pitcher'
                 total_pitchers_drafted += 1
             positions = []
-            if 'eligible_positions' in result[12]:
-                for pos in result[12]['eligible_positions']:
-                    positions.append(pos['position'])
-            elif 'eligible_positions' in result[13]:
-                for pos in result[13]['eligible_positions']:
+            if 'eligible_positions' in player_dict:
+                for pos in player_dict['eligible_positions']:
                     positions.append(pos['position'])
             else:
                 positions.append('')
@@ -524,9 +513,6 @@ def get_auction_results(league_key, user, redirect):
 
     return auction_results
 
-
-#    new_dict1 = dict([(key, dct[key]) for dct in team_dict[0] for key in dct])
-#    new_dict2 = dict([(key, dct[key]) for dct in team_dict[1]['roster']['0']['players']['0']['player'][0] for key in dct])
 
 # http://fantasysports.yahooapis.com/fantasy/v2/leagues;league_keys=370.l.5091/teams/roster;date=2017-11-28
 def get_current_rosters(league_key, user, redirect):
@@ -563,6 +549,7 @@ def get_current_rosters(league_key, user, redirect):
             player = {}
             player_data = roster_dict['{}'.format(j)]['player'][0]
             player_dict = dict([(key, dct[key]) for dct in player_data for key in dct])
+
             player['player_key'] = player_dict['player_key']
             ascii_first_name = player_dict['name']['ascii_first']
             ascii_last_name = player_dict['name']['ascii_last']
