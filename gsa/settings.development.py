@@ -23,8 +23,8 @@ ALLOWED_HOSTS = [
 DATABASES = {
     'default': {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": "colin.aardsma",
-        "USER": "colin.aardsma",
+        "NAME": "gsa",
+        "USER": "gsa_admin",
         "PASSWORD": "",
         "HOST": "localhost",
         "PORT": "",
