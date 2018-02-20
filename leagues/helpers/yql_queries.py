@@ -378,8 +378,7 @@ def get_players(league_key, user, redirect, total_players, pOrB, player_list_typ
 
 
 def get_auction_results(league_key, user, redirect):
-    auction_results = {}
-    auction_results['results'] = []
+    auction_results = {'results': []}
 
     total_money_spent = 0
     money_spent_on_batters = 0
@@ -391,7 +390,6 @@ def get_auction_results(league_key, user, redirect):
     one_dollar_batters = 0
     one_dollar_pitchers = 0
 
-    auction_results['results'] = []
     auction_query_results_dict = get_league_query(league_key, user, redirect, '/draftresults')
     auction_results_dict = auction_query_results_dict['fantasy_content']['leagues']['0']['league'][1]['draft_results']
     auction_count = auction_results_dict['count']
