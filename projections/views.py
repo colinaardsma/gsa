@@ -177,16 +177,17 @@ def user_(request):
         oldest_last_mod_date = datetime(2000, 1, 1, tzinfo=pytz.utc)
 
     now = datetime.now(pytz.utc)
+    razzball_proj_update_datetime = None
     if main_league and main_league.end_date > now:
         batter_url = 'http://razzball.com/restofseason-hitterprojections/'
         pitcher_url = 'http://razzball.com/restofseason-pitcherprojections/'
-        razzball_proj_update_datetime = None
     else:
         batter_url = 'http://razzball.com/steamer-hitter-projections/'
         pitcher_url = 'http://razzball.com/steamer-pitcher-projections/'
-        razzball_proj_update_datetime = razzball_get_update_datetime(batter_url)
-        if razzball_proj_update_datetime < oldest_last_mod_date:
-            razzball_proj_update_datetime = None
+        if oldest_last_mod_date.date() < now.date():
+            razzball_proj_update_datetime = razzball_get_update_datetime(batter_url)
+            if razzball_proj_update_datetime < oldest_last_mod_date:
+                razzball_proj_update_datetime = None
 
     return render(request, 'user.html', {'yahoo_link': yahoo_link, 'elapsed': elapsed,
                                          'max_year_leagues': max_year_leagues_,

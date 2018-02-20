@@ -7,8 +7,9 @@ from .models import League, Profile
 class LeagueAdmin(admin.ModelAdmin):
     fieldsets = [
         ('Descriptive Properties', {
-            'fields': ['league_name', 'league_key', 'prev_year_key', 'team_count', 'max_ip', 'season', 'batting_pos',
-                       'pitcher_pos', 'bench_pos', 'dl_pos', 'na_pos', 'draft_status', 'start_date', 'end_date']}),
+            'fields': ['league_name', 'league_key', 'prev_year_league', 'prev_year_key', 'team_count', 'max_ip',
+                       'season', 'batting_pos', 'pitcher_pos', 'bench_pos', 'dl_pos', 'na_pos', 'draft_status',
+                       'start_date', 'end_date']}),
         ('Advanced Stats', {
             'fields': ['total_money_spent', 'money_spent_on_batters', 'money_spent_on_pitchers', 'batter_budget_pct',
                        'pitcher_budget_pct', 'batters_over_zero_dollars', 'pitchers_over_zero_dollars',
@@ -29,7 +30,7 @@ class LeagueAdmin(admin.ModelAdmin):
             'classes': ['collapse']}),
         ('Users', {'fields': ['users'], 'classes': ['collapse']}),
     ]
-    list_display = ('league_name', 'season', 'draft_status', 'league_key', 'prev_year_key')
+    list_display = ('league_name', 'season', 'draft_status', 'league_key', 'prev_year_league', 'prev_year_key')
     list_filter = ['season']
     search_fields = ['league_name']
 

@@ -92,14 +92,14 @@ def get_leagues(user, redirect):
         user = updated_user
     current_year_dict = get_user_query(user, redirect, "/leagues")
     current_year_league_list = []
-    current_year_league_base = (current_year_dict['fantasy_content']['users']['0']
-    ['user'][1]['games']['0']['game'][1]['leagues'])
+    current_year_league_base = (
+        current_year_dict['fantasy_content']['users']['0']['user'][1]['games']['0']['game'][1]['leagues'])
     if not current_year_league_base:
         current_year = datetime.now().year
         prev_year_game_id = GAME_ID_DICT[current_year]
         current_year_dict = get_user_query(user, redirect, "/leagues", prev_year_game_id)
-        current_year_league_base = (current_year_dict['fantasy_content']['users']['0']
-        ['user'][1]['games']['0']['game'][1]['leagues'])
+        current_year_league_base = (
+            current_year_dict['fantasy_content']['users']['0']['user'][1]['games']['0']['game'][1]['leagues'])
     current_year_league_count = current_year_league_base['count']
     for i in range(current_year_league_count):
         league_dict = current_year_league_base['{}'.format(i)]['league'][0]
@@ -738,18 +738,20 @@ def update_leagues(user, redirect):
     main_league = None
     # TODO: i have no doubt this can be simplified
     for league in leagues:
+        settings = get_league_settings(league['league_key'], user, redirect)
         db_league = [db_lg for db_lg in db_leagues if db_lg.league_key == league['league_key']]
+        prev_year_db_league = [db_lg for db_lg in db_leagues if db_lg.league_key == league['prev_year']]
+        prev_year_league = prev_year_db_league[0] if prev_year_db_league else None
         now = datetime.now()
         #if no league
         if not db_league:
-            settings = get_league_settings(league['league_key'], user, redirect)
             league_start_datetime = datetime.strptime(settings['start_date'], '%Y-%m-%d')
 
             # if no league & preseason
             if league_start_datetime > now:
                 # if preseason & predraft
                 if settings['draft_status'] == 'predraft':
-                    save_league(user=user, league_name=settings['Name'], league_key=settings['League Key'],
+                    save_league(user=user, prev_year_league=prev_year_league, league_name=settings['Name'], league_key=settings['League Key'],
                                 team_count=settings['Max Teams'], max_ip=settings['Max Innings Pitched'],
                                 batting_pos=settings['Batting POS'], pitcher_pos=settings['Pitching POS'],
                                 bench_pos=settings['Bench POS'], dl_pos=settings['DL POS'], na_pos=settings['NA POS'],
@@ -778,7 +780,7 @@ def update_leagues(user, redirect):
                     b_player_pool_mult = 2.375
                     p_player_pool_mult = 4.45
 
-                    save_league(user=user, league_name=settings['Name'], league_key=settings['League Key'],
+                    save_league(user=user, prev_year_league=prev_year_league, league_name=settings['Name'], league_key=settings['League Key'],
                                 team_count=settings['Max Teams'], max_ip=settings['Max Innings Pitched'],
                                 batting_pos=settings['Batting POS'], pitcher_pos=settings['Pitching POS'],
                                 bench_pos=settings['Bench POS'], dl_pos=settings['DL POS'], na_pos=settings['NA POS'],
@@ -826,7 +828,7 @@ def update_leagues(user, redirect):
                 if 'OPS' in sgp:
                     ops_sgp = sgp['OPS']
 
-                save_league(user=user, league_name=settings['Name'], league_key=settings['League Key'],
+                save_league(user=user, prev_year_league=prev_year_league, league_name=settings['Name'], league_key=settings['League Key'],
                             team_count=settings['Max Teams'], max_ip=settings['Max Innings Pitched'],
                             batting_pos=settings['Batting POS'], pitcher_pos=settings['Pitching POS'],
                             bench_pos=settings['Bench POS'], dl_pos=settings['DL POS'], na_pos=settings['NA POS'],
@@ -851,10 +853,9 @@ def update_leagues(user, redirect):
                 main_league = league
         #if is league & preseason
         elif db_league[0].start_date.replace(tzinfo=None) > now:
-            settings = get_league_settings(league['league_key'], user, redirect)
             # if preseason & predraft
             if db_league[0].draft_status == 'predraft':
-                update_league(league=db_league, user=user, league_name=settings['Name'],
+                update_league(league=db_league[0], user=user, prev_year_league=prev_year_league, league_name=settings['Name'],
                               league_key=settings['League Key'], team_count=settings['Max Teams'],
                               max_ip=settings['Max Innings Pitched'], batting_pos=settings['Batting POS'],
                               pitcher_pos=settings['Pitching POS'], bench_pos=settings['Bench POS'],
@@ -882,7 +883,8 @@ def update_leagues(user, redirect):
                 b_player_pool_mult = 2.375
                 p_player_pool_mult = 4.45
 
-                update_league(league=db_league, user=user, league_name=settings['Name'],
+                update_league(league=db_league[0], user=user, prev_year_league=prev_year_league,
+                              league_name=settings['Name'],
                               league_key=settings['League Key'], team_count=settings['Max Teams'],
                               max_ip=settings['Max Innings Pitched'], batting_pos=settings['Batting POS'],
                               pitcher_pos=settings['Pitching POS'], bench_pos=settings['Bench POS'],
@@ -902,12 +904,12 @@ def update_leagues(user, redirect):
                               b_player_pool_mult=b_player_pool_mult, p_player_pool_mult=p_player_pool_mult)
                 main_league = league
 
-        # if league & in season
+        # if league & in season or after season
         else:
-            db_league[0].users.add(user)
+            update_league(league=db_league[0], user=user, prev_year_league=prev_year_league)
             calc_three_year_avgs(settings['League Key'])
             main_league = league
-    update_profile(user, main_league=main_league['league_key'])
+    update_profile(user=user, main_league=main_league['league_key'])
 
 
 STAT_ID_DICT = {'1': 'TotalGP',
