@@ -295,44 +295,19 @@ def get_single_team_roster(league_key, user, redirect):
             return team
 
 
-# TODO: don't need 2 methods that do effectively the same thing, combine these
 def format_single_team_rosters_dict(team_rosters_base_dict):
     team_count = team_rosters_base_dict['count']
     rosters = team_rosters_base_dict
-
-    formatted_rosters = []
-    for i in range(team_count):
-        team_dict = {}
-        team_rosters_dict = rosters['{}'.format(i)]['team']
-        team_dict['TEAM_NAME'] = team_rosters_dict[0][2]['name']
-        team_dict['TEAM_NUMBER'] = team_rosters_dict[0][1]['team_id']
-        team_dict['TEAM_KEY'] = team_rosters_dict[0][0]['team_key']
-        roster = []
-        roster_count = team_rosters_dict[2]['roster']['0']['players']['count']
-        for j in range(roster_count):
-            player_dict = {}
-            for info in team_rosters_dict[2]['roster']['0']['players']['{}'.format(j)]['player'][0]:
-                if 'name' in info:
-                    first_name = info['name']['ascii_first']
-                    last_name = info['name']['ascii_last']
-                    player_name = str(first_name) + " " + str(last_name)
-                    norm_name = name_normalizer(player_name)
-                    player_dict['NAME'] = player_name
-                    player_dict["NORMALIZED_FIRST_NAME"] = norm_name['First']
-                    player_dict["LAST_NAME"] = norm_name['Last']
-                if 'editorial_team_abbr' in info:
-                    team = info['editorial_team_abbr']
-                    player_dict['TEAM'] = team_normalizer(team)
-            roster.append(player_dict)
-        team_dict['ROSTER'] = roster
-        formatted_rosters.append(team_dict)
-    return formatted_rosters
+    return format_team_rosters_dict(team_count, rosters)
 
 
 def format_all_team_rosters_dict(team_rosters_base_dict):
     team_count = team_rosters_base_dict[0]['num_teams']
     rosters = team_rosters_base_dict[1]['teams']
+    return format_team_rosters_dict(team_count, rosters)
 
+
+def format_team_rosters_dict(team_count, rosters):
     formatted_rosters = []
     for i in range(team_count):
         team_dict = {}
@@ -343,18 +318,18 @@ def format_all_team_rosters_dict(team_rosters_base_dict):
         roster_count = team_rosters_dict[1]['roster']['0']['players']['count']
         for j in range(roster_count):
             player_dict = {}
-            for info in team_rosters_dict[1]['roster']['0']['players']['{}'.format(j)]['player'][0]:
-                if 'name' in info:
-                    first_name = info['name']['ascii_first']
-                    last_name = info['name']['ascii_last']
-                    player_name = str(first_name) + " " + str(last_name)
-                    norm_name = name_normalizer(player_name)
-                    player_dict['NAME'] = player_name
-                    player_dict["NORMALIZED_FIRST_NAME"] = norm_name['First']
-                    player_dict["LAST_NAME"] = norm_name['Last']
-                if 'editorial_team_abbr' in info:
-                    team = info['editorial_team_abbr']
-                    player_dict['TEAM'] = team_normalizer(team)
+            info = team_rosters_dict[1]['roster']['0']['players']['{}'.format(j)]['player'][0]
+            player_data_dict = dict([(key, dct[key]) for dct in info for key in dct])
+
+            first_name = player_data_dict['name']['ascii_first']
+            last_name = player_data_dict['name']['ascii_last']
+            player_name = str(first_name) + " " + str(last_name)
+            norm_name = name_normalizer(player_name)
+            player_dict['NAME'] = player_name
+            player_dict["NORMALIZED_FIRST_NAME"] = norm_name['First']
+            player_dict["LAST_NAME"] = norm_name['Last']
+            team = player_data_dict['editorial_team_abbr']
+            player_dict['TEAM'] = team_normalizer(team)
             roster.append(player_dict)
         team_dict['ROSTER'] = roster
         formatted_rosters.append(team_dict)
