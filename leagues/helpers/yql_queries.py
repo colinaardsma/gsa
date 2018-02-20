@@ -525,6 +525,9 @@ def get_auction_results(league_key, user, redirect):
     return auction_results
 
 
+#    new_dict1 = dict([(key, dct[key]) for dct in team_dict[0] for key in dct])
+#    new_dict2 = dict([(key, dct[key]) for dct in team_dict[1]['roster']['0']['players']['0']['player'][0] for key in dct])
+
 # http://fantasysports.yahooapis.com/fantasy/v2/leagues;league_keys=370.l.5091/teams/roster;date=2017-11-28
 def get_current_rosters(league_key, user, redirect):
     current_rosters = []
@@ -532,61 +535,54 @@ def get_current_rosters(league_key, user, redirect):
     date = '{year}-{month}-{day}'.format(year=now.year, month=now.month, day=now.day)
     endpoint = '/teams/roster;date={date}'.format(date=date)
     roster_query_results_dict = get_league_query(league_key, user, redirect, endpoint)
-    current_rosters_dict = (roster_query_results_dict['fantasy_content']['leagues']['0']
-    ['league'][1]['teams'])
+    current_rosters_dict = (
+        roster_query_results_dict['fantasy_content']['leagues']['0']['league'][1]['teams'])
     team_count = current_rosters_dict['count']
     for i in range(team_count):
         team = {}
         team_data = current_rosters_dict['{}'.format(i)]['team']
-        team['team_key'] = team_data[0][0]['team_key']
-        team['team_name'] = team_data[0][2]['name']
-        team['waiver_priority'] = team_data[0][7]['waiver_priority']
-        team['faab_balance'] = team_data[0][8]['faab_balance']
-        managers = team_data[0][19]['managers']
+        team_dict = dict([(key, dct[key]) for dct in team_data[0] for key in dct])
+
+        team['team_key'] = team_dict['team_key']
+        team['team_name'] = team_dict['name']
+        team['waiver_priority'] = team_dict['waiver_priority']
+        team['faab_balance'] = team_dict['faab_balance']
+        if 'auction_budget_total' in team_dict:
+            team['auction_budget'] = team_dict['auction_budget_total']
+        managers = team_dict['managers']
         manager_guid_list = []
         for manager in managers:
             guid = manager['manager']['guid']
             manager_guid_list.append(guid)
         team['manager_guids'] = manager_guid_list
+
         roster = []
         roster_dict = team_data[1]['roster']['0']['players']
         roster_count = roster_dict['count']
         for j in range(roster_count):
             player = {}
             player_data = roster_dict['{}'.format(j)]['player'][0]
-            player['player_key'] = player_data[0]['player_key']
-            ascii_first_name = player_data[2]['name']['ascii_first']
-            ascii_last_name = player_data[2]['name']['ascii_last']
+            player_dict = dict([(key, dct[key]) for dct in player_data for key in dct])
+            player['player_key'] = player_dict['player_key']
+            ascii_first_name = player_dict['name']['ascii_first']
+            ascii_last_name = player_dict['name']['ascii_last']
             normalized_name = name_normalizer(ascii_first_name + ' ' + ascii_last_name)
             player['full_name'] = normalized_name['Full']
             player['first_name'] = ascii_first_name
             player['last_name'] = ascii_last_name
-            if 'status_full' in player_data[3]:
-                player['status'] = player_data[3]['status_full']
+            if 'status_full' in player_dict:
+                player['status'] = player_dict['status_full']
             else:
                 player['status'] = ''
-            if 'editorial_team_abbr' in player_data[6]:
-                player['team'] = player_data[6]['editorial_team_abbr']
-            elif 'editorial_team_abbr' in player_data[7]:
-                player['team'] = player_data[7]['editorial_team_abbr']
-            else:
+            if 'editorial_team_abbr' in player_dict:
+                player['team'] = player_dict['editorial_team_abbr']
                 player['team'] = 'FA'
             player['category'] = 'pitcher'
-            if 'position_type' in player_data[10]:
-                if player_data[10]['position_type'] == 'B':
+            if 'position_type' in player_dict:
+                if player_dict['position_type'] == 'B':
                     player['category'] = 'batter'
-            elif 'position_type' in player_data[11]:
-                if player_data[11]['position_type'] == 'B':
-                    player['category'] = 'batter'
-            elif 'position_type' in player_data[12]:
-                if player_data[12]['position_type'] == 'B':
-                    player['category'] = 'batter'
-            if 'eligible_positions' in player_data[11]:
-                positions = player_data[11]['eligible_positions']
-            elif 'eligible_positions' in player_data[12]:
-                positions = player_data[12]['eligible_positions']
-            elif 'eligible_positions' in player_data[13]:
-                positions = player_data[13]['eligible_positions']
+            if 'eligible_positions' in player_dict:
+                positions = player_dict['eligible_positions']
             position_list = []
             for position in positions:
                 pos = position['position']

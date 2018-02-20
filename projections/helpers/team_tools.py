@@ -12,17 +12,10 @@ from leagues.helpers.yql_queries import get_league_settings, get_league_standing
 from .keepers import project_keepers
 from leagues.models import League, update_league
 
-RUN_ASYNC = True
-
-# https://developer.yahoo.com/fantasysports/guide/players-collection.html
-# https://www.mysportsfeeds.com
 
 # static variables
-ROS_BATTER_URL = "http://www.fantasypros.com/mlb/projections/ros-hitters.php"
-ROS_PITCHER_URL = "https://www.fantasypros.com/mlb/projections/ros-pitchers.php"
-# ROS_BATTER_URL = "file://" + urllib.pathname2url(r"/Users/colinaardsma/git/tfbps/testing html/2017 Rest of Season Fantasy Baseball Projections - Hitters.html")
-# ROS_PITCHER_URL = "file://" + urllib.pathname2url(r"/Users/colinaardsma/git/tfbps/testing html/2017 Rest of Season Fantasy Baseball Projections - Pitchers.html")
 
+#TODO: replace these with db calls
 BATTERS_OVER_ZERO_DOLLARS = 176
 PITCHERS_OVER_ZERO_DOLLARS = 124
 ONE_DOLLAR_BATTERS = 30
@@ -31,35 +24,7 @@ B_DOLLAR_PER_FVAAZ = 3.0
 P_DOLLAR_PER_FVAAZ = 2.17
 B_PLAYER_POOL_MULT = 2.375
 P_PLAYER_POOL_MULT = 4.45
-LEAGUE_NO = 5091
-TEAM_COUNT = 12
-# BATTER_LIST = create_full_batter_html(ROS_BATTER_URL)
-# PITCHER_LIST = create_full_pitcher_html(ROS_PITCHER_URL)
-# BATTER_LIST = create_full_batter_csv(CSV)
-# PITCHER_LIST = create_full_pitcher_csv(CSV)
 
-SGP_DICT = {'R SGP': 19.16666667, 'HR SGP': 11.5, 'RBI SGP': 20.83333333, 'SB SGP': 7.537037037,
-            'OPS SGP': 0.005055555556, 'W SGP': 3.277777778, 'SV SGP': 10.44444444, 'K SGP': 42.5,
-            'ERA SGP': -0.08444444444, 'WHIP SGP': -0.01666666667}
-
-
-# # dynamic variables
-# ROS_PROJ_B_LIST = queries.get_batters()
-# ROS_PROJ_P_LIST = queries.get_pitchers()
-# ROS_PROJ_B_LIST = calc_batter_z_score(BATTER_LIST, BATTERS_OVER_ZERO_DOLLARS,
-#                                                      ONE_DOLLAR_BATTERS, B_DOLLAR_PER_FVAAZ,
-#                                                      B_PLAYER_POOL_MULT)
-# ROS_PROJ_P_LIST = calc_pitcher_z_score(PITCHER_LIST, PITCHERS_OVER_ZERO_DOLLARS,
-#                                                       ONE_DOLLAR_PITCHERS, P_DOLLAR_PER_FVAAZ,
-#                                                       P_PLAYER_POOL_MULT)
-
-# variable defined within methods
-# BATTER_FA_LIST = yahoo_fa(LEAGUE_NO, "B")
-# PITCHER_FA_LIST = yahoo_fa(LEAGUE_NO, "P")
-# LEAGUE_SETTINGS = get_league_settings(LEAGUE_NO)
-# CURRENT_STANDINGS = get_standings(LEAGUE_NO, int(LEAGUE_SETTINGS['Max Teams:']))
-# TEAM_LIST = yahoo_teams(LEAGUE_NO)
-# LEAGUE_POS_DICT = split_league_pos_types(LEAGUE_SETTINGS["Roster Positions:"])
 
 def fa_finder(league_key, user, redirect):
     """Compare team player values with available FA player values\n
@@ -102,20 +67,9 @@ def single_player_rater(player_name):
     Raises:\n
         None.
     """
-    # player_list = single_player_rater_db(player_name)
-    # player = player_list[0]
     ros_proj_b_list = BatterProjection.objects.all()
     ros_proj_p_list = PitcherProjection.objects.all()
     player = single_player_rater_html(player_name, ros_proj_b_list, ros_proj_p_list)
-    # player_stats = ""
-    # if any("P" in pos for pos in player.pos):
-    #     player_stats = ("${player.dollarValue:^5.2f} - {player.name:^25} - {player.pos:^25}" +
-    #                     " - {player.w:^3} - {player.sv:^2} - {player.k:^3}" +
-    #                     "- {player.era:^4} - {player.whip:^4}\n").format(player=player)
-    # else:
-    #     player_stats = ("${player.dollarValue:^5.2f} - {player.name:^25} - {player.pos:^25}" +
-    #                     " - {player.r:^3} - {player.hr:^2} - {player.rbi:^3}" +
-    #                     " - {player.sb:^2} - {player.ops:^5} - {player.avg:^5}\n").format(player=player)
 
     return player
 
@@ -130,23 +84,58 @@ def final_standing_projection(league_key, user, redirect):
     Raises:\n
         None.
     """
-    # ros_proj_b_list = calc_batter_z_score(BATTER_LIST, BATTERS_OVER_ZERO_DOLLARS,
-    #                                                      ONE_DOLLAR_BATTERS, B_DOLLAR_PER_FVAAZ,
-    #                                                      B_PLAYER_POOL_MULT)
-    # ros_proj_p_list = calc_pitcher_z_score(PITCHER_LIST, PITCHERS_OVER_ZERO_DOLLARS,
-    #                                                      ONE_DOLLAR_PITCHERS, P_DOLLAR_PER_FVAAZ,
-    #                                                      P_PLAYER_POOL_MULT)
     ros_proj_b_list = BatterProjection.objects.all()
     ros_proj_p_list = PitcherProjection.objects.all()
     # TODO: change to db call
     league_settings = get_league_settings(league_key, user, redirect)
     draft_status, current_standings = get_league_standings(league_key, user, redirect)
     league = user.profile.leagues.get(league_key=league_key)
+
+    sgp_dict = {'R SGP': league.r_sgp_avg or league.r_sgp, 'HR SGP': league.hr_sgp_avg or league.hr_sgp,
+                'RBI SGP': league.rbi_sgp_avg or league.rbi_sgp, 'SB SGP': league.sb_sgp_avg or league.sb_sgp,
+                'OPS SGP': league.ops_sgp_avg or league.ops_sgp, 'AVG SGP': league.avg_sgp_avg or league.avg_sgp,
+                'W SGP': league.w_sgp_avg or league.w_sgp, 'SV SGP': league.sv_sgp_avg or league.sv_sgp,
+                'K SGP': league.k_sgp_avg or league.k_sgp, 'ERA SGP': league.era_sgp_avg or league.era_sgp,
+                'WHIP SGP': league.whip_sgp_avg or league.whip_sgp}
+
     update_league(league, draft_status=league_settings['draft_status'])
 
     team_list = get_all_team_rosters(league_key, user, redirect)
     final_stats = final_stats_projection(team_list, ros_proj_b_list, ros_proj_p_list, current_standings, league_settings)
-    volatility_standings = league_volatility(SGP_DICT, final_stats)
+    volatility_standings = league_volatility(sgp_dict, final_stats)
+    ranked_standings = rank_list(volatility_standings)
+    return ranked_standings
+
+
+def final_standing_projection_(league, new_league, user, projected_keepers, redirect, ros_proj_b_list, ros_proj_p_list):
+    """Returns projection of final standings for league based on\n
+    current standings and team projections\n
+    Args:\n
+        league_no: Yahoo! fantasy baseball league number.\n
+    Returns:\n
+        Final point standings.\n
+    Raises:\n
+        None.
+    """
+    # TODO: change to db call
+    league_settings = get_league_settings(league.league_key, user, redirect)
+    draft_status, current_standings = get_league_standings(league.league_key, user, redirect)
+    update_league(league, draft_status=league_settings['draft_status'])
+
+    sgp_dict = {'R SGP': league.r_sgp_avg or league.r_sgp, 'HR SGP': league.hr_sgp_avg or league.hr_sgp,
+                'RBI SGP': league.rbi_sgp_avg or league.rbi_sgp, 'SB SGP': league.sb_sgp_avg or league.sb_sgp,
+                'OPS SGP': league.ops_sgp_avg or league.ops_sgp, 'AVG SGP': league.avg_sgp_avg or league.avg_sgp,
+                'W SGP': league.w_sgp_avg or league.w_sgp, 'SV SGP': league.sv_sgp_avg or league.sv_sgp,
+                'K SGP': league.k_sgp_avg or league.k_sgp, 'ERA SGP': league.era_sgp_avg or league.era_sgp,
+                'WHIP SGP': league.whip_sgp_avg or league.whip_sgp}
+
+    team_list = get_all_team_rosters(league.league_key, user, redirect)
+    pprint.pprint(team_list)
+    print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+    pprint.pprint(projected_keepers['projected_keepers'])
+    # TODO: in order to calc final_stats based on keepers team_list or projected_keepers['projected_keepers'] needs major refactoring
+    final_stats = final_stats_projection(team_list, ros_proj_b_list, ros_proj_p_list, current_standings, league_settings)
+    volatility_standings = league_volatility(sgp_dict, final_stats)
     ranked_standings = rank_list(volatility_standings)
     return ranked_standings
 
@@ -196,9 +185,15 @@ def get_projected_keepers(league_key, user, redirect):
     ros_proj_b_list = BatterProjection.objects.all()
     ros_proj_p_list = PitcherProjection.objects.all()
     league = League.objects.get(league_key=league_key)
-    new_league = League.objects.get(prev_year_league=league)
     potential_keepers = get_keepers(league_key, league, user, redirect)
     projected_keepers = project_keepers(ros_proj_b_list, ros_proj_p_list, potential_keepers, league)
+    # TODO: not ready, see final_standing_projection_
+    # try:
+    #     new_league = League.objects.get(prev_year_league=league)
+    # except League.DoesNotExist:
+    #     new_league = league
+    # standings = final_standing_projection_(league, new_league, user, projected_keepers, redirect, ros_proj_b_list, ros_proj_p_list)
+
     end = time.time()
     elapsed = end - start
     print("***************************** %s seconds *****************************" % elapsed)
@@ -214,8 +209,15 @@ def trade_analyzer_(league_key, user, redirect, team_a, team_a_players, team_b, 
     league = user.profile.leagues.get(league_key=league_key)
     update_league(league, status=league_status)
 
+    sgp_dict = {'R SGP': league.r_sgp_avg or league.r_sgp, 'HR SGP': league.hr_sgp_avg or league.hr_sgp,
+                'RBI SGP': league.rbi_sgp_avg or league.rbi_sgp, 'SB SGP': league.sb_sgp_avg or league.sb_sgp,
+                'OPS SGP': league.ops_sgp_avg or league.ops_sgp, 'AVG SGP': league.avg_sgp_avg or league.avg_sgp,
+                'W SGP': league.w_sgp_avg or league.w_sgp, 'SV SGP': league.sv_sgp_avg or league.sv_sgp,
+                'K SGP': league.k_sgp_avg or league.k_sgp, 'ERA SGP': league.era_sgp_avg or league.era_sgp,
+                'WHIP SGP': league.whip_sgp_avg or league.whip_sgp}
+
     new_standings = trade_analyzer(team_a, team_a_players, team_b, team_b_players, team_list, ros_proj_b_list,
-                                   ros_proj_p_list, current_standings, league_settings, SGP_DICT)
+                                   ros_proj_p_list, current_standings, league_settings, sgp_dict)
     return new_standings
 
 
@@ -228,7 +230,6 @@ def pull_batters(user, league, csv):
     logging.info("\r\n***************\r\nBatter Creation in %f seconds", elapsed)
 
     # delete all records from database before rebuidling
-    # if BatterDB:
     start = time.time()
     batters_to_delete = BatterProjection.objects.all()
     end = time.time()
@@ -243,31 +244,25 @@ def pull_batters(user, league, csv):
     logging.info("\r\n***************\r\nBatter Deletion in %f seconds", elapsed)
 
     start = time.time()
-    batters = calc_batter_z_score(batter_list, BATTERS_OVER_ZERO_DOLLARS,
-                                  ONE_DOLLAR_BATTERS, B_DOLLAR_PER_FVAAZ,
-                                  B_PLAYER_POOL_MULT)
-    # batter_models = []
+    batters_over_zero_dollars = league.batters_over_zero_dollars_avg or league.batters_over_zero_dollars
+    one_dollar_batters = league.one_dollar_batters_avg or league.one_dollar_batters
+    b_dollar_per_fvaaz = league.b_dollar_per_fvaaz_avg or league.b_dollar_per_fvaaz
+    b_player_pool_mult = league.b_player_pool_mult_avg or league.b_player_pool_mult
+
+    batters = calc_batter_z_score(batter_list, batters_over_zero_dollars, one_dollar_batters, b_dollar_per_fvaaz,
+                                  b_player_pool_mult)
     for batter in batters:
-        batter_model = save_batter(batter)
-        # batter_models.append(batter_model)
+        save_batter(batter)
     end = time.time()
     elapsed = end - start
-    logging.info("\r\n***************\r\nBatter Valuation in %f seconds", elapsed)
-
-    # start = time.time()
-    # for batter in batter_models:
-    #     batter.save()
-    # # put_batters(batter_models)
-    # end = time.time()
-    # elapsed = end - start
-    # logging.info("\r\n***************\r\nGeneric Batter DB Storage in %f seconds", elapsed)
+    logging.info("\r\n***************\r\nBatter Generic Valuation in %f seconds", elapsed)
 
     # TODO: this is very slow, not sure this is the right solution for custom valuation
     # start = time.time()
     # store_batter_values(user.yahooGuid, league, batter_models)
     # end = time.time()
     # elapsed = end - start
-    # logging.info("\r\n***************\r\nBatter Value DB Storage in %f seconds", elapsed)
+    # logging.info("\r\n***************\r\nBatter Custom Valuation  in %f seconds", elapsed)
 
 
 def pull_pitchers(user, league, csv):
@@ -279,7 +274,6 @@ def pull_pitchers(user, league, csv):
     logging.info("\r\n***************\r\nPitcher Creation in %f seconds", elapsed)
 
     # delete all records from database before rebuidling
-    # if PitcherDB:
     start = time.time()
     pitchers_to_delete = PitcherProjection.objects.all()
     end = time.time()
@@ -294,72 +288,80 @@ def pull_pitchers(user, league, csv):
     logging.info("\r\n***************\r\nPitcher Deletion in %f seconds", elapsed)
 
     start = time.time()
-    pitchers = calc_pitcher_z_score(pitcher_list, PITCHERS_OVER_ZERO_DOLLARS,
-                                    ONE_DOLLAR_PITCHERS, P_DOLLAR_PER_FVAAZ,
-                                    P_PLAYER_POOL_MULT)
-    # pitcher_models = []
+    pitchers_over_zero_dollars = league.pitchers_over_zero_dollars_avg or league.pitchers_over_zero_dollars
+    one_dollar_pitchers = league.one_dollar_pitchers_avg or league.one_dollar_pitchers
+    p_dollar_per_fvaaz = league.p_dollar_per_fvaaz_avg or league.p_dollar_per_fvaaz
+    p_player_pool_mult = league.p_player_pool_mult_avg or league.p_player_pool_mult
+
+    pitchers = calc_pitcher_z_score(pitcher_list, pitchers_over_zero_dollars, one_dollar_pitchers, p_dollar_per_fvaaz,
+                                    p_player_pool_mult)
     for pitcher in pitchers:
-        pitcher_model = save_pitcher(pitcher)
-        # pitcher_models.append(pitcher_model)
+        save_pitcher(pitcher)
     end = time.time()
     elapsed = end - start
-    logging.info("\r\n***************\r\nPitcher Valuation in %f seconds", elapsed)
-
-    # start = time.time()
-    # for pitcher in pitcher_models:
-    #     pitcher.save()
-    # # put_pitchers(pitcher_models)
-    # end = time.time()
-    # elapsed = end - start
-    # logging.info("\r\n***************\r\nGeneric Pitcher DB Storage in %f seconds", elapsed)
+    logging.info("\r\n***************\r\nPitcher Generic Valuation in %f seconds", elapsed)
 
     # TODO: this is very slow, not sure this is the right solution for custom valuation
     # start = time.time()
     # store_pitcher_values(user.yahooGuid, league, pitcher_models)
     # end = time.time()
     # elapsed = end - start
-    # logging.info("\r\n***************\r\nPitcher Value DB Storage in %f seconds", elapsed)
+    # logging.info("\r\n***************\r\nPitcher Custom Valuation in %f seconds", elapsed)
 
 
 def pull_players(user, league, pitcher_csv, batter_csv):
+    start = time.time()
     # pitcher_list = create_full_pitcher_html(ROS_PITCHER_URL)
     # batter_list = create_full_batter_html(ROS_BATTER_URL)
     pitcher_list = create_full_pitcher_csv(user, league, pitcher_csv)
     batter_list = create_full_batter_csv(user, league, batter_csv)
+    end = time.time()
+    elapsed = end - start
+    logging.info("\r\n***************\r\nPlayer Creation in %f seconds", elapsed)
+
     # delete all records from database before rebuidling
-    # if PitcherDB:
+    start = time.time()
     pitchers_to_delete = PitcherProjection.objects.all()
-    # if BatterDB:
     batters_to_delete = BatterProjection.objects.all()
-    pitchers = calc_pitcher_z_score(pitcher_list, PITCHERS_OVER_ZERO_DOLLARS,
-                                    ONE_DOLLAR_PITCHERS, P_DOLLAR_PER_FVAAZ,
-                                    P_PLAYER_POOL_MULT)
-    batters = calc_batter_z_score(batter_list, BATTERS_OVER_ZERO_DOLLARS,
-                                  ONE_DOLLAR_BATTERS, B_DOLLAR_PER_FVAAZ,
-                                  B_PLAYER_POOL_MULT)
+    end = time.time()
+    elapsed = end - start
+    logging.info("\r\n***************\r\nPlayer Get for Deletion in %f seconds", elapsed)
+
+    start = time.time()
     for pitcher in pitchers_to_delete:
         pitcher.delete()
-    # pitcher_models = []
-    for pitcher in pitchers:
-        pitcher_model = save_pitcher(pitcher)
-        # pitcher_models.append(pitcher_model)
     for batter in batters_to_delete:
         batter.delete()
-    # batter_models = []
+    end = time.time()
+    elapsed = end - start
+    logging.info("\r\n***************\r\nPlayer Deletion in %f seconds", elapsed)
+
+    start = time.time()
+    batters_over_zero_dollars = league.batters_over_zero_dollars_avg or league.batters_over_zero_dollars
+    one_dollar_batters = league.one_dollar_batters_avg or league.one_dollar_batters
+    b_dollar_per_fvaaz = league.b_dollar_per_fvaaz_avg or league.b_dollar_per_fvaaz
+    b_player_pool_mult = league.b_player_pool_mult_avg or league.b_player_pool_mult
+    pitchers_over_zero_dollars = league.pitchers_over_zero_dollars_avg or league.pitchers_over_zero_dollars
+    one_dollar_pitchers = league.one_dollar_pitchers_avg or league.one_dollar_pitchers
+    p_dollar_per_fvaaz = league.p_dollar_per_fvaaz_avg or league.p_dollar_per_fvaaz
+    p_player_pool_mult = league.p_player_pool_mult_avg or league.p_player_pool_mult
+
+    pitchers = calc_pitcher_z_score(pitcher_list, pitchers_over_zero_dollars, one_dollar_pitchers, p_dollar_per_fvaaz,
+                                    p_player_pool_mult)
+    batters = calc_batter_z_score(batter_list, batters_over_zero_dollars, one_dollar_batters, b_dollar_per_fvaaz,
+                                  b_player_pool_mult)
+    for pitcher in pitchers:
+        save_pitcher(pitcher)
     for batter in batters:
-        batter_model = save_batter(batter)
-        # batter_models.append(batter_model)
+        save_batter(batter)
+    end = time.time()
+    elapsed = end - start
+    logging.info("\r\n***************\r\nPlayer Generic Valuation in %f seconds", elapsed)
 
-    # put_batters(batter_models)
+    # TODO: this is very slow, not sure this is the right solution for custom valuation
+    # start = time.time()
     # store_batter_values(user.yahooGuid, league, batter_models)
-    # put_pitchers(pitcher_models)
     # store_pitcher_values(user.yahooGuid, league, pitcher_models)
-
-# print pull_batters()
-# start = time.time()
-# print single_player_rater("mike trout")
-# # print fa_finder(5091, "MachadoAboutNothing") #42sec #29sec
-# # print final_standing_projection(5091) #21sec #5sec
-# end = time.time()
-# elapsed = end - start
-# print "{elapsed:.2f} seconds".format(elapsed=elapsed)
+    # end = time.time()
+    # elapsed = end - start
+    # logging.info("\r\n***************\r\nPitcher Custom Valuation in %f seconds", elapsed)
