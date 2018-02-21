@@ -24,8 +24,9 @@ def keeper_dict_by_team(dict_list):
             keeper_team_dict[team_name]['manager_guids'] = player['manager_guids']
             keeper_team_dict[team_name]['total_cost'] = 0
             keeper_team_dict[team_name]['players'] = []
-        keeper_team_dict[team_name]['total_cost'] += player['keeper_cost'] if player['worth_keeping'] else 0
-        keeper_team_dict[team_name]['players'].append(player)
+        if player['worth_keeping']:
+            keeper_team_dict[team_name]['total_cost'] += player['keeper_cost']
+            keeper_team_dict[team_name]['players'].append(player)
     return keeper_team_dict
 
 
