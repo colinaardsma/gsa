@@ -21,6 +21,7 @@ def keeper_dict_by_team(dict_list):
         team_name = player['fantasy_team']
         if team_name not in keeper_team_dict:
             keeper_team_dict[team_name] = {}
+            keeper_team_dict[team_name]['manager_guids'] = player['manager_guids']
             keeper_team_dict[team_name]['total_cost'] = 0
             keeper_team_dict[team_name]['players'] = []
         keeper_team_dict[team_name]['total_cost'] += player['keeper_cost'] if player['worth_keeping'] else 0
@@ -75,6 +76,7 @@ def process_keepers(batter_dict_list, pitcher_dict_list, potential_keepers):
         for potential_keeper in team['roster']:
             if potential_keeper['worth_keeping']:
                 potential_keeper['fantasy_team'] = team['team_name']
+                potential_keeper['manager_guids'] = team['manager_guids']
                 proj_keeper_dict_list.append(potential_keeper)
             else:
                 team['remaining_roster'].append(potential_keeper)

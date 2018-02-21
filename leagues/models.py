@@ -226,7 +226,6 @@ def max_year_leagues(user):
     return user_leagues.filter(season=max_year)
 
 
-# TODO: how to incorporate/update current and/or undrafted leagues
 def calc_three_year_avgs(league_key):
     r_sgp_list = []
     rbi_sgp_list = []

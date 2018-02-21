@@ -184,10 +184,18 @@ def format_league_standings_dict(league_standings_base_dict):
     formatted_standings = []
     for i in range(team_count):
         team_standing_dict = standings['{}'.format(i)]['team']
-        team_info_dict = team_standing_dict[0]
+        team_info_dict = dict([(key, dct[key]) for dct in team_standing_dict[0] for key in dct])
 
         standing = {}
-        standing['PointsTeam'] = [x['name'] for x in team_info_dict if 'name' in x][0]
+
+        managers = team_info_dict['managers']
+        manager_guid_list = []
+        for manager in managers:
+            guid = manager['manager']['guid']
+            manager_guid_list.append(guid)
+        standing['manager_guids'] = manager_guid_list
+
+        standing['PointsTeam'] = team_info_dict['name']
         standing['StatsTeam'] = standing['PointsTeam']
         standing['Stats'] = {}
         stats = {}
@@ -214,11 +222,19 @@ def format_league_standings_dict(league_standings_base_dict):
         standing['Stats'] = stats
         status = league_standings_base_dict[0]['draft_status']
 
-        if status != 'predraft':
-            standing['PointsRank'] = int(team_standing_dict[2]['team_standings']['rank'])
+        if status == 'predraft':
+            for key, val in standing.items():
+                if key == 'Stats':
+                    for k, v in val.items():
+                        v['Point_Value'] = 0
+                        v['Stat_Value'] = 0
+                elif key == 'PointsTeam' or key == 'StatsTeam':
+                    continue
+                elif 'Points' in key or 'Stats' in key:
+                    standing[key] = 0
         else:
-            standing['PointsRank'] = 0
-        standing['StatsRank'] = standing['PointsRank']
+            standing['PointsRank'] = int(team_standing_dict[2]['team_standings']['rank'])
+            standing['StatsRank'] = standing['PointsRank']
 
         formatted_standings.append(standing)
     return status, formatted_standings
@@ -312,8 +328,17 @@ def format_team_rosters_dict(team_count, rosters):
     for i in range(team_count):
         team_dict = {}
         team_rosters_dict = rosters['{}'.format(i)]['team']
-        team_dict['TEAM_NAME'] = team_rosters_dict[0][2]['name']
-        team_dict['TEAM_NUMBER'] = team_rosters_dict[0][1]['team_id']
+        team_dict_info = dict([(key, dct[key]) for dct in team_rosters_dict[0] for key in dct])
+        team_dict['TEAM_NAME'] = team_dict_info['name']
+        team_dict['TEAM_NUMBER'] = team_dict_info['team_id']
+
+        managers = team_dict_info['managers']
+        manager_guid_list = []
+        for manager in managers:
+            guid = manager['manager']['guid']
+            manager_guid_list.append(guid)
+        team_dict['manager_guids'] = manager_guid_list
+
         roster = []
         roster_count = team_rosters_dict[1]['roster']['0']['players']['count']
         for j in range(roster_count):
@@ -527,9 +552,8 @@ def get_current_rosters(league_key, user, redirect):
                 player['status'] = player_dict['status_full']
             else:
                 player['status'] = ''
-            if 'editorial_team_abbr' in player_dict:
-                player['team'] = player_dict['editorial_team_abbr']
-                player['team'] = 'FA'
+            player_team = player_dict['editorial_team_abbr']
+            player['team'] = team_normalizer(player_team)
             player['category'] = 'pitcher'
             if 'position_type' in player_dict:
                 if player_dict['position_type'] == 'B':

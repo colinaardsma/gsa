@@ -6,6 +6,7 @@ import ast
 import copy
 import collections
 import itertools
+import pprint
 
 from .normalizer import team_normalizer, name_normalizer, player_comparer
 from ..models import BatterProjection, BatterValue, PitcherProjection, PitcherValue
@@ -53,8 +54,7 @@ def rate_team(team_dict, ros_projection_list):
     return team_player_list
 
 
-def team_optimizer(team_dict, ros_proj_b_list, ros_proj_p_list, league_pos_dict,
-                   current_stangings, league_settings):
+def team_optimizer(team_dict, ros_proj_b_list, ros_proj_p_list, league_pos_dict, current_stangings, league):
     """Optimizes full season lineups for team\n
     Args:\n
         team_dict: dict of players on team.\n
@@ -69,14 +69,12 @@ def team_optimizer(team_dict, ros_proj_b_list, ros_proj_p_list, league_pos_dict,
         None.
     """
     opt_batters = batting_roster_optimizer(team_dict, ros_proj_b_list, league_pos_dict)
-    opt_pitchers = pitching_roster_optimizer(team_dict, ros_proj_p_list, league_pos_dict,
-                                             current_stangings, league_settings)
-    opt_bench = bench_roster_optimizer(team_dict, ros_proj_b_list, ros_proj_p_list,
-                                       league_pos_dict, current_stangings, league_settings,
-                                       opt_batters, opt_pitchers)
+    opt_pitchers = pitching_roster_optimizer(team_dict, ros_proj_p_list, league_pos_dict, current_stangings, league)
+    opt_bench = bench_roster_optimizer(team_dict, ros_proj_b_list, ros_proj_p_list, league_pos_dict, current_stangings,
+                                       league, opt_batters, opt_pitchers)
     team_stats = {}
     for standing in current_stangings:
-        if standing['PointsTeam'] == team_dict['TEAM_NAME']:
+        if [mg for mg in standing['manager_guids'] if mg in team_dict['manager_guids']]:
             batters = [val for sublist in opt_batters.values() for val in sublist]
             batters.extend(opt_bench['batters'])
             team_stats['StatsR'] = int(standing['StatsR'])
@@ -91,7 +89,7 @@ def team_optimizer(team_dict, ros_proj_b_list, ros_proj_p_list, league_pos_dict,
                 team_stats['StatsRBI'] += int(batter.rbi)
                 team_stats['StatsSB'] += int(batter.sb)
                 # calc ab and gp for use in ops weighting
-                avg_ab_per_team = 34.1 # per game
+                avg_ab_per_team = 34.1  # per game
                 avg_ab_per_player = avg_ab_per_team / 9
                 batter_est_gp = batter.ab / avg_ab_per_player
                 team_abs = int(team_stats['StatsTotalGP']) * avg_ab_per_player
@@ -125,6 +123,7 @@ def team_optimizer(team_dict, ros_proj_b_list, ros_proj_p_list, league_pos_dict,
                 team_stats['StatsWHIP'] = (weighted_team_whip + weighted_pitcher_whip) / current_ip
                 team_stats['StatsIP'] = current_ip
             team_stats['TEAM_NAME'] = standing['PointsTeam']
+            team_stats['manager_guids'] = standing['manager_guids']
     return team_stats
 
 
@@ -225,8 +224,7 @@ def order_batting_pos_by_scarcity(league_batting_roster_pos):
     return ordered_roster_pos_list
 
 
-def pitching_roster_optimizer(team_dict, ros_projection_list, league_pos_dict, current_stangings,
-                              league_settings):
+def pitching_roster_optimizer(team_dict, ros_projection_list, league_pos_dict, current_stangings, league):
     """Optimizes Pitching Roster for remainder of year\n
     Args:\n
         team_dict: dict of players on team.\n
@@ -242,9 +240,9 @@ def pitching_roster_optimizer(team_dict, ros_projection_list, league_pos_dict, c
     team_player_list = []
     current_ip = 0
     starter_ip = 0
-    max_ip = int(league_settings['Max Innings Pitched'])
     for standing in current_stangings:
-        if standing['PointsTeam'] == team_dict['TEAM_NAME']:
+        # if standing['PointsTeam'] == team_dict['TEAM_NAME']:
+        if [mg for mg in standing['manager_guids'] if mg in team_dict['manager_guids']]:
             current_ip += int(math.ceil(float(standing['StatsIP'])))
     for player_proj, roster_player in itertools.product(ros_projection_list, team_dict['ROSTER']):
         if player_comparer(roster_player, player_proj):
@@ -262,13 +260,13 @@ def pitching_roster_optimizer(team_dict, ros_projection_list, league_pos_dict, c
         i = 0
         regex_pos = re.compile(pos)
         multi_pos = False
-        if current_ip >= max_ip:
+        if current_ip >= league.max_ip:
             break
         else:
             while i < len(team_player_list):
                 player = team_player_list[i]
-                if player.ip + current_ip > max_ip:
-                    player = partial_pitcher(player, max_ip, current_ip)
+                if player.ip + current_ip > league.max_ip:
+                    player = partial_pitcher(player, league.max_ip, current_ip)
                 if filter(regex_pos.match, player.pos) or pos == "P":
                     if (pos == "SP" and not player.is_sp) or (pos == "RP" and player.is_sp):
                         i += 1
@@ -303,9 +301,8 @@ def pitching_roster_optimizer(team_dict, ros_projection_list, league_pos_dict, c
     return starting_pitchers
 
 
-def bench_roster_optimizer(team_dict, ros_batter_projection_list, ros_pitcher_projection_list,
-                           league_pos_dict, current_stangings, league_settings, optimized_batters,
-                           optimized_pitchers):
+def bench_roster_optimizer(team_dict, ros_batter_projection_list, ros_pitcher_projection_list, league_pos_dict,
+                           current_stangings, league, optimized_batters, optimized_pitchers):
     """Optimizes Bench Roster for remainder of year\n
     Args:\n
         team_dict: dict of players on team.\n
@@ -349,21 +346,19 @@ def bench_roster_optimizer(team_dict, ros_batter_projection_list, ros_pitcher_pr
             #            name_comparer(player.name, bench_player['NAME'])
             #            for bench_player in bench_roster_list):
             team_player_list.append(player_proj)
-    bench_players = {}
-    bench_players['pitchers'] = []
-    bench_players['batters'] = []
+    bench_players = {'pitchers': [], 'batters': []}
     current_ip = 0
     bench_ip = 0
-    max_ip = int(league_settings['Max Innings Pitched'])
     for standing in current_stangings:
-        if standing['PointsTeam'] == team_dict['TEAM_NAME']:
-            current_ip += int(math.ceil(float(standing['StatsIP'])))
+        # if standing['PointsTeam'] == team_dict['TEAM_NAME']:
+        if [mg for mg in standing['manager_guids'] if mg in team_dict['manager_guids']]:
+                current_ip += int(math.ceil(float(standing['StatsIP'])))
     current_ip += starter_ip
     for player in team_player_list:
         if player.category == "pitcher":
-            if current_ip < max_ip:
-                if player.ip + current_ip > max_ip:
-                    player = partial_pitcher(player, max_ip, current_ip)
+            if current_ip < league.max_ip:
+                if player.ip + current_ip > league.max_ip:
+                    player = partial_pitcher(player, league.max_ip, current_ip)
                 bench_players['pitchers'].append(player)
                 current_ip += player.ip
                 bench_ip += player.ip
@@ -454,16 +449,16 @@ def single_player_rater_db(player_name):
     norm_player_name = name_normalizer(player_name)
     player_name = player_name.lower()
     player = BatterProjection.objects.filter(normalized_first_name=norm_player_name['First'],
-                                              last_name=norm_player_name['Last'])
+                                             last_name=norm_player_name['Last'])
     #    player = queries.get_single_batter(norm_player_name)
     if not player:
         player = PitcherProjection.objects.filter(normalized_first_name=norm_player_name['First'],
-                                                   last_name=norm_player_name['Last'])
+                                                  last_name=norm_player_name['Last'])
         # player = queries.get_single_pitcher(norm_player_name)
     return player
 
 
-def final_stats_projection(team_list, ros_proj_b_list, ros_proj_p_list, current_stangings, league_settings):
+def final_stats_projection(team_list, ros_proj_b_list, ros_proj_p_list, current_stangings, league):
     """Calculates final stats of the team based on an optimized lineup\n
     Args:\n
         team_list: a list of dicts of teams in the league with current rosters and stats.\n
@@ -478,9 +473,13 @@ def final_stats_projection(team_list, ros_proj_b_list, ros_proj_p_list, current_
     """
     final_standings = []
     for team in team_list:
-        post_dict_copy = copy.deepcopy(league_settings["Roster Positions"])
-        optimized_team = team_optimizer(team, ros_proj_b_list, ros_proj_p_list,
-                                        post_dict_copy, current_stangings, league_settings)
+        roster_pos = {'Batting POS': list(league.batting_pos), 'Pitching POS': list(league.pitcher_pos),
+                      'Bench POS': list(league.bench_pos), 'DL POS': list(league.dl_pos), 'NA_POS': list(league.na_pos)}
+        optimized_team = team_optimizer(team, ros_proj_b_list, ros_proj_p_list, roster_pos, current_stangings,
+                                        league)
+        # TODO: this is a shitty way of finding a missing team, what if the guids simply don't match (ie new manager)?
+        if optimized_team == {}:
+            continue
         final_standings.append(optimized_team)
     return final_standings
 
@@ -622,9 +621,8 @@ def calc_volatility(sgp_dict, final_stats, stat, factor, reverse=True):
         final_stats[i][down_vol_title] = down_counter
 
 
-def trade_analyzer(team_a, team_a_players, team_b, team_b_players, team_list,
-                   ros_proj_b_list, ros_proj_p_list, current_standings,
-                   league_settings, sgp_dict):
+def trade_analyzer(team_a, team_a_players, team_b, team_b_players, team_list, ros_proj_b_list, ros_proj_p_list,
+                   current_standings, league_settings, sgp_dict):
     """Analyzes value of trade for 2 teams\n
     Args:\n
         projected_volatility: projected volatility for league\n
@@ -682,7 +680,6 @@ def trade_analyzer(team_a, team_a_players, team_b, team_b_players, team_list,
 
 def evaluate_keepers(keepers, ros_proj_b_list, ros_proj_p_list):
     for keeper in keepers:
-        # print("KEEPERS:")
         for player in keeper['roster']:
             norm_player_name = name_normalizer(player['full_name'])
             value_window = player['keeper_cost'] * 0.10
@@ -692,27 +689,24 @@ def evaluate_keepers(keepers, ros_proj_b_list, ros_proj_p_list):
                              if x['normalized_first_name'] == norm_player_name['First']
                              and x['last_name'] == norm_player_name['Last']]
                     player['value'] = value[0] if value else 0.00
-                    player['worth_keeping'] = True if player['value'] - player['keeper_cost'] >= -value_window else False
+                    player['worth_keeping'] = player['value'] - player['keeper_cost'] >= -value_window
                 else:
                     value = [x['dollarValue'] for x in ros_proj_p_list
                              if x['normalized_first_name'] == norm_player_name['First']
                              and x['last_name'] == norm_player_name['Last']]
                     player['value'] = value[0] if value else 0.00
-                    player['worth_keeping'] = True if player['value'] - player['keeper_cost'] >= -value_window else False
+                    player['worth_keeping'] = player['value'] - player['keeper_cost'] >= -value_window
             else:
                 if player['category'] == 'batter':
                     value = [x.dollarValue for x in ros_proj_b_list
                              if x.normalized_first_name == norm_player_name['First']
                              and x.last_name == norm_player_name['Last']]
                     player['value'] = value[0] if value else 0.00
-                    player['worth_keeping'] = True if player['value'] - player[
-                        'keeper_cost'] >= -value_window else False
+                    player['worth_keeping'] = player['value'] - player['keeper_cost'] >= -value_window
                 else:
                     value = [x.dollarValue for x in ros_proj_p_list
                              if x.normalized_first_name == norm_player_name['First']
                              and x.last_name == norm_player_name['Last']]
                     player['value'] = value[0] if value else 0.00
-                    player['worth_keeping'] = True if player['value'] - player[
-                        'keeper_cost'] >= -value_window else False
-            # print(player)
+                    player['worth_keeping'] = player['value'] - player['keeper_cost'] >= -value_window
     return keepers

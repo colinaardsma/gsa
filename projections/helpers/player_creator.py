@@ -214,11 +214,8 @@ def calc_pitcher_z_score(pitcher_list, players_over_zero_dollars, one_dollar_pla
         win_list.append(pitcher['w'])
         sv_list.append(pitcher['sv'])
         k_list.append(pitcher['k'])
-        # TODO: is dividing by 15 the best route here?
         era_list.append(pitcher['era'])
         whip_list.append(pitcher['whip'])
-        # era_list.append(pitcher['era'] * (pitcher['ip'] / 15))
-        # whip_list.append(pitcher['whip'] * (pitcher['ip'] / 15))
     win_list_nlargest = heapq.nlargest(player_pool, win_list)
     sv_list_nlargest = heapq.nlargest(player_pool, sv_list)
     k_list_nlargest = heapq.nlargest(player_pool, k_list)

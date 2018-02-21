@@ -12,7 +12,7 @@ from django.views import generic
 from gsa.settings import TOKEN_REDIRECT_PATH, TEAM_TOOLS_REDIRECT, USER_REDIRECT
 from leagues.helpers.api_connector import request_auth, get_token
 from leagues.models import League, dummy_league, update_profile, max_year_leagues
-from leagues.helpers.yql_queries import get_leagues, get_current_leagues, get_all_team_rosters
+from leagues.helpers.yql_queries import get_current_leagues, get_all_team_rosters
 from leagues.helpers.html_parser import get_single_yahoo_team
 from .helpers.team_tools import pull_batters, pull_pitchers, fa_finder, final_standing_projection, single_player_rater, \
     get_keeper_costs, get_projected_keepers, trade_analyzer_
@@ -55,24 +55,28 @@ def process_players(request):
 def team_tools(request):
     max_year_leagues_ = None
     if request.user:
-        # league_list = get_leagues(request.user, TEAM_TOOLS_REDIRECT)
-        # TODO: switch to getting leagues this way
         max_year_leagues_ = max_year_leagues(request.user)
-    return render(request, 'team_tools.html', {'current_leagues': max_year_leagues_, 'redirect': TEAM_TOOLS_REDIRECT})
+        return render(request, 'team_tools.html', {'current_leagues': max_year_leagues_, 'redirect': TEAM_TOOLS_REDIRECT})
+    else:
+        return redirect(TEAM_TOOLS_REDIRECT)
 
 
 def top_fa(request):
     if request.method == 'POST':
         fa_league_key = request.POST["fa_league_key"]
         top_fa_ = fa_finder(fa_league_key, request.user, TEAM_TOOLS_REDIRECT)
-    return render(request, 'top_fa.html', {'top_fa': top_fa_, 'redirect': TEAM_TOOLS_REDIRECT})
+        return render(request, 'top_fa.html', {'top_fa': top_fa_, 'redirect': TEAM_TOOLS_REDIRECT})
+    else:
+        return redirect(TEAM_TOOLS_REDIRECT)
 
 
 def single_player(request):
     if request.method == 'POST':
         player_name = request.POST["player_name"]
         player = single_player_rater(player_name)
-    return render(request, 'single_player.html', {'player': player, 'redirect': TEAM_TOOLS_REDIRECT})
+        return render(request, 'single_player.html', {'player': player, 'redirect': TEAM_TOOLS_REDIRECT})
+    else:
+        return redirect(TEAM_TOOLS_REDIRECT)
 
 
 def trade_projection(request):
@@ -113,14 +117,19 @@ def trade_projection(request):
             return render(request, 'trade_projection.html',
                           {'team_a': team_a, 'team_b': team_b, 'league_key': league_key, 'league_no': league_no,
                            'trade_result': trade_result, 'redirect': TEAM_TOOLS_REDIRECT})
+    else:
+        return redirect(TEAM_TOOLS_REDIRECT)
 
 
 def projected_standings(request):
     if request.method == 'POST':
         proj_league_key = request.POST["proj_league_key"]
-        projected_standings_ = final_standing_projection(proj_league_key, request.user, TEAM_TOOLS_REDIRECT)
-    return render(request, 'projected_standings.html', {'projected_standings': projected_standings_,
-                                                        'redirect': TEAM_TOOLS_REDIRECT})
+        league = League.objects.get(league_key=proj_league_key)
+        projected_standings_ = final_standing_projection(league, request.user, TEAM_TOOLS_REDIRECT)
+        return render(request, 'projected_standings.html', {'projected_standings': projected_standings_,
+                                                            'redirect': TEAM_TOOLS_REDIRECT})
+    else:
+        return redirect(TEAM_TOOLS_REDIRECT)
 
 
 def all_keepers(request):
@@ -128,7 +137,9 @@ def all_keepers(request):
         user = request.user
         all_keepers_key = request.POST["all_keepers_key"]
         all_keepers_ = get_keeper_costs(all_keepers_key, user, TEAM_TOOLS_REDIRECT)
-    return render(request, 'all_keepers.html', {'all_keepers': all_keepers_, 'redirect': TEAM_TOOLS_REDIRECT})
+        return render(request, 'all_keepers.html', {'all_keepers': all_keepers_, 'redirect': TEAM_TOOLS_REDIRECT})
+    else:
+        return redirect(TEAM_TOOLS_REDIRECT)
 
 
 def projected_keepers(request):
@@ -136,8 +147,11 @@ def projected_keepers(request):
         proj_keepers_key = request.POST["proj_keepers_key"]
         league_settings = League.objects.get(league_key=proj_keepers_key)
         proj_keepers = get_projected_keepers(proj_keepers_key, request.user, TEAM_TOOLS_REDIRECT)
-    return render(request, 'projected_keepers.html', {'proj_keepers': proj_keepers, 'league_settings': league_settings,
-                                                      'redirect': TEAM_TOOLS_REDIRECT})
+        return render(request, 'projected_keepers.html', {'proj_keepers': proj_keepers,
+                                                          'league_settings': league_settings,
+                                                          'redirect': TEAM_TOOLS_REDIRECT})
+    else:
+        return redirect(TEAM_TOOLS_REDIRECT)
 
 
 def batting_projections(request):

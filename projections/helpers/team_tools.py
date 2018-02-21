@@ -74,40 +74,19 @@ def single_player_rater(player_name):
     return player
 
 
-def final_standing_projection(league_key, user, redirect):
-    """Returns projection of final standings for league based on\n
-    current standings and team projections\n
-    Args:\n
-        league_no: Yahoo! fantasy baseball league number.\n
-    Returns:\n
-        Final point standings.\n
-    Raises:\n
-        None.
-    """
+def final_standing_projection(league, user, redirect):
     ros_proj_b_list = BatterProjection.objects.all()
     ros_proj_p_list = PitcherProjection.objects.all()
-    # TODO: change to db call
-    league_settings = get_league_settings(league_key, user, redirect)
-    draft_status, current_standings = get_league_standings(league_key, user, redirect)
-    league = user.profile.leagues.get(league_key=league_key)
-
-    sgp_dict = {'R SGP': league.r_sgp_avg or league.r_sgp, 'HR SGP': league.hr_sgp_avg or league.hr_sgp,
-                'RBI SGP': league.rbi_sgp_avg or league.rbi_sgp, 'SB SGP': league.sb_sgp_avg or league.sb_sgp,
-                'OPS SGP': league.ops_sgp_avg or league.ops_sgp, 'AVG SGP': league.avg_sgp_avg or league.avg_sgp,
-                'W SGP': league.w_sgp_avg or league.w_sgp, 'SV SGP': league.sv_sgp_avg or league.sv_sgp,
-                'K SGP': league.k_sgp_avg or league.k_sgp, 'ERA SGP': league.era_sgp_avg or league.era_sgp,
-                'WHIP SGP': league.whip_sgp_avg or league.whip_sgp}
-
-    update_league(league, draft_status=league_settings['draft_status'])
-
-    team_list = get_all_team_rosters(league_key, user, redirect)
-    final_stats = final_stats_projection(team_list, ros_proj_b_list, ros_proj_p_list, current_standings, league_settings)
-    volatility_standings = league_volatility(sgp_dict, final_stats)
-    ranked_standings = rank_list(volatility_standings)
-    return ranked_standings
+    rosters = get_all_team_rosters(league.league_key, user, redirect)
+    return standing_projection(league, user, redirect, rosters, ros_proj_b_list, ros_proj_p_list)
 
 
-def final_standing_projection_(league, new_league, user, projected_keepers, redirect, ros_proj_b_list, ros_proj_p_list):
+def keeper_standing_projection(league, user, redirect, projected_keepers, ros_proj_b_list, ros_proj_p_list):
+    rosters = keeper_to_roster_converter(projected_keepers['projected_keepers'])
+    return standing_projection(league, user, redirect, rosters, ros_proj_b_list, ros_proj_p_list)
+
+
+def standing_projection(league, user, redirect, rosters, ros_proj_b_list, ros_proj_p_list):
     """Returns projection of final standings for league based on\n
     current standings and team projections\n
     Args:\n
@@ -117,11 +96,10 @@ def final_standing_projection_(league, new_league, user, projected_keepers, redi
     Raises:\n
         None.
     """
-    # TODO: change to db call
-    league_settings = get_league_settings(league.league_key, user, redirect)
     draft_status, current_standings = get_league_standings(league.league_key, user, redirect)
-    update_league(league, draft_status=league_settings['draft_status'])
+    league = update_league(league, draft_status=draft_status)
 
+    # TODO: move to method for reuse
     sgp_dict = {'R SGP': league.r_sgp_avg or league.r_sgp, 'HR SGP': league.hr_sgp_avg or league.hr_sgp,
                 'RBI SGP': league.rbi_sgp_avg or league.rbi_sgp, 'SB SGP': league.sb_sgp_avg or league.sb_sgp,
                 'OPS SGP': league.ops_sgp_avg or league.ops_sgp, 'AVG SGP': league.avg_sgp_avg or league.avg_sgp,
@@ -129,15 +107,22 @@ def final_standing_projection_(league, new_league, user, projected_keepers, redi
                 'K SGP': league.k_sgp_avg or league.k_sgp, 'ERA SGP': league.era_sgp_avg or league.era_sgp,
                 'WHIP SGP': league.whip_sgp_avg or league.whip_sgp}
 
-    team_list = get_all_team_rosters(league.league_key, user, redirect)
-    pprint.pprint(team_list)
-    print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-    pprint.pprint(projected_keepers['projected_keepers'])
-    # TODO: in order to calc final_stats based on keepers team_list or projected_keepers['projected_keepers'] needs major refactoring
-    final_stats = final_stats_projection(team_list, ros_proj_b_list, ros_proj_p_list, current_standings, league_settings)
+    final_stats = final_stats_projection(rosters, ros_proj_b_list, ros_proj_p_list, current_standings, league)
     volatility_standings = league_volatility(sgp_dict, final_stats)
     ranked_standings = rank_list(volatility_standings)
     return ranked_standings
+
+
+def keeper_to_roster_converter(keeper_dict):
+    roster_list = []
+    for key, val in keeper_dict.items():
+        roster_dict = {'TEAM_NAME': key, 'manager_guids': val['manager_guids'], 'ROSTER': []}
+        for roster_player in val['players']:
+            player = dict(LAST_NAME=roster_player['last_name'].lower(), NAME=roster_player['full_name'],
+                          NORMALIZED_FIRST_NAME=roster_player['first_name'].lower(), TEAM=roster_player['team'])
+            roster_dict['ROSTER'].append(player)
+        roster_list.append(roster_dict)
+    return roster_list
 
 
 def get_keeper_costs(league_key, user, redirect):
@@ -187,17 +172,43 @@ def get_projected_keepers(league_key, user, redirect):
     league = League.objects.get(league_key=league_key)
     potential_keepers = get_keepers(league_key, league, user, redirect)
     projected_keepers = project_keepers(ros_proj_b_list, ros_proj_p_list, potential_keepers, league)
-    # TODO: not ready, see final_standing_projection_
-    # try:
-    #     new_league = League.objects.get(prev_year_league=league)
-    # except League.DoesNotExist:
-    #     new_league = league
-    # standings = final_standing_projection_(league, new_league, user, projected_keepers, redirect, ros_proj_b_list, ros_proj_p_list)
+
+    # auction_needs = analyze_auction_needs(league, user, redirect, projected_keepers, ros_proj_b_list,ros_proj_p_list)
 
     end = time.time()
     elapsed = end - start
     print("***************************** %s seconds *****************************" % elapsed)
     return projected_keepers
+
+
+# TODO: not ready, this needs direction and thought, currently getting an average of batter/pitcher stats kept, but what good is that?
+def analyze_auction_needs(league, user, redirect, projected_keepers, ros_proj_b_list, ros_proj_p_list):
+    try:
+        new_league = League.objects.get(prev_year_league=league)
+    except League.DoesNotExist:
+        new_league = league
+    standings = keeper_standing_projection(new_league, user, redirect, projected_keepers, ros_proj_b_list,
+                                           ros_proj_p_list)
+    for std_team in standings:
+        for keeper_team_name, keeper_team_values in projected_keepers['projected_keepers'].items():
+            if [mg for mg in std_team['manager_guids'] if mg in keeper_team_values['manager_guids']]:
+                batters = 0
+                pitchers = 0
+                for player in keeper_team_values['players']:
+                    if player['category'] == 'batter':
+                        batters += 1
+                    else:
+                        pitchers += 1
+
+                needs = {'team_name': keeper_team_name, 'manager_guids': keeper_team_values['manager_guids'],
+                         'era': std_team['StatsERA'], 'hr_avg': std_team['StatsHR'] / batters,
+                         'ip': std_team['StatsIP'], 'k_avg': std_team['StatsK'] / pitchers,
+                         'ops_avg': std_team['StatsOPS'] / batters, 'r_avg': std_team['StatsR'] / batters,
+                         'rbi_avg': std_team['StatsRBI'] / batters, 'sb_avg': std_team['StatsSB'] / batters,
+                         'sv_avg': std_team['StatsSV'] / pitchers, 'total_gp': std_team['StatsTotalGP'],
+                         'w_avg': std_team['StatsW'] / pitchers, 'whip': std_team['StatsWHIP']}
+
+    # pprint.pprint(standings)
 
 
 def trade_analyzer_(league_key, user, redirect, team_a, team_a_players, team_b, team_b_players, team_list):
