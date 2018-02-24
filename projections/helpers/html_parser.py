@@ -4,7 +4,7 @@ import urllib
 from datetime import datetime
 from http.client import HTTPException
 import pytz
-from lxml import html
+from lxml import html, etree
 
 
 def html_to_document(url, headers=None):
@@ -137,6 +137,27 @@ def razzball_get_update_datetime(url):
     update_datetime = datetime.strptime(offset_string, '%Y-%m-%d %I:%M:%S %p %z')
 
     return update_datetime
+
+
+def scrape_razzball(url):
+    document = razzball_get_projection_page(url)
+    table = document.xpath("//table[@id='neorazzstatstable']")
+    headers = table[0].xpath("descendant::thead//th/text()")[1:]
+    headers = [h.lower() for h in headers]
+    body_rows = [tr.xpath("descendant::a/text()|descendant::td/text()") for tr in table[0].xpath("descendant::tbody//tr")]
+    projection_dict = [dict(zip(headers, player)) for player in body_rows]
+    return projection_dict
+
+
+def pretty_print_element(element):
+    print(etree.tostring(element, encoding='unicode', pretty_print=True))
+
+
+def pretty_print_to_file(element):
+    text = etree.tostring(element, encoding='unicode', pretty_print=True)
+    with open('html.txt', 'w') as outfile:
+        print(text.encode('utf-8'), file=outfile)
+    print("FILE OUTPUT COMPLETE")
 
 
 def timezone_switch_case(tz_string):

@@ -477,10 +477,9 @@ class Profile(models.Model):
         return str(self.user)
 
 
-def update_profile(user, league=None, username=None, hashed_password=None, email=None,
-                   yahoo_guid=None, last_accessed=None,
-                   location=None, access_token=None, token_expiration=None,
-                   refresh_token=None, main_league=None):
+def update_profile(user, league=None, username=None, hashed_password=None, email=None, yahoo_guid=None,
+                   last_accessed=None, location=None, access_token=None, token_expiration=None, refresh_token=None,
+                   main_league=None):
     if league and league not in user.profile.leagues.all():
         user.profile.leagues.add(league)
     # if username:

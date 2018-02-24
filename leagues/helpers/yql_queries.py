@@ -753,10 +753,11 @@ def update_leagues(user, redirect):
                     b_player_pool_mult = 2.375
                     p_player_pool_mult = 4.45
 
-                    save_league(user=user, prev_year_league=prev_year_league, league_name=settings['Name'], league_key=settings['League Key'],
-                                team_count=settings['Max Teams'], max_ip=settings['Max Innings Pitched'],
-                                batting_pos=settings['Batting POS'], pitcher_pos=settings['Pitching POS'],
-                                bench_pos=settings['Bench POS'], dl_pos=settings['DL POS'], na_pos=settings['NA POS'],
+                    save_league(user=user, prev_year_league=prev_year_league, league_name=settings['Name'],
+                                league_key=settings['League Key'], team_count=settings['Max Teams'],
+                                max_ip=settings['Max Innings Pitched'], batting_pos=settings['Batting POS'],
+                                pitcher_pos=settings['Pitching POS'], bench_pos=settings['Bench POS'],
+                                dl_pos=settings['DL POS'], na_pos=settings['NA POS'],
                                 draft_status=settings['draft_status'], start_date=settings['start_date'],
                                 end_date=settings['end_date'], prev_year_key=settings['Prev Year Key'],
                                 season=settings['Season'], batters_over_zero_dollars=results['total_batters_drafted'],

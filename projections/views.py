@@ -14,9 +14,8 @@ from leagues.helpers.api_connector import request_auth, get_token
 from leagues.models import League, dummy_league, update_profile, max_year_leagues
 from leagues.helpers.yql_queries import get_current_leagues, get_all_team_rosters
 from leagues.helpers.html_parser import get_single_yahoo_team
-from .helpers.team_tools import pull_batters, pull_pitchers, fa_finder, final_standing_projection, single_player_rater, \
-    get_keeper_costs, get_projected_keepers, trade_analyzer_
-from .helpers.html_parser import razzball_get_update_datetime
+from .helpers.team_tools import pull_batters, pull_pitchers, fa_finder, final_standing_projection, single_player_rater, get_keeper_costs, get_projected_keepers, trade_analyzer_, pull_players_html
+from .helpers.html_parser import razzball_get_update_datetime, scrape_razzball
 from .helpers.keepers import project_keepers
 from .models import BatterProjection, PitcherProjection
 
@@ -32,7 +31,7 @@ def process_players(request):
     csv = request.FILES['csv']
     decoded_csv = StringIO(csv.read().decode())
     try:
-        league = League.objects.get(league_key=request.user.profile.main_league)
+        league = request.user.profile.leagues.get(league_key=request.user.profile.main_league)
         logging.info("USING MAIN LEAGUE %s" % league.league_key)
         logging.debug("USING MAIN LEAGUE %s" % league.league_key)
         logging.warning("USING MAIN LEAGUE %s" % league.league_key)
@@ -46,9 +45,20 @@ def process_players(request):
     end = time.time()
     elapsed = end - start
     logging.info('%s seconds elapsed' % elapsed)
-    yahoo_link = request_auth(TOKEN_REDIRECT_PATH)
-    max_year_leagues_ = max_year_leagues(request.user)
-    # return render(request, 'user.html', {'elapsed': elapsed, 'yahoo_link': yahoo_link, 'max_year_leagues': max_year_leagues_})
+    return redirect("/user/")
+
+
+def scrape_proj(request):
+    # if request.method == 'POST':
+    main_league = request.user.profile.leagues.get(league_key=request.user.profile.main_league)
+    now = datetime.now(pytz.utc)
+    if main_league.start_date > now:
+        batter_url = 'http://razzball.com/restofseason-hitterprojections/'
+        pitcher_url = 'http://razzball.com/restofseason-pitcherprojections/'
+    else:
+        batter_url = 'http://razzball.com/steamer-hitter-projections/'
+        pitcher_url = 'http://razzball.com/steamer-pitcher-projections/'
+    pull_players_html(request.user, main_league, batter_url, pitcher_url)
     return redirect("/user/")
 
 
@@ -124,7 +134,7 @@ def trade_projection(request):
 def projected_standings(request):
     if request.method == 'POST':
         proj_league_key = request.POST["proj_league_key"]
-        league = League.objects.get(league_key=proj_league_key)
+        league = request.user.profile.leagues.get(league_key=proj_league_key)
         projected_standings_ = final_standing_projection(league, request.user, TEAM_TOOLS_REDIRECT)
         return render(request, 'projected_standings.html', {'projected_standings': projected_standings_,
                                                             'redirect': TEAM_TOOLS_REDIRECT})
@@ -145,7 +155,7 @@ def all_keepers(request):
 def projected_keepers(request):
     if request.method == 'POST':
         proj_keepers_key = request.POST["proj_keepers_key"]
-        league_settings = League.objects.get(league_key=proj_keepers_key)
+        league_settings = request.user.profile.leagues.get(league_key=proj_keepers_key)
         proj_keepers = get_projected_keepers(proj_keepers_key, request.user, TEAM_TOOLS_REDIRECT)
         return render(request, 'projected_keepers.html', {'proj_keepers': proj_keepers,
                                                           'league_settings': league_settings,
@@ -179,7 +189,7 @@ def user_(request):
     max_year_leagues_ = max_year_leagues(request.user)
 
     try:
-        main_league = League.objects.get(league_key=request.user.profile.main_league)
+        main_league = request.user.profile.leagues.get(league_key=request.user.profile.main_league)
     except League.DoesNotExist:
         main_league = None
 

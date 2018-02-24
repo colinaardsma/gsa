@@ -9,6 +9,7 @@ from django.forms.models import model_to_dict
 from .advanced_stat_calc import avg_calc, std_dev_calc, z_score_calc, z_score_calc_era_whip
 from .csv_parser import parse_batters_from_csv, parse_pitchers_from_csv
 from .html_parser import fantasy_pro_players
+from .normalizer import name_normalizer
 
 
 def create_full_batter_html(url):
@@ -52,6 +53,8 @@ def calc_batter_z_score(batter_list, players_over_zero_dollars, one_dollar_playe
     else:
         batter_dict_list = batter_list
     for batter in batter_dict_list:
+        batter = additional_batter_categories(batter)
+
         run_list.append(batter['r'])
         hr_list.append(batter['hr'])
         rbi_list.append(batter['rbi'])
@@ -163,6 +166,36 @@ def calc_batter_z_score(batter_list, players_over_zero_dollars, one_dollar_playe
     # sorts by fvaaz (largest to smallest)
 
 
+def additional_batter_categories(batter):
+    if 'yahoo' in batter:
+        batter['pos'] = batter['yahoo']
+
+    for key, value in batter.items():
+        if not isinstance(value, list) and not isinstance(value, float) and not isinstance(value, int):
+            try:
+                batter[key] = float(value)
+            except ValueError:
+                pass
+
+    if not batter['pos']:
+        batter['pos'] = 'DH'
+    elif not isinstance(batter['pos'], list):
+        batter['pos'] = batter['pos'].split(',')
+    if 'normalized_first_name' not in batter:
+        norm_name = name_normalizer(batter['name'])
+        batter['normalized_first_name'] = norm_name['First']
+        batter['last_name'] = norm_name['Last']
+    if 'isFA' not in batter:
+        batter['isFA'] = False
+    if 'keeper' not in batter:
+        batter['keeper'] = 0.0
+    if 'category' not in batter:
+        batter['category'] = "batter"
+    if 'status' not in batter:
+        batter['status'] = ''
+    return batter
+
+
 def create_full_pitcher_html(url):
     """Create pitchers using html"""
     raw_pitcher_list = fantasy_pro_players(url)
@@ -208,14 +241,19 @@ def calc_pitcher_z_score(pitcher_list, players_over_zero_dollars, one_dollar_pla
     else:
         pitcher_dict_list = pitcher_list
     for pitcher in pitcher_dict_list:
+        pitcher = additional_pitcher_categories(pitcher)
+
         if (pitcher['w'] < 0 or pitcher['sv'] < 0 or pitcher['k'] < 0 or
                 pitcher['era'] < 0 or pitcher['whip'] < 0):
             continue
         win_list.append(pitcher['w'])
         sv_list.append(pitcher['sv'])
         k_list.append(pitcher['k'])
+        # TODO: is dividing by 15 the best route here?
         era_list.append(pitcher['era'])
         whip_list.append(pitcher['whip'])
+        # era_list.append(pitcher['era'] * (pitcher['ip'] / 15))
+        # whip_list.append(pitcher['whip'] * (pitcher['ip'] / 15))
     win_list_nlargest = heapq.nlargest(player_pool, win_list)
     sv_list_nlargest = heapq.nlargest(player_pool, sv_list)
     k_list_nlargest = heapq.nlargest(player_pool, k_list)
@@ -321,3 +359,36 @@ def calc_pitcher_z_score(pitcher_list, players_over_zero_dollars, one_dollar_pla
             pitcher['dollarValue'] = 0.0
     return sorted(pitcher_dict_list, key=operator.itemgetter('fvaaz'), reverse=True)
     # sorts by fvaaz (largest to smallest)
+
+
+def additional_pitcher_categories(pitcher):
+    for key, value in pitcher.items():
+        if not isinstance(value, list) and not isinstance(value, float) and not isinstance(value, int):
+            try:
+                pitcher[key] = float(value)
+            except ValueError:
+                pass
+
+    if not pitcher['pos']:
+        pitcher['pos'] = ['P']
+    elif not isinstance(pitcher['pos'], list):
+        pitcher['pos'] = pitcher['pos'].split(',')
+    if 'normalized_first_name' not in pitcher:
+        norm_name = name_normalizer(pitcher['name'])
+        pitcher['normalized_first_name'] = norm_name['First']
+        pitcher['last_name'] = norm_name['Last']
+    if 'isFA' not in pitcher:
+        pitcher['isFA'] = False
+    if 'keeper' not in pitcher:
+        pitcher['keeper'] = 0.0
+    if 'is_sp' not in pitcher:
+        pitcher['is_sp'] = True if 'SP' in pitcher['pos'] else False
+    if 'category' not in pitcher:
+        pitcher['category'] = "pitcher"
+    if 'kip' not in pitcher:
+        pitcher['kip'] = pitcher['k'] / pitcher['ip']
+    if 'winsip' not in pitcher:
+        pitcher['winsip'] = pitcher['w'] / pitcher['ip']
+    if 'status' not in pitcher:
+        pitcher['status'] = ''
+    return pitcher

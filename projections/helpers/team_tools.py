@@ -7,6 +7,7 @@ import pprint
 
 from .data_analysis import rate_fa, rate_team, single_player_rater_db, single_player_rater_html, final_stats_projection, league_volatility, rank_list, evaluate_keepers, trade_analyzer
 from .player_creator import calc_batter_z_score, calc_pitcher_z_score, create_full_batter_html, create_full_pitcher_html, create_full_batter_csv, create_full_pitcher_csv
+from .html_parser import scrape_razzball
 from ..models import BatterProjection, BatterValue, PitcherProjection, PitcherValue, save_batter, save_batter_values, save_pitcher, save_pitcher_values
 from leagues.helpers.yql_queries import get_league_settings, get_league_standings, get_all_team_rosters, get_keepers, get_players, get_single_team_roster
 from .keepers import project_keepers
@@ -320,16 +321,27 @@ def pull_pitchers(user, league, csv):
     # logging.info("\r\n***************\r\nPitcher Custom Valuation in %f seconds", elapsed)
 
 
-def pull_players(user, league, pitcher_csv, batter_csv):
+def pull_players_csv(user, league, pitcher_csv, batter_csv):
     start = time.time()
-    # pitcher_list = create_full_pitcher_html(ROS_PITCHER_URL)
-    # batter_list = create_full_batter_html(ROS_BATTER_URL)
     pitcher_list = create_full_pitcher_csv(user, league, pitcher_csv)
     batter_list = create_full_batter_csv(user, league, batter_csv)
     end = time.time()
     elapsed = end - start
     logging.info("\r\n***************\r\nPlayer Creation in %f seconds", elapsed)
+    pull_players_(user, league, pitcher_list, batter_list)
 
+
+def pull_players_html(user, league, batter_url, pitcher_url):
+    start = time.time()
+    batter_list = scrape_razzball(batter_url)
+    pitcher_list = scrape_razzball(pitcher_url)
+    end = time.time()
+    elapsed = end - start
+    logging.info("\r\n***************\r\nPlayer Creation in %f seconds", elapsed)
+    pull_players_(user, league, pitcher_list, batter_list)
+
+
+def pull_players_(user, league, pitcher_list, batter_list):
     # delete all records from database before rebuidling
     start = time.time()
     pitchers_to_delete = PitcherProjection.objects.all()

@@ -15,4 +15,5 @@ urlpatterns = [
     path('batting/', views.batting_projections, name='batting'),
     path('pitching/', views.pitching_projections, name='pitching'),
     path('user/', views.user_, name='user'),
+    path('scrape_proj/', views.scrape_proj, name='scrape_proj'),
 ]
