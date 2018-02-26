@@ -59,15 +59,14 @@ def get_token_(request):
     update_profile(request.user, yahoo_guid=yahoo_guid,
                    access_token=access_token, refresh_token=refresh_token,
                    token_expiration=token_expiration)
-    redirect = "/user"
 
-    update_leagues(request.user, redirect)
-    return render(request, 'index.html', {})
+    update_leagues(request.user, USER_REDIRECT)
+    return redirect(USER_REDIRECT)
 
 
 def get_leagues_(request):
     update_leagues(request.user, USER_REDIRECT)
-    return redirect('/user')
+    return redirect(USER_REDIRECT)
 
 
 def update_main_league(request):
@@ -78,7 +77,7 @@ def update_main_league(request):
     yahoo_link = request_auth(TOKEN_REDIRECT_PATH)
     max_year_leagues_ = max_year_leagues(request.user)
     # return render(request, 'user.html', {'yahoo_link': yahoo_link, 'elapsed': elapsed, 'max_year_leagues': max_year_leagues_})
-    return redirect("/user/")
+    return redirect(USER_REDIRECT)
 
 
 def main_page(request):
