@@ -14,8 +14,7 @@ ALLOWED_HOSTS = [
     'localhost',
     '10.211.55.2',
     'mbp',
-    #TODO: move this to environments
-    'grays-sports-almanac.us-west-2.elasticbeanstalk.com'
+    'grays-sports-almanac.us-west-2.elasticbeanstalk.com',    #TODO: move this to environments
 ]
 
 
