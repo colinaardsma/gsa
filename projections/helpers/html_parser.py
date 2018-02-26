@@ -5,6 +5,9 @@ from datetime import datetime
 from http.client import HTTPException
 import pytz
 from lxml import html, etree
+import re
+
+from .normalizer import name_normalizer, team_normalizer
 
 
 def html_to_document(url, headers=None):
@@ -147,6 +150,75 @@ def scrape_razzball(url):
     body_rows = [tr.xpath("descendant::a/text()|descendant::td/text()") for tr in table[0].xpath("descendant::tbody//tr")]
     projection_dict = [dict(zip(headers, player)) for player in body_rows]
     return projection_dict
+
+
+def scrape_razzball_batters(url):
+    batter_list = scrape_razzball(url)
+    for batter in batter_list:
+        if 'yahoo' in batter:
+            batter['pos'] = batter['yahoo']
+
+        for key, value in batter.items():
+            if not isinstance(value, list) and not isinstance(value, float) and not isinstance(value, int):
+                try:
+                    batter[key] = float(value)
+                except ValueError:
+                    pass
+
+        batter['team'] = team_normalizer(batter['team'])
+        if not batter['pos']:
+            batter['pos'] = 'DH'
+        elif not isinstance(batter['pos'], list):
+            batter['pos'] = re.split('\W+', batter['pos'])
+        if 'normalized_first_name' not in batter:
+            norm_name = name_normalizer(batter['name'])
+            batter['normalized_first_name'] = norm_name['First']
+            batter['last_name'] = norm_name['Last']
+        if 'isFA' not in batter:
+            batter['isFA'] = False
+        if 'keeper' not in batter:
+            batter['keeper'] = 0.0
+        if 'category' not in batter:
+            batter['category'] = "batter"
+        if 'status' not in batter:
+            batter['status'] = ''
+    return batter_list
+
+
+def scrape_razzball_pitchers(url):
+    pitcher_list = scrape_razzball(url)
+    for pitcher in pitcher_list:
+        for key, value in pitcher.items():
+            if not isinstance(value, list) and not isinstance(value, float) and not isinstance(value, int):
+                try:
+                    pitcher[key] = float(value)
+                except ValueError:
+                    pass
+
+        pitcher['team'] = team_normalizer(pitcher['team'])
+        if not pitcher['pos']:
+            pitcher['pos'] = ['P']
+        elif not isinstance(pitcher['pos'], list):
+            pitcher['pos'] = re.split('\W+', pitcher['pos'])
+        if 'normalized_first_name' not in pitcher:
+            norm_name = name_normalizer(pitcher['name'])
+            pitcher['normalized_first_name'] = norm_name['First']
+            pitcher['last_name'] = norm_name['Last']
+        if 'isFA' not in pitcher:
+            pitcher['isFA'] = False
+        if 'keeper' not in pitcher:
+            pitcher['keeper'] = 0.0
+        if 'is_sp' not in pitcher:
+            pitcher['is_sp'] = True if 'SP' in pitcher['pos'] else False
+        if 'category' not in pitcher:
+            pitcher['category'] = "pitcher"
+        if 'kip' not in pitcher:
+            pitcher['kip'] = pitcher['k'] / pitcher['ip']
+        if 'winsip' not in pitcher:
+            pitcher['winsip'] = pitcher['w'] / pitcher['ip']
+        if 'status' not in pitcher:
+            pitcher['status'] = ''
+    return pitcher_list
 
 
 def pretty_print_element(element):

@@ -86,16 +86,8 @@ def process_keepers(batter_dict_list, pitcher_dict_list, potential_keepers):
     orig_batter_pool = list(batter_dict_list)
     orig_pitcher_pool = list(pitcher_dict_list)
     processed_keepers = remove_projected_keepers(list(proj_keeper_dict_list), orig_batter_pool, orig_pitcher_pool)
-    # orig_batter_pool = 0
-    # orig_pitcher_pool = 0
-    # for player in batter_dict_list:
-    #     orig_batter_pool += 1
-    # for player in pitcher_dict_list:
-    #     orig_pitcher_pool += 1
     processed_keepers['batters_kept'] = len(batter_dict_list) - len(processed_keepers['remaining_batters'])
     processed_keepers['pitchers_kept'] = len(pitcher_dict_list) - len(processed_keepers['remaining_pitchers'])
-    # processed_keepers['batters_kept'] = 0
-    # processed_keepers['pitchers_kept'] = 0
     processed_keepers['projected_keepers'] = proj_keeper_dict_list
     processed_keepers['remaining_potential_keepers'] = evaluated_keepers
     return processed_keepers
@@ -134,7 +126,8 @@ def project_keepers(batter_projections_, pitcher_projections_, potential_keepers
     total_batters_kept = 0
     total_pitchers_kept = 0
 
-    passes = 2
+    # TODO: what is the best number of passes?
+    passes = 3
 
     batter_pool = batter_projections_
     pitcher_pool = pitcher_projections_
@@ -155,25 +148,25 @@ def run_keeper_passes(batter_pool, pitcher_pool, potential_keepers, total_dollar
     total_pitchers_kept += processed_keepers['pitchers_kept']
     b_over_zero_remaining = b_over_zero - processed_keepers['batters_kept']
     p_over_zero_remaining = p_over_zero - processed_keepers['pitchers_kept']
-    print("Pass %s" % passes)
-    print("Batters Over $0 Start:")
-    print(b_over_zero)
-    print("Total Batters Kept:")
-    print(total_batters_kept)
-    print("Current Batters Kept:")
-    print(processed_keepers['batters_kept'])
-    print("Batters Over $0 Remaining:")
-    print(b_over_zero_remaining)
-    print("#################################")
-    print("Pitchers Over $0 Start:")
-    print(p_over_zero)
-    print("Total Pitchers Kept:")
-    print(total_pitchers_kept)
-    print("Current Pitchers Kept:")
-    print(processed_keepers['pitchers_kept'])
-    print("Pitchers Over $0 Remaining:")
-    print(p_over_zero_remaining)
-    print("-----------------------------------------------")
+    # print("Pass %s" % passes)
+    # print("Batters Over $0 Start:")
+    # print(b_over_zero)
+    # print("Total Batters Kept:")
+    # print(total_batters_kept)
+    # print("Current Batters Kept:")
+    # print(processed_keepers['batters_kept'])
+    # print("Batters Over $0 Remaining:")
+    # print(b_over_zero_remaining)
+    # print("#################################")
+    # print("Pitchers Over $0 Start:")
+    # print(p_over_zero)
+    # print("Total Pitchers Kept:")
+    # print(total_pitchers_kept)
+    # print("Current Pitchers Kept:")
+    # print(processed_keepers['pitchers_kept'])
+    # print("Pitchers Over $0 Remaining:")
+    # print(p_over_zero_remaining)
+    # print("-----------------------------------------------")
     batter_pool_ = calc_batter_z_score(processed_keepers['remaining_batters'], b_over_zero_remaining, b_one_dollar,
                                        b_dollar_per_fvaaz, b_mult)
     pitcher_pool_ = calc_pitcher_z_score(processed_keepers['remaining_pitchers'], p_over_zero_remaining, p_one_dollar,

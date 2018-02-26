@@ -60,7 +60,7 @@ class BatterProjectionAdmin(admin.ModelAdmin):
     ]
     list_display = ('name', 'team', 'pos', 'status', 'dollarValue', 'fvaaz', 'ab', 'r', 'hr', 'rbi', 'sb', 'avg', 'ops')
     list_filter = [PosListFilter, 'team', ]
-    search_fields = ['pos']
+    search_fields = ['name']
 
     def get_ordering(self, request):
         return ['-fvaaz']
@@ -87,7 +87,7 @@ class PitcherProjectionAdmin(admin.ModelAdmin):
     list_display = ('name', 'team', 'pos', 'status', 'dollarValue', 'fvaaz', 'ip', 'w', 'sv', 'k', 'era', 'whip', 'kip',
                     'winsip')
     list_filter = [PosListFilter, 'team', ]
-    search_fields = ['pos']
+    search_fields = ['name']
 
     def get_ordering(self, request):
         return ['-fvaaz']
@@ -114,7 +114,7 @@ class BatterValueAdmin(admin.ModelAdmin):
     ]
     list_display = ('name', 'team', 'pos', 'dollarValue', 'fvaaz')
     list_filter = [PosListFilter, 'team', ]
-    search_fields = ['pos']
+    search_fields = ['name']
 
     def get_ordering(self, request):
         return ['user', 'league', '-fvaaz']
@@ -138,7 +138,7 @@ class PitcherValueAdmin(admin.ModelAdmin):
     ]
     list_display = ('name', 'team', 'pos', 'dollarValue', 'fvaaz')
     list_filter = [PosListFilter, 'team', ]
-    search_fields = ['pos']
+    search_fields = ['name']
 
     def get_ordering(self, request):
         return ['user', 'league', '-fvaaz']

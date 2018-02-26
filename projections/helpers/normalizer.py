@@ -33,7 +33,8 @@ def name_normalizer(full_name):
                  'rob': ['rob', 'robbie', 'bob', 'bobbie', 'bobby', 'robert'],
                  'sal': ['sal', 'salvador'],
                  'al': ['al', 'allen', 'alan', 'allan', 'albert'],
-                 'vince': ['vince', 'vincent']}
+                 'vince': ['vince', 'vincent'],
+                 'ed': ['ed', 'eddie', 'edward']}
     if full_name is None:
         return {'First': "", 'Last': "", 'Full': ""}
     original_full_name = str(full_name)

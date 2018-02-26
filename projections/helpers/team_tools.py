@@ -5,18 +5,21 @@ import logging
 import urllib
 import pprint
 
-from .data_analysis import rate_fa, rate_team, single_player_rater_db, single_player_rater_html, final_stats_projection, league_volatility, rank_list, evaluate_keepers, trade_analyzer
-from .player_creator import calc_batter_z_score, calc_pitcher_z_score, create_full_batter_html, create_full_pitcher_html, create_full_batter_csv, create_full_pitcher_csv
-from .html_parser import scrape_razzball
-from ..models import BatterProjection, BatterValue, PitcherProjection, PitcherValue, save_batter, save_batter_values, save_pitcher, save_pitcher_values
-from leagues.helpers.yql_queries import get_league_settings, get_league_standings, get_all_team_rosters, get_keepers, get_players, get_single_team_roster
+from .data_analysis import rate_fa, rate_team, single_player_rater_db, single_player_rater_html, final_stats_projection, \
+    league_volatility, rank_list, evaluate_keepers, trade_analyzer
+from .player_creator import calc_batter_z_score, calc_pitcher_z_score, create_full_batter_html, \
+    create_full_pitcher_html, create_full_batter_csv, create_full_pitcher_csv
+from .html_parser import scrape_razzball_batters, scrape_razzball_pitchers
+from ..models import BatterProjection, BatterValue, PitcherProjection, PitcherValue, save_batter, save_batter_values, \
+    save_pitcher, save_pitcher_values
+from leagues.helpers.yql_queries import get_league_settings, get_league_standings, get_all_team_rosters, get_keepers, \
+    get_players, get_single_team_roster
 from .keepers import project_keepers
 from leagues.models import League, update_league
 
-
 # static variables
 
-#TODO: replace these with db calls
+# TODO: replace these with db calls
 BATTERS_OVER_ZERO_DOLLARS = 176
 PITCHERS_OVER_ZERO_DOLLARS = 124
 ONE_DOLLAR_BATTERS = 30
@@ -79,15 +82,27 @@ def final_standing_projection(league, user, redirect):
     ros_proj_b_list = BatterProjection.objects.all()
     ros_proj_p_list = PitcherProjection.objects.all()
     rosters = get_all_team_rosters(league.league_key, user, redirect)
-    return standing_projection(league, user, redirect, rosters, ros_proj_b_list, ros_proj_p_list)
+    sgp_dict = create_sgp_dict(league)
+    return standing_projection(league, user, redirect, rosters, ros_proj_b_list, ros_proj_p_list, sgp_dict)
 
 
 def keeper_standing_projection(league, user, redirect, projected_keepers, ros_proj_b_list, ros_proj_p_list):
     rosters = keeper_to_roster_converter(projected_keepers['projected_keepers'])
-    return standing_projection(league, user, redirect, rosters, ros_proj_b_list, ros_proj_p_list)
+    keeper_sgp_dict = {'R SGP': (league.r_sgp_avg or league.r_sgp) / len(league.batting_pos),
+                       'HR SGP': (league.hr_sgp_avg or league.hr_sgp) / len(league.batting_pos),
+                       'RBI SGP': (league.rbi_sgp_avg or league.rbi_sgp) / len(league.batting_pos),
+                       'SB SGP': (league.sb_sgp_avg or league.sb_sgp) / len(league.batting_pos),
+                       'OPS SGP': league.ops_sgp_avg or league.ops_sgp, 'AVG SGP': league.avg_sgp_avg or league.avg_sgp,
+                       'W SGP': (league.w_sgp_avg or league.w_sgp) / len(league.pitcher_pos),
+                       'SV SGP': (league.sv_sgp_avg or league.sv_sgp) / len(league.pitcher_pos),
+                       'K SGP': (league.k_sgp_avg or league.k_sgp) / len(league.pitcher_pos),
+                       'ERA SGP': league.era_sgp_avg or league.era_sgp,
+                       'WHIP SGP': league.whip_sgp_avg or league.whip_sgp}
+
+    return standing_projection(league, user, redirect, rosters, ros_proj_b_list, ros_proj_p_list, keeper_sgp_dict)
 
 
-def standing_projection(league, user, redirect, rosters, ros_proj_b_list, ros_proj_p_list):
+def standing_projection(league, user, redirect, rosters, ros_proj_b_list, ros_proj_p_list, sgp_dict):
     """Returns projection of final standings for league based on\n
     current standings and team projections\n
     Args:\n
@@ -100,18 +115,19 @@ def standing_projection(league, user, redirect, rosters, ros_proj_b_list, ros_pr
     draft_status, current_standings = get_league_standings(league.league_key, user, redirect)
     league = update_league(league, draft_status=draft_status)
 
-    # TODO: move to method for reuse
-    sgp_dict = {'R SGP': league.r_sgp_avg or league.r_sgp, 'HR SGP': league.hr_sgp_avg or league.hr_sgp,
-                'RBI SGP': league.rbi_sgp_avg or league.rbi_sgp, 'SB SGP': league.sb_sgp_avg or league.sb_sgp,
-                'OPS SGP': league.ops_sgp_avg or league.ops_sgp, 'AVG SGP': league.avg_sgp_avg or league.avg_sgp,
-                'W SGP': league.w_sgp_avg or league.w_sgp, 'SV SGP': league.sv_sgp_avg or league.sv_sgp,
-                'K SGP': league.k_sgp_avg or league.k_sgp, 'ERA SGP': league.era_sgp_avg or league.era_sgp,
-                'WHIP SGP': league.whip_sgp_avg or league.whip_sgp}
-
     final_stats = final_stats_projection(rosters, ros_proj_b_list, ros_proj_p_list, current_standings, league)
     volatility_standings = league_volatility(sgp_dict, final_stats)
     ranked_standings = rank_list(volatility_standings)
     return ranked_standings
+
+
+def create_sgp_dict(league):
+    return {'R SGP': league.r_sgp_avg or league.r_sgp, 'HR SGP': league.hr_sgp_avg or league.hr_sgp,
+            'RBI SGP': league.rbi_sgp_avg or league.rbi_sgp, 'SB SGP': league.sb_sgp_avg or league.sb_sgp,
+            'OPS SGP': league.ops_sgp_avg or league.ops_sgp, 'AVG SGP': league.avg_sgp_avg or league.avg_sgp,
+            'W SGP': league.w_sgp_avg or league.w_sgp, 'SV SGP': league.sv_sgp_avg or league.sv_sgp,
+            'K SGP': league.k_sgp_avg or league.k_sgp, 'ERA SGP': league.era_sgp_avg or league.era_sgp,
+            'WHIP SGP': league.whip_sgp_avg or league.whip_sgp}
 
 
 def keeper_to_roster_converter(keeper_dict):
@@ -173,8 +189,8 @@ def get_projected_keepers(league_key, user, redirect):
     league = League.objects.get(league_key=league_key)
     potential_keepers = get_keepers(league_key, league, user, redirect)
     projected_keepers = project_keepers(ros_proj_b_list, ros_proj_p_list, potential_keepers, league)
-
-    # auction_needs = analyze_auction_needs(league, user, redirect, projected_keepers, ros_proj_b_list,ros_proj_p_list)
+    auction_needs = analyze_auction_needs(league, user, redirect, projected_keepers, ros_proj_b_list, ros_proj_p_list)
+    # pprint.pprint(auction_needs)
 
     end = time.time()
     elapsed = end - start
@@ -190,6 +206,8 @@ def analyze_auction_needs(league, user, redirect, projected_keepers, ros_proj_b_
         new_league = league
     standings = keeper_standing_projection(new_league, user, redirect, projected_keepers, ros_proj_b_list,
                                            ros_proj_p_list)
+    # pprint.pprint(standings)
+    league_needs = []
     for std_team in standings:
         for keeper_team_name, keeper_team_values in projected_keepers['projected_keepers'].items():
             if [mg for mg in std_team['manager_guids'] if mg in keeper_team_values['manager_guids']]:
@@ -208,8 +226,9 @@ def analyze_auction_needs(league, user, redirect, projected_keepers, ros_proj_b_
                          'rbi_avg': std_team['StatsRBI'] / batters, 'sb_avg': std_team['StatsSB'] / batters,
                          'sv_avg': std_team['StatsSV'] / pitchers, 'total_gp': std_team['StatsTotalGP'],
                          'w_avg': std_team['StatsW'] / pitchers, 'whip': std_team['StatsWHIP']}
+                league_needs.append(needs)
 
-    # pprint.pprint(standings)
+    return league_needs
 
 
 def trade_analyzer_(league_key, user, redirect, team_a, team_a_players, team_b, team_b_players, team_list):
@@ -221,12 +240,7 @@ def trade_analyzer_(league_key, user, redirect, team_a, team_a_players, team_b, 
     league = user.profile.leagues.get(league_key=league_key)
     update_league(league, status=league_status)
 
-    sgp_dict = {'R SGP': league.r_sgp_avg or league.r_sgp, 'HR SGP': league.hr_sgp_avg or league.hr_sgp,
-                'RBI SGP': league.rbi_sgp_avg or league.rbi_sgp, 'SB SGP': league.sb_sgp_avg or league.sb_sgp,
-                'OPS SGP': league.ops_sgp_avg or league.ops_sgp, 'AVG SGP': league.avg_sgp_avg or league.avg_sgp,
-                'W SGP': league.w_sgp_avg or league.w_sgp, 'SV SGP': league.sv_sgp_avg or league.sv_sgp,
-                'K SGP': league.k_sgp_avg or league.k_sgp, 'ERA SGP': league.era_sgp_avg or league.era_sgp,
-                'WHIP SGP': league.whip_sgp_avg or league.whip_sgp}
+    sgp_dict = create_sgp_dict(league)
 
     new_standings = trade_analyzer(team_a, team_a_players, team_b, team_b_players, team_list, ros_proj_b_list,
                                    ros_proj_p_list, current_standings, league_settings, sgp_dict)
@@ -333,8 +347,8 @@ def pull_players_csv(user, league, pitcher_csv, batter_csv):
 
 def pull_players_html(user, league, batter_url, pitcher_url):
     start = time.time()
-    batter_list = scrape_razzball(batter_url)
-    pitcher_list = scrape_razzball(pitcher_url)
+    batter_list = scrape_razzball_batters(batter_url)
+    pitcher_list = scrape_razzball_pitchers(pitcher_url)
     end = time.time()
     elapsed = end - start
     logging.info("\r\n***************\r\nPlayer Creation in %f seconds", elapsed)

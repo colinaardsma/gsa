@@ -155,8 +155,7 @@ def batting_roster_optimizer(team_dict, ros_projection_list, league_pos_dict):
         for player in team_player_list:
             if pos == "C" and "CF" in player.pos:
                 continue
-            elif pos in player.pos or (pos == "OF" and ("RF" in player.pos
-                                                        or "LF" in player.pos
+            elif pos in player.pos or (pos == "OF" and ("RF" in player.pos or "LF" in player.pos
                                                         or "CF" in player.pos)):
                 if pos not in pos_elig_dict:
                     pos_elig_dict[pos] = 1
@@ -179,13 +178,11 @@ def batting_roster_optimizer(team_dict, ros_projection_list, league_pos_dict):
             player = team_player_list[i]
             if pos == "C" and "CF" in player.pos:
                 i += 1
-            elif pos in player.pos or pos == "Util" or (pos == "OF" and ("RF" in player.pos
-                                                                         or "LF" in player.pos
+            elif pos in player.pos or pos == "Util" or (pos == "OF" and ("RF" in player.pos or "LF" in player.pos
                                                                          or "CF" in player.pos)):
                 if multi_pos is True or batting_pos_scarc_elig.count(pos) > 1:
                     multi_pos = True
-                    if (pos in starting_batters and len(starting_batters[pos]) <
-                            batting_pos_scarc_elig.count(pos)):
+                    if (pos in starting_batters and len(starting_batters[pos]) < batting_pos_scarc_elig.count(pos)):
                         starting_batters[pos].append(player)
                         del team_player_list[i]
                     elif pos not in starting_batters:
@@ -681,32 +678,45 @@ def trade_analyzer(team_a, team_a_players, team_b, team_b_players, team_list, ro
 def evaluate_keepers(keepers, ros_proj_b_list, ros_proj_p_list):
     for keeper in keepers:
         for player in keeper['roster']:
-            norm_player_name = name_normalizer(player['full_name'])
+            value = 0.0
+            pos = []
             value_window = player['keeper_cost'] * 0.10
             if isinstance(ros_proj_b_list[0], dict):
                 if player['category'] == 'batter':
-                    value = [x['dollarValue'] for x in ros_proj_b_list
-                             if x['normalized_first_name'] == norm_player_name['First']
-                             and x['last_name'] == norm_player_name['Last']]
-                    player['value'] = value[0] if value else 0.00
+                    for batter in ros_proj_b_list:
+                        if (player['first_name'] == batter['normalized_first_name']
+                                and player['last_name'] == batter['last_name']):
+                            value = batter['dollarValue']
+                            pos = batter['pos']
+                    player['value'] = value or 0.00
+                    player['positions'] = pos or player['positions']
                     player['worth_keeping'] = player['value'] - player['keeper_cost'] >= -value_window
                 else:
-                    value = [x['dollarValue'] for x in ros_proj_p_list
-                             if x['normalized_first_name'] == norm_player_name['First']
-                             and x['last_name'] == norm_player_name['Last']]
-                    player['value'] = value[0] if value else 0.00
-                    player['worth_keeping'] = player['value'] - player['keeper_cost'] >= -value_window
+                    for pitcher in ros_proj_p_list:
+                        if (player['first_name'] == pitcher['normalized_first_name']
+                                and player['last_name'] == pitcher['last_name']):
+                            value = pitcher['dollarValue']
+                            pos = pitcher['pos']
+                        player['value'] = value or 0.00
+                        player['positions'] = pos or player['positions']
+                        player['worth_keeping'] = player['value'] - player['keeper_cost'] >= -value_window
             else:
                 if player['category'] == 'batter':
-                    value = [x.dollarValue for x in ros_proj_b_list
-                             if x.normalized_first_name == norm_player_name['First']
-                             and x.last_name == norm_player_name['Last']]
-                    player['value'] = value[0] if value else 0.00
-                    player['worth_keeping'] = player['value'] - player['keeper_cost'] >= -value_window
+                    for batter in ros_proj_b_list:
+                        if (player['first_name'] == batter.normalized_first_name
+                                and player['last_name'] == batter.last_name):
+                            value = batter.dollarValue
+                            pos = batter.pos
+                        player['value'] = value or 0.00
+                        player['positions'] = pos or player['positions']
+                        player['worth_keeping'] = player['value'] - player['keeper_cost'] >= -value_window
                 else:
-                    value = [x.dollarValue for x in ros_proj_p_list
-                             if x.normalized_first_name == norm_player_name['First']
-                             and x.last_name == norm_player_name['Last']]
-                    player['value'] = value[0] if value else 0.00
-                    player['worth_keeping'] = player['value'] - player['keeper_cost'] >= -value_window
+                    for pitcher in ros_proj_b_list:
+                        if (player['first_name'] == pitcher.normalized_first_name
+                                and player['last_name'] == pitcher.last_name):
+                            value = pitcher.dollarValue
+                            pos = pitcher.pos
+                        player['value'] = value or 0.00
+                        player['positions'] = pos or player['positions']
+                        player['worth_keeping'] = player['value'] - player['keeper_cost'] >= -value_window
     return keepers

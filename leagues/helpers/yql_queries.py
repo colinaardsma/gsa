@@ -546,8 +546,8 @@ def get_current_rosters(league_key, user, redirect):
             ascii_last_name = player_dict['name']['ascii_last']
             normalized_name = name_normalizer(ascii_first_name + ' ' + ascii_last_name)
             player['full_name'] = normalized_name['Full']
-            player['first_name'] = ascii_first_name
-            player['last_name'] = ascii_last_name
+            player['first_name'] = normalized_name['First']
+            player['last_name'] = normalized_name['Last']
             if 'status_full' in player_dict:
                 player['status'] = player_dict['status_full']
             else:
