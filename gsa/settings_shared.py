@@ -122,8 +122,8 @@ STATIC_ROOT = '/static/'
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'gsa', 'static'),
-    '/var/www/static/',
-    os.path.join('static'),
+    # '/var/www/static/',
+    # os.path.join('static'),
 ]
 
 STATICFILES_FINDERS = (
