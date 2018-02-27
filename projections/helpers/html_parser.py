@@ -1,6 +1,6 @@
 """Projection HTML Parsing"""
 import unicodedata
-import urllib
+from urllib import request, parse
 from datetime import datetime
 from http.client import HTTPException
 import pytz
@@ -19,10 +19,10 @@ def html_to_document(url, headers=None):
     Raises:\n
         None.
     """
-    request = urllib.request.Request(url, headers=headers)
+    req = request.Request(url, headers=headers)
     while True:
         try:
-            content = urllib.request.urlopen(request).read().decode('utf-8')
+            content = request.urlopen(req).read().decode('utf-8')
         except HTTPException:
             print(HTTPException)
             continue

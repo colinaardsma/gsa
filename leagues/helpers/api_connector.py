@@ -5,7 +5,7 @@ Functions:\n
 import base64
 from datetime import datetime, timezone, timedelta
 import json
-import urllib
+from urllib import parse, request
 from http.client import HTTPException
 import logging
 
@@ -29,14 +29,14 @@ def request_auth(redirect_path):
         None.
     """
     url = 'https://api.login.yahoo.com/oauth2/request_auth'
-    parameters = urllib.parse.urlencode({
+    parameters = parse.urlencode({
         'client_id': CLIENT_ID,
         'redirect_uri': REDIRECT_URI + redirect_path,
         'response_type': 'code'
     })
     url += '?' + parameters
-    request = urllib.request.Request(url)
-    content = urllib.request.urlopen(request)
+    req = request.Request(url)
+    content = request.urlopen(req)
     return content.url
 
 
@@ -57,13 +57,13 @@ def get_token(authorization_code, redirect_path):
         b'Authorization': b'Basic ' + auth_header,
         b'Content-Type': b'application/x-www-form-urlencoded'
     }
-    body = urllib.parse.urlencode({
+    body = parse.urlencode({
         'grant_type': 'authorization_code',
         'redirect_uri': REDIRECT_URI + redirect_path,
         'code': authorization_code
     }).encode('utf-8')
-    request = urllib.request.Request(url, data=body, headers=headers)
-    content = urllib.request.urlopen(request)
+    req = request.Request(url, data=body, headers=headers)
+    content = request.urlopen(req)
     raw_json = content.read()
     return raw_json
 
@@ -93,10 +93,10 @@ def get_json_data(url, access_token):
 
 def get_xml_data(url, access_token):
     headers = {b'Authorization': b'Bearer ' + access_token.encode('utf-8'), b'request': b'None'}
-    request = urllib.request.Request(url, headers=headers)
+    req = request.Request(url, headers=headers)
     while True:
         try:
-            content = urllib.request.urlopen(request)
+            content = request.urlopen(req)
             raw_xml = content.read()
         except HTTPException as error:
             print(error)
@@ -126,13 +126,13 @@ def check_token_expiration(user, redirect_path):
         b'Authorization': b'Basic ' + auth_header,
         b'Content-Type': b'application/x-www-form-urlencoded'
     }
-    body = urllib.parse.urlencode({
+    body = parse.urlencode({
         'grant_type': 'refresh_token',
         'redirect_uri': REDIRECT_URI + redirect_path,
         'refresh_token': user.profile.refresh_token
     }).encode('utf-8')
-    request = urllib.request.Request(url, data=body, headers=headers)
-    content = urllib.request.urlopen(request)
+    req = request.Request(url, data=body, headers=headers)
+    content = request.urlopen(req)
     token_json = content.read()
     token_dict = json.loads(token_json)
     # print token_dict
