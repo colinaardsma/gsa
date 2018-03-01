@@ -174,6 +174,44 @@ def run_keeper_passes(batter_pool, pitcher_pool, potential_keepers, total_dollar
     all_projected_keepers.extend(processed_keepers['projected_keepers'])
     potential_keepers_ = processed_keepers['remaining_potential_keepers']
 
+    # TODO: none of this works well, may be a bad idea to begin with
+    # old_batter_total_dollar_value = 0.0
+    # old_pitcher_total_dollar_value = 0.0
+    #
+    # if isinstance(batter_pool[0], dict):
+    #     for batter in batter_pool:
+    #         old_batter_total_dollar_value += batter['dollarValue']
+    #     for pitcher in pitcher_pool:
+    #         old_pitcher_total_dollar_value += pitcher['dollarValue']
+    # else:
+    #     for batter in batter_pool:
+    #         old_batter_total_dollar_value += batter.dollarValue
+    #     for pitcher in pitcher_pool:
+    #         old_pitcher_total_dollar_value += pitcher.dollarValue
+    #
+    # old_batter_avg_dollar_value = old_batter_total_dollar_value / len(batter_pool)
+    # old_pitcher_avg_dollar_value = old_pitcher_total_dollar_value / len(pitcher_pool)
+    #
+    # new_batter_total_dollar_value = 0.0
+    # new_pitcher_total_dollar_value = 0.0
+    #
+    # for batter in batter_pool_:
+    #     new_batter_total_dollar_value += batter['dollarValue']
+    # for pitcher in pitcher_pool_:
+    #     new_pitcher_total_dollar_value += pitcher['dollarValue']
+    #
+    # new_batter_avg_dollar_value = new_batter_total_dollar_value / len(batter_pool_)
+    # new_pitcher_avg_dollar_value = new_pitcher_total_dollar_value / len(pitcher_pool_)
+    #
+    # batter_dollar_value_mult = old_batter_avg_dollar_value / new_batter_avg_dollar_value
+    # pitcher_dollar_value_mult = old_pitcher_avg_dollar_value / new_pitcher_avg_dollar_value
+    #
+    # for player in all_projected_keepers:
+    #     if player['category'] == 'batter':
+    #         player['value'] *= batter_dollar_value_mult
+    #     elif player['category'] == 'pitcher':
+    #         player['value'] *= pitcher_dollar_value_mult
+
     while passes > 0:
         passes -= 1
         if passes == 0:

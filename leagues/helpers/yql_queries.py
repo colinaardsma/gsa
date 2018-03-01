@@ -535,38 +535,39 @@ def get_current_rosters(league_key, user, redirect):
 
         roster = []
         roster_dict = team_data[1]['roster']['0']['players']
-        roster_count = roster_dict['count']
-        for j in range(roster_count):
-            player = {}
-            player_data = roster_dict['{}'.format(j)]['player'][0]
-            player_dict = dict([(key, dct[key]) for dct in player_data for key in dct])
+        if 'count' in roster_dict:
+            roster_count = roster_dict['count']
+            for j in range(roster_count):
+                player = {}
+                player_data = roster_dict['{}'.format(j)]['player'][0]
+                player_dict = dict([(key, dct[key]) for dct in player_data for key in dct])
 
-            player['player_key'] = player_dict['player_key']
-            ascii_first_name = player_dict['name']['ascii_first']
-            ascii_last_name = player_dict['name']['ascii_last']
-            normalized_name = name_normalizer(ascii_first_name + ' ' + ascii_last_name)
-            player['full_name'] = normalized_name['Full']
-            player['first_name'] = normalized_name['First']
-            player['last_name'] = normalized_name['Last']
-            if 'status_full' in player_dict:
-                player['status'] = player_dict['status_full']
-            else:
-                player['status'] = ''
-            player_team = player_dict['editorial_team_abbr']
-            player['team'] = team_normalizer(player_team)
-            player['category'] = 'pitcher'
-            if 'position_type' in player_dict:
-                if player_dict['position_type'] == 'B':
-                    player['category'] = 'batter'
-            if 'eligible_positions' in player_dict:
-                positions = player_dict['eligible_positions']
-            position_list = []
-            for position in positions:
-                pos = position['position']
-                position_list.append(pos)
-            player['positions'] = position_list
-            roster.append(player)
-        team['roster'] = roster
+                player['player_key'] = player_dict['player_key']
+                ascii_first_name = player_dict['name']['ascii_first']
+                ascii_last_name = player_dict['name']['ascii_last']
+                normalized_name = name_normalizer(ascii_first_name + ' ' + ascii_last_name)
+                player['full_name'] = normalized_name['Full']
+                player['first_name'] = normalized_name['First']
+                player['last_name'] = normalized_name['Last']
+                if 'status_full' in player_dict:
+                    player['status'] = player_dict['status_full']
+                else:
+                    player['status'] = ''
+                player_team = player_dict['editorial_team_abbr']
+                player['team'] = team_normalizer(player_team)
+                player['category'] = 'pitcher'
+                if 'position_type' in player_dict:
+                    if player_dict['position_type'] == 'B':
+                        player['category'] = 'batter'
+                if 'eligible_positions' in player_dict:
+                    positions = player_dict['eligible_positions']
+                position_list = []
+                for position in positions:
+                    pos = position['position']
+                    position_list.append(pos)
+                player['positions'] = position_list
+                roster.append(player)
+            team['roster'] = roster
         current_rosters.append(team)
     return current_rosters
 
@@ -626,11 +627,23 @@ def get_league_transactions(league_key, user, redirect):
     return transactions
 
 
-def get_keepers(league_key, league, user, redirect):
-    current_rosters = get_current_rosters(league_key, user, redirect)
-    auction_results = get_auction_results(league_key, user, redirect)
-    league_transactions = get_league_transactions(league_key, user, redirect)
+def get_keepers(league, user, redirect):
+    current_rosters = get_current_rosters(league.league_key, user, redirect)
+    auction_results = get_auction_results(league.league_key, user, redirect)
+    league_transactions = get_league_transactions(league.league_key, user, redirect)
+    list_of_managers = []
+    try:
+        new_league = user.profile.leagues.get(prev_year_key=league.league_key)
+        new_current_rosters = get_current_rosters(new_league.league_key, user, redirect)
+        for team in new_current_rosters:
+            list_of_managers.extend(team['manager_guids'])
+    except ModuleNotFoundError:
+        for team in current_rosters:
+            list_of_managers.extend(team['manager_guids'])
+    teams_to_remove = []
     for team in current_rosters:
+        if not [mg for mg in team['manager_guids'] if mg in list_of_managers]:
+            teams_to_remove.append(team)
         for player in team['roster']:
             # TODO: this is super custom
             player['keeper_cost'] = 5
@@ -694,6 +707,7 @@ def get_keepers(league_key, league, user, redirect):
                 player['keeper_cost'] += [int(result['cost']) for result in auction_results['results']
                                           if result['player_key'] == player['player_key']][0]
                 player['keeper_found'] = True
+    current_rosters = [team for team in current_rosters if team not in teams_to_remove]
     return current_rosters
 
 

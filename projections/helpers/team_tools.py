@@ -152,7 +152,7 @@ def get_keeper_costs(league_key, user, redirect):
         None.
     """
     league = League.objects.get(league_key=league_key)
-    keepers = get_keepers(league_key, league, user, redirect)
+    keepers = get_keepers(league, user, redirect)
     return keepers
 
 
@@ -187,7 +187,7 @@ def get_projected_keepers(league_key, user, redirect):
     ros_proj_b_list = BatterProjection.objects.all()
     ros_proj_p_list = PitcherProjection.objects.all()
     league = League.objects.get(league_key=league_key)
-    potential_keepers = get_keepers(league_key, league, user, redirect)
+    potential_keepers = get_keepers(league, user, redirect)
     projected_keepers = project_keepers(ros_proj_b_list, ros_proj_p_list, potential_keepers, league)
     auction_needs = analyze_auction_needs(league, user, redirect, projected_keepers, ros_proj_b_list, ros_proj_p_list)
     # pprint.pprint(auction_needs)
