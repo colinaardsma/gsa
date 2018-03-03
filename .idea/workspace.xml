@@ -2,179 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="38537363-6b01-480c-b22e-f0b737bd9ad4" name="Default" comment="">
-      <change beforePath="" afterPath="$PROJECT_DIR$/.bash_profile" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/.gitignore" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/css/autocomplete.css" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/css/base.css" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/css/changelists.css" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/css/dashboard.css" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/css/fonts.css" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/css/forms.css" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/css/login.css" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/css/responsive.css" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/css/responsive_rtl.css" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/css/rtl.css" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/css/vendor/select2/LICENSE-SELECT2.md" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/css/vendor/select2/select2.css" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/css/vendor/select2/select2.min.css" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/css/widgets.css" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/fonts/LICENSE.txt" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/fonts/README.txt" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/fonts/Roboto-Bold-webfont.woff" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/fonts/Roboto-Light-webfont.woff" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/fonts/Roboto-Regular-webfont.woff" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/img/LICENSE" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/img/README.txt" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/img/calendar-icons.svg" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/img/gis/move_vertex_off.svg" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/img/gis/move_vertex_on.svg" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/img/icon-addlink.svg" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/img/icon-alert.svg" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/img/icon-calendar.svg" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/img/icon-changelink.svg" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/img/icon-clock.svg" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/img/icon-deletelink.svg" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/img/icon-no.svg" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/img/icon-unknown-alt.svg" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/img/icon-unknown.svg" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/img/icon-yes.svg" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/img/inline-delete.svg" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/img/search.svg" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/img/selector-icons.svg" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/img/sorting-icons.svg" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/img/tooltag-add.svg" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/img/tooltag-arrowright.svg" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/SelectBox.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/SelectFilter2.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/actions.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/actions.min.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/admin/DateTimeShortcuts.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/admin/RelatedObjectLookups.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/autocomplete.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/calendar.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/cancel.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/change_form.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/collapse.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/collapse.min.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/core.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/inlines.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/inlines.min.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/jquery.init.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/popup_response.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/prepopulate.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/prepopulate.min.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/prepopulate_init.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/timeparse.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/urlify.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/jquery/LICENSE-JQUERY.txt" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/jquery/jquery.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/jquery/jquery.min.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/LICENSE-SELECT2.md" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/i18n/ar.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/i18n/az.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/i18n/bg.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/i18n/ca.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/i18n/cs.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/i18n/da.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/i18n/de.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/i18n/el.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/i18n/en.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/i18n/es.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/i18n/et.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/i18n/eu.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/i18n/fa.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/i18n/fi.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/i18n/fr.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/i18n/gl.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/i18n/he.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/i18n/hi.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/i18n/hr.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/i18n/hu.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/i18n/id.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/i18n/is.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/i18n/it.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/i18n/ja.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/i18n/km.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/i18n/ko.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/i18n/lt.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/i18n/lv.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/i18n/mk.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/i18n/ms.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/i18n/nb.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/i18n/nl.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/i18n/pl.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/i18n/pt-BR.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/i18n/pt.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/i18n/ro.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/i18n/ru.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/i18n/sk.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/i18n/sr-Cyrl.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/i18n/sr.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/i18n/sv.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/i18n/th.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/i18n/tr.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/i18n/uk.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/i18n/vi.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/i18n/zh-CN.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/i18n/zh-TW.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/select2.full.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/select2/select2.full.min.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/xregexp/LICENSE-XREGEXP.txt" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/xregexp/xregexp.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/admin/js/vendor/xregexp/xregexp.min.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/assets/brand/bootstrap-outline.svg" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/assets/brand/bootstrap-punchout.svg" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/assets/brand/bootstrap-solid.svg" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/assets/css/docs.min.css" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/assets/css/docs.min.css.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/assets/css/ie10-viewport-bug-workaround.css" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/assets/css/src/docs.css" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/assets/css/src/pygments-manni.css" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/assets/flash/ZeroClipboard.swf" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/assets/img/components.png" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/assets/img/devices.png" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/assets/img/expo-lyft.jpg" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/assets/img/expo-newsweek.jpg" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/assets/img/expo-riot.jpg" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/assets/img/expo-vogue.jpg" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/assets/img/sass-less.png" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/assets/js/customize.min.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/assets/js/docs.min.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/assets/js/ie-emulation-modes-warning.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/assets/js/ie10-viewport-bug-workaround.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/assets/js/ie8-responsive-file-warning.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/assets/js/raw-files.min.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/assets/js/src/application.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/assets/js/src/customizer.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/assets/js/vendor/Blob.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/assets/js/vendor/FileSaver.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/assets/js/vendor/ZeroClipboard.min.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/assets/js/vendor/anchor.min.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/assets/js/vendor/autoprefixer.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/assets/js/vendor/holder.min.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/assets/js/vendor/jquery.min.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/assets/js/vendor/jszip.min.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/assets/js/vendor/less.min.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/assets/js/vendor/uglify.min.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/dist/css/bootstrap-theme.css" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/dist/css/bootstrap-theme.css.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/dist/css/bootstrap-theme.min.css" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/dist/css/bootstrap-theme.min.css.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/dist/css/bootstrap.css" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/dist/css/bootstrap.css.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/dist/css/bootstrap.min.css" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/dist/css/bootstrap.min.css.map" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/dist/fonts/glyphicons-halflings-regular.eot" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/dist/fonts/glyphicons-halflings-regular.svg" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/dist/fonts/glyphicons-halflings-regular.ttf" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/dist/fonts/glyphicons-halflings-regular.woff" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/dist/fonts/glyphicons-halflings-regular.woff2" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/dist/js/bootstrap.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/dist/js/bootstrap.min.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/dist/js/npm.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/static/styles/signin.css" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change beforePath="$PROJECT_DIR$/gsa/settings.py" afterPath="$PROJECT_DIR$/gsa/settings.py" />
+      <change beforePath="$PROJECT_DIR$/static/admin/fonts/LICENSE.txt" afterPath="$PROJECT_DIR$/static/admin/fonts/LICENSE.txt" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -198,8 +29,8 @@
       <file leaf-file-name="settings.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/gsa/settings.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="30">
-              <caret line="2" column="19" lean-forward="true" selection-start-line="2" selection-start-column="19" selection-end-line="2" selection-end-column="19" />
+            <state relative-caret-position="567">
+              <caret line="39" column="0" lean-forward="true" selection-start-line="39" selection-start-column="0" selection-end-line="39" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -289,6 +120,7 @@
         <option value="$PROJECT_DIR$/.ebextensions/django.config" />
         <option value="$PROJECT_DIR$/projections/helpers/team_tools.py" />
         <option value="$PROJECT_DIR$/gsa/settings.staging.py" />
+        <option value="$PROJECT_DIR$/.gitignore" />
       </list>
     </option>
   </component>
@@ -533,7 +365,14 @@
       <option name="project" value="LOCAL" />
       <updated>1520051250942</updated>
     </task>
-    <option name="localTasksCounter" value="21" />
+    <task id="LOCAL-00021" summary="updates for aws">
+      <created>1520051966741</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1520051966741</updated>
+    </task>
+    <option name="localTasksCounter" value="22" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -681,20 +520,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/.bash_profile">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/.gitignore">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/projections/views.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2774">
@@ -782,14 +607,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/.elasticbeanstalk/config.yml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="45">
-          <caret line="3" column="22" lean-forward="true" selection-start-line="3" selection-start-column="22" selection-end-line="3" selection-end-column="22" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/leagues/management/commands/createsu.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="120">
@@ -797,14 +614,6 @@
           <folding>
             <element signature="e#0#51#0" expanded="false" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/.ebextensions/django.config">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="195">
-          <caret line="13" column="25" lean-forward="true" selection-start-line="13" selection-start-column="25" selection-end-line="13" selection-end-column="25" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -874,10 +683,42 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/.bash_profile">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.ebextensions/django.config">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="13" column="25" lean-forward="true" selection-start-line="13" selection-start-column="25" selection-end-line="13" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.elasticbeanstalk/config.yml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="45">
+          <caret line="3" column="22" lean-forward="true" selection-start-line="3" selection-start-column="22" selection-end-line="3" selection-end-column="22" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="8" column="0" lean-forward="true" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/gsa/settings.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="2" column="19" lean-forward="true" selection-start-line="2" selection-start-column="19" selection-end-line="2" selection-end-column="19" />
+        <state relative-caret-position="567">
+          <caret line="39" column="0" lean-forward="true" selection-start-line="39" selection-start-column="0" selection-end-line="39" selection-end-column="0" />
           <folding />
         </state>
       </provider>
