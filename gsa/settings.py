@@ -1,1 +1,1 @@
-settings.development.py
+./gsa/settings.development.py

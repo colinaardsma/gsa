@@ -3,13 +3,19 @@
 
 # run using ./staging_deploy.sh from gsa folder
 
-echo Preparing for deployment to staging
+echo ...PREPARING FOR DEPLOYMENT TO STAGING...
 
-ln -s -f settings.staging.py settings.py
+#echo ...COLLECTING STATIC FILES...
+#python3 manage.py collectstatic
+
+echo ...SETTING ENVIRONMENT TO STAGING...
+ln -s -f ./gsa/settings.staging.py ./gsa/settings.py
 
 # gsa-dev is the name of the environment
+echo ...DEPLOYING...
 eb deploy gsa-dev
 
 # this needs to be the last line to set everything back to the dev env
-ln -s -f settings.development.py settings.py
+echo ...SETTING ENVIRONMENT BACK TO DEVELOPMENT...
+ln -s -f ./gsa/settings.development.py ./gsa/settings.py
 
