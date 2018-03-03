@@ -7,3 +7,6 @@
 # PyCharm Files
 .idea/*
 .idea/workspace.xml
+
+# .pyc
+*.pyc
