@@ -189,7 +189,7 @@ def get_projected_keepers(league_key, user, redirect):
     league = League.objects.get(league_key=league_key)
     potential_keepers = get_keepers(league_key, league, user, redirect)
     projected_keepers = project_keepers(ros_proj_b_list, ros_proj_p_list, potential_keepers, league)
-    auction_needs = analyze_auction_needs(league, user, redirect, projected_keepers, ros_proj_b_list, ros_proj_p_list)
+    # auction_needs = analyze_auction_needs(league, user, redirect, projected_keepers, ros_proj_b_list, ros_proj_p_list)
     # pprint.pprint(auction_needs)
 
     end = time.time()
