@@ -189,8 +189,8 @@ def get_projected_keepers(league_key, user, redirect):
     league = League.objects.get(league_key=league_key)
     potential_keepers = get_keepers(league, user, redirect)
     projected_keepers = project_keepers(ros_proj_b_list, ros_proj_p_list, potential_keepers, league)
-    # auction_needs = analyze_auction_needs(league, user, redirect, projected_keepers, ros_proj_b_list, ros_proj_p_list)
-    # pprint.pprint(auction_needs)
+    auction_needs = analyze_auction_needs(league, user, redirect, projected_keepers, ros_proj_b_list, ros_proj_p_list)
+    pprint.pprint(auction_needs)
 
     end = time.time()
     elapsed = end - start
@@ -216,7 +216,7 @@ def analyze_auction_needs(league, user, redirect, projected_keepers, ros_proj_b_
                 for player in keeper_team_values['players']:
                     if player['category'] == 'batter':
                         batters += 1
-                    else:
+                    elif player['category'] == 'pitcher':
                         pitchers += 1
 
                 needs = {'team_name': keeper_team_name, 'manager_guids': keeper_team_values['manager_guids'],
