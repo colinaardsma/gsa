@@ -18,16 +18,15 @@ from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from django.views.static import serve
 
-from leagues.views import get_token_, get_leagues_, main_page
+from leagues.views import get_token_, get_leagues_, main_page, registration
 from projections.views import team_tools, user_
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # url(r'^login/$', auth_views.login, name='login'),
-    # url(r'^logout/$', auth_views.logout, name='logout'),
-    # url(r'^admin/', admin.site.urls),
     path('login/', auth_views.login,  {'template_name': 'login.html'}, name='login'),
     path('logout/', auth_views.logout, {'template_name': 'main_page.html'}, name='logout'),
+    path('registration/', registration, name='registration'),
+
     path('leagues/', include('leagues.urls')),
     path('projections/', include('projections.urls')),
     path('get_token/', get_token_, name='get_token'),

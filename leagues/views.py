@@ -8,6 +8,8 @@ from django.shortcuts import render, redirect
 from django.views import generic
 from django.http import HttpResponse
 from django.contrib.auth.models import User
+from django.contrib.auth import login, authenticate
+from django.contrib.auth.forms import UserCreationForm
 
 from .helpers.api_connector import request_auth, get_token
 from .models import League, update_profile, save_league, calc_three_year_avgs, max_year_leagues
@@ -82,3 +84,18 @@ def update_main_league(request):
 
 def main_page(request):
     return render(request, "main_page.html", {})
+
+# TODO: improved this via https://simpleisbetterthancomplex.com/tutorial/2017/02/18/how-to-create-user-sign-up-view.html
+def registration(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=raw_password)
+            login(request, user)
+            return redirect('/user')
+    else:
+        form = UserCreationForm()
+    return render(request, 'registration.html', {'form': form})
