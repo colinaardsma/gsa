@@ -17,7 +17,7 @@
 </div>
 <div>
     <h2>Update Database Player Projections</h2>
-    <p><a href="/projections/scrape_proj">Scrape Projections from Razzball</a></p>
+    <a href="/projections/scrape_proj" class="btn btn-sm btn-default">Scrape Projections from Razzball</a>
     <p>
         {% if razzball_proj_update_datetime %}
         {% localtime off %}
@@ -28,20 +28,23 @@
         {% endif %}
     </p>
     {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-    <form action="/projections/process_players/" method="post" enctype="multipart/form-data" encoding='multipart/form-data'>
-        {% csrf_token %}
-        <label>batter/pitcher csv file</label>
-        <input type="file" name="csv" />
-        <input type="radio" name="player_type" value="batter" checked="checked" /> Batter<br />
-        <input type="radio" name="player_type" value="pitcher" /> Pitcher<br />
-        <button type="submit">import</button>
-    </form>
+    <div  class="form-group">
+        <form action="/projections/process_players/" method="post" enctype="multipart/form-data" encoding='multipart/form-data'>
+            {% csrf_token %}
+            <label>batter/pitcher csv file</label><br/>
+            <input type="file" class="form-control-file" name="csv" />
+            <label class="radio-inline"><input type="radio" name="player_type" value="batter" checked="checked" /> Batter</label>
+            <label class="radio-inline"><input type="radio" name="player_type" value="pitcher" /> Pitcher</label>
+            <br/>
+            <button type="submit" class="btn btn-sm btn-default">import</button>
+        </form>
+    </div>
     {% if elapsed %}
     <h6>Updated in {{elapsed|floatformat:2}} seconds</h6>
     {% endif %}
     <br/>
 </div>
-<div>
+<div class="form-group">
     <h2>Set Main League</h2>
     {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
     <form method="post" action="../../projections/trade_projection/">
@@ -49,7 +52,7 @@
         <table>
             <tr>
                 <td>
-                    <select name="league_key">
+                    <select class="form-control" name="league_key">
                         {% for league in max_year_leagues %}
                         <option value="{{league.league_key}}">{{league.league_name}} - {{league.season}}</option>
                         {% endfor %}
@@ -58,7 +61,7 @@
             </tr>
             <tr>
                 <td>
-                    <input type = "submit" />
+                    <button type="submit" class="btn btn-sm btn-default">set</button>
                 </td>
             </tr>
 
