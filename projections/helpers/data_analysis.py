@@ -481,6 +481,7 @@ def final_stats_projection(team_list, ros_proj_b_list, ros_proj_p_list, current_
     return final_standings
 
 
+# TODO: seems like this could be refactored/sped up
 def rank_list(projected_final_stats_list):
     """Ranks each stat and calculates total points in final stat projections\n
     Args:\n
@@ -543,6 +544,7 @@ def stat_ranker(projected_final_stats_list, stat, reverse=True):
         points -= 1
 
 
+# TODO: seems like this could be refactored/sped up
 def league_volatility(sgp_dict, final_stats, factor=1):
     """Calculates volatility for each position. Volatility = # of teams within factor * SGP\n
     Args:\n

@@ -12,7 +12,46 @@
     <h2>Projected Keepers</h2>
     {% for key, value in proj_keepers.projected_keepers.items %}
     <h3>{{key}}</h3>
-    <h3>Total Kept: ${{value.total_cost|floatformat}}</h3>
+    <h4>Total Kept: ${{value.total_cost|floatformat}} on {{value.players|length}} players</h4>
+    <h5>${{value.dollar_spent_per_point|floatformat:2}} spent per point</h5>
+    <h4>Avg Stats Kept:</h4>
+    <table>
+        <thead>
+        <tr>
+            <th>TOTAL POINTS</th>
+            <th>TOTAL GP</th>
+            <th>R</th>
+            <th>HR</th>
+            <th>RBI</th>
+            <th>SB</th>
+            <th>OPS</th>
+            <th>TOTAL IP</th>
+            <th>W</th>
+            <th>SV</th>
+            <th>K</th>
+            <th>ERA</th>
+            <th>WHIP</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>{{value.keeper_stats_avg.PointsTotal|floatformat}}</td>
+            <td>{{value.keeper_stats_avg.StatsTotalGP|floatformat:2}}</td>
+            <td>{{value.keeper_stats_avg.PointsR|floatformat}}</td>
+            <td>{{value.keeper_stats_avg.PointsHR|floatformat}}</td>
+            <td>{{value.keeper_stats_avg.PointsRBI|floatformat}}</td>
+            <td>{{value.keeper_stats_avg.PointsSB|floatformat}}</td>
+            <td>{{value.keeper_stats_avg.PointsOPS|floatformat}}</td>
+            <td>{{value.keeper_stats_avg.StatsIP|floatformat:2}}</td>
+            <td>{{value.keeper_stats_avg.PointsW|floatformat}}</td>
+            <td>{{value.keeper_stats_avg.PointsSV|floatformat}}</td>
+            <td>{{value.keeper_stats_avg.PointsK|floatformat}}</td>
+            <td>{{value.keeper_stats_avg.PointsERA|floatformat}}</td>
+            <td>{{value.keeper_stats_avg.PointsWHIP|floatformat}}</td>
+        </tr>
+        </tbody>
+    </table>
+    <h4>Players Kept:</h4>
     <table>
         <thead>
         <tr>
@@ -43,6 +82,7 @@
         {% endif %}
         {% endfor %}
     </table>
+    <br/>
     {% endfor %}
 </div>
 

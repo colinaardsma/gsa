@@ -189,8 +189,16 @@ def get_projected_keepers(league_key, user, redirect):
     league = League.objects.get(league_key=league_key)
     potential_keepers = get_keepers(league, user, redirect)
     projected_keepers = project_keepers(ros_proj_b_list, ros_proj_p_list, potential_keepers, league)
-    auction_needs = analyze_auction_needs(league, user, redirect, projected_keepers, ros_proj_b_list, ros_proj_p_list)
-    pprint.pprint(auction_needs)
+    keeper_team_stats = analyze_keeper_team_stats(league, user, redirect, projected_keepers, ros_proj_b_list, ros_proj_p_list)
+    ranked_stats = rank_list(keeper_team_stats)
+
+    # pprint.pprint(ranked_stats)
+    for key, value in projected_keepers['projected_keepers'].items():
+        for stats in ranked_stats:
+            if [mg for mg in value['manager_guids'] if mg in stats['manager_guids']]:
+                value['keeper_stats_avg'] = stats
+                value['dollar_spent_per_point'] = value['total_cost'] / stats['PointsTotal']
+    # pprint.pprint(projected_keepers['projected_keepers'])
 
     end = time.time()
     elapsed = end - start
@@ -199,7 +207,7 @@ def get_projected_keepers(league_key, user, redirect):
 
 
 # TODO: not ready, this needs direction and thought, currently getting an average of batter/pitcher stats kept, but what good is that?
-def analyze_auction_needs(league, user, redirect, projected_keepers, ros_proj_b_list, ros_proj_p_list):
+def analyze_keeper_team_stats(league, user, redirect, projected_keepers, ros_proj_b_list, ros_proj_p_list):
     try:
         new_league = League.objects.get(prev_year_league=league)
     except League.DoesNotExist:
@@ -220,12 +228,12 @@ def analyze_auction_needs(league, user, redirect, projected_keepers, ros_proj_b_
                         pitchers += 1
 
                 needs = {'team_name': keeper_team_name, 'manager_guids': keeper_team_values['manager_guids'],
-                         'era': std_team['StatsERA'], 'hr_avg': std_team['StatsHR'] / batters,
-                         'ip': std_team['StatsIP'], 'k_avg': std_team['StatsK'] / pitchers,
-                         'ops_avg': std_team['StatsOPS'] / batters, 'r_avg': std_team['StatsR'] / batters,
-                         'rbi_avg': std_team['StatsRBI'] / batters, 'sb_avg': std_team['StatsSB'] / batters,
-                         'sv_avg': std_team['StatsSV'] / pitchers, 'total_gp': std_team['StatsTotalGP'],
-                         'w_avg': std_team['StatsW'] / pitchers, 'whip': std_team['StatsWHIP']}
+                         'StatsERA': std_team['StatsERA'], 'StatsHR': std_team['StatsHR'] / batters,
+                         'StatsIP': std_team['StatsIP'], 'StatsK': std_team['StatsK'] / pitchers,
+                         'StatsOPS': std_team['StatsOPS'], 'StatsR': std_team['StatsR'] / batters,
+                         'StatsRBI': std_team['StatsRBI'] / batters, 'StatsSB': std_team['StatsSB'] / batters,
+                         'StatsSV': std_team['StatsSV'] / pitchers, 'StatsTotalGP': std_team['StatsTotalGP'],
+                         'StatsW': std_team['StatsW'] / pitchers, 'StatsWHIP': std_team['StatsWHIP']}
                 league_needs.append(needs)
 
     return league_needs
