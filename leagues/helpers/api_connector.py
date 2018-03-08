@@ -115,6 +115,8 @@ def check_token_expiration(user, redirect_path):
     Raises:\n
         None.
     """
+    if not user.profile.access_token:
+        return
     token_expiration = user.profile.token_expiration.replace(tzinfo=None)
     now = datetime.now()
     if (not user or token_expiration - now).total_seconds() > 240:

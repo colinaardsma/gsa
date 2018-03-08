@@ -12,8 +12,9 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
 
 from .helpers.api_connector import request_auth, get_token
-from .models import League, update_profile, save_league, calc_three_year_avgs, max_year_leagues
 from .helpers.yql_queries import update_leagues, get_leagues, get_league_settings, get_league_standings, get_auction_results
+from .helpers.forms import RegistrationForm
+from .models import League, update_profile, save_league, calc_three_year_avgs, max_year_leagues
 from projections.helpers.advanced_stat_calc import get_sgp
 from projections.models import BatterProjection, BatterValue, PitcherProjection, PitcherValue
 from gsa.settings import TOKEN_REDIRECT_PATH, TEAM_TOOLS_REDIRECT, USER_REDIRECT
@@ -88,14 +89,17 @@ def main_page(request):
 # TODO: improved this via https://simpleisbetterthancomplex.com/tutorial/2017/02/18/how-to-create-user-sign-up-view.html
 def registration(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = RegistrationForm(request.POST)
         if form.is_valid():
             form.save()
             username = form.cleaned_data.get('username')
             raw_password = form.cleaned_data.get('password1')
+            link_yahoo = form.cleaned_data.get('link_yahoo')
             user = authenticate(username=username, password=raw_password)
             login(request, user)
+            if link_yahoo:
+                return redirect(request_auth(TOKEN_REDIRECT_PATH))
             return redirect('/user')
     else:
-        form = UserCreationForm()
+        form = RegistrationForm()
     return render(request, 'registration.html', {'form': form})
