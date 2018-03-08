@@ -8,208 +8,132 @@
         vertical-align: top;
     }
 </style>
-<div id="team_tools">
-    <h2>FA Rater by Team/League</h2>
-    Current Leagues:
-    <form method="post" action="../../projections/top_fa/">
-        {% csrf_token %}
-        {% if user %}
-        <select name="fa_league_key">
-            {% for team_league in current_leagues %}
-            <option value="{{team_league.league_key}}">{{team_league.league_name}} - {{team_league.season}}</option>
-            {% endfor %}
-        </select>
-        {% else %}
-        <table>
-            <tr>
-                <td>League Number:</td>
-                <td>
-                    <input class="regform" type="text" name="league_no" value="{{league_no}}" placeholder="5091" />
-                </td>
-            </tr>
-            <tr>
-                <td>Team Name:</td>
-                <td>
-                    <input class="regform" type="text" name="team_name" value="{{team_name}}" placeholder="MachadoAboutNothing" />
-                </td>
-            </tr>
-        </table>
-        {% endif %}
-        <!--<div style="color: red">{{error}}</div>-->
-        <table>
-            <tr>
-                <td>
-                    <input type = "submit" />
-                </td>
-            </tr>
-        </table>
-    </form>
-</div>
-<div id="team_tools">
-    <h2>Single Player Search</h2>
-    <form method="post" action="../../projections/single_player/">
-        {% csrf_token %}
-        <table>
-            <tr>
-                <td>Player Name:</td>
-                <td>
-                    <input class="regform" type="text" name="player_name" value="{{player_name}}" placeholder="Mike Trout" />
-                </td>
-            </tr>
-        </table>
-        <!--<div style="color: red">{{error}}</div>-->
-        <table>
-            <tr>
-                <td>
-                    <input type = "submit" />
-                </td>
-            </tr>
-        </table>
-    </form>
-</div>
-</br>
-<div id="team_tools">
-    <h2>Trade Analyzer</h2>
-    <form method="post" action="../../projections/trade_projection/">
-        {% csrf_token %}
-        <table>
-            <tr>
-                {% if user %}
-                <td>League:</td>
-                <td>
-                    <select name="league_key">
-                        {% for league in current_leagues %}
-                        <option value="{{league.league_key}}">{{league.league_name}} - {{league.season}}</option>
-                        {% endfor %}
-                    </select>
-                </td>
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h4>FA Rater by Team/League</h4>
+            <form class="form-inline" method="post" action="../../projections/top_fa/">
+                {% csrf_token %}
+                {% if request.user and not request.user.is_anonymous %}
+                <!--<label class="my-1 mr-2" for="faLeagueNumber">Current Leagues:</label>-->
+                <select class="custom-select my-1 mr-sm-2" id="faLeagueNumber" name="fa_league_key">
+                    {% for league in current_leagues %}
+                    <option value="{{league.league_key}}">{{league.league_name}} - {{league.season}}</option>
+                    {% endfor %}
+                </select>
                 {% else %}
-                <td>League Number:</td>
-                <td>
-                    <input class="regform" type="text" name="league_no" value="{{league_no}}" placeholder="5091" />
-                </td>
+                <!--<label class="my-1 mr-2" for="faLeagueNumber">League Number</label>-->
+                <input type="text" class="form-control mb-2 mr-sm-2" id="faLeagueNumber" name="league_no" value="{{league_no}}" placeholder="League Number" />
+                <!--<label class="my-1 mr-2" for="faTeamName">Team Name</label>-->
+                <input type="text" class="form-control mb-2 mr-sm-2" id="faTeamName" name="team_name" value="{{team_name}}" placeholder="Team Name" />
                 {% endif %}
-            </tr>
-            <tr>
-                <td>Team A:</td>
-                <td>
-                    <input class="regform" type="text" name="team_a_name" value="{{team_a_name}}" placeholder="MachadoAboutNothing" />
-                </td>
-            </tr>
-            <tr>
-                <td>Team B:</td>
-                <td>
-                    <input class="regform" type="text" name="team_b_name" value="{{team_b_name}}" placeholder="Big Sack" />
-                </td>
-            </tr>
-        </table>
-        <!--<div style="color: red">{{error}}</div>-->
-        <table>
-            <tr>
-                <td>
-                    <input type = "submit" />
-                </td>
-            </tr>
-        </table>
-    </form>
-    <br />
-</div>
-<!-- get rid of these breaks -->
-</br>
-<div id="team_tools">
-    <h2>Projected Final Standings</h2>
-    Current Leagues:
-    <form method="post" action="../../projections/projected_standings/">
-        {% csrf_token %}
-        {% if user %}
-        <select name="proj_league_key">
-            {% for league in current_leagues %}
-            <option value="{{league.league_key}}">{{league.league_name}} - {{league.season}}</option>
-            {% endfor %}
-        </select>
-        {% else %}
-        <table>
-            <tr>
-                <td>League Number:</td>
-                <td>
-                    <input class="regform" type="text" name="league_no" value="{{league_no}}" placeholder="5091" />
-                </td>
-            </tr>
-        </table>
-        {% endif %}
-        <!--<div style="color: red">{{error}}</div>-->
-        <table>
-            <tr>
-                <td>
-                    <input type = "submit" />
-                </td>
-            </tr>
-        </table>
-    </form>
-</div>
-<!-- get rid of these breaks -->
-</br>
-<div id="team_tools">
-    <h2>All Keepers</h2>
-    Current Leagues:
-    <form method="post" action="../../projections/all_keepers/">
-        {% csrf_token %}
-        {% if user %}
-        <select name="all_keepers_key">
-            {% for league in current_leagues %}
-            <option value="{{league.league_key}}">{{league.league_name}} - {{league.season}}</option>
-            {% endfor %}
-        </select>
-        {% csrf_token %}
-        {% else %}
-        <table>
-            <tr>
-                <td>League Number:</td>
-                <td>
-                    <input class="regform" type="text" name="all_keepers_key" value="{{all_keepers_key}}" placeholder="5091" />
-                </td>
-            </tr>
-        </table>
-        {% endif %}
-        <!--<div style="color: red">{{error}}</div>-->
-        <table>
-            <tr>
-                <td>
-                    <input type = "submit" />
-                </td>
-            </tr>
-        </table>
-    </form>
-</div>
-<div id="team_tools">
-    <h2>Projected Keepers</h2>
-    Current Leagues:
-    <form method="post" action="../../projections/projected_keepers/">
-        {% csrf_token %}
-        {% if user %}
-        <select name="proj_keepers_key">
-            {% for league in current_leagues %}
-            <option value="{{league.league_key}}">{{league.league_name}} - {{league.season}}</option>
-            {% endfor %}
-        </select>
-        {% else %}
-        <table>
-            <tr>
-                <td>League Number:</td>
-                <td>
-                    <input class="regform" type="text" name="proj_keepers_key" value="{{proj_keepers_key}}" placeholder="5091" />
-                </td>
-            </tr>
-        </table>
-        {% endif %}
-        <!--<div style="color: red">{{error}}</div>-->
-        <table>
-            <tr>
-                <td>
-                    <input type = "submit" />
-                </td>
-            </tr>
-        </table>
-    </form>
+                <button type="submit" class="btn btn-primary mb-2">Find FAs</button>
+            </form>
+        </div>
+        <div class="col">
+            <h4>Single Player Search</h4>
+            <form class="form-inline" method="post" action="../../projections/single_player/">
+                {% csrf_token %}
+                <!--<label class="my-1 mr-2" for="playerName">Player Name</label>-->
+                <input type="text" class="form-control mb-2 mr-sm-2" id="playerName" name="player_name" value="{{player_name}}" placeholder="Player Name" />
+                <button type="submit" class="btn btn-primary mb-2">Search</button>
+            </form>
+        </div>
+    </div>
+    <br/>
+    <div class="row">
+        <div class="col">
+            <h4>Trade Analyzer</h4>
+            <form class="form-inline" method="post" action="../../projections/trade_projection/">
+                {% csrf_token %}
+                {% if request.user and not request.user.is_anonymous %}
+                <!--<label class="my-1 mr-2" for="tradeLeagueNo">League:</label>-->
+                <select class="custom-select my-1 mr-sm-2" id="tradeLeagueNo" name="fa_league_key">
+                    {% for league in current_leagues %}
+                    <option value="{{league.league_key}}">{{league.league_name}} - {{league.season}}</option>
+                    {% endfor %}
+                </select>
+                <!--<label class="my-1 mr-2" for="tradeTeamA">Team A:</label>-->
+                <input type="text" class="form-control mb-2 mr-sm-2" id="tradeTeamA" name="team_a_name" value="{{team_a_name}}" placeholder="Team A Name" />
+                <!--<label class="my-1 mr-2" for="tradeTeamB">Team B:</label>-->
+                <input type="text" class="form-control mb-2 mr-sm-2" id="tradeTeamB" name="team_b_name" value="{{team_b_name}}" placeholder="Team B Name" />
+                {% else %}
+                <!--<label class="my-1 mr-2" for="tradeLeagueNo">League Number:</label>-->
+                <input type="text" class="form-control mb-2 mr-sm-2" id="tradeLeagueNo" name="league_no" value="{{league_no}}" placeholder="League Number" />
+                <br/>
+                <!--<label class="my-1 mr-2" for="tradeTeamA">Team A:</label>-->
+                <input type="text" class="form-control mb-2 mr-sm-2" id="tradeTeamA" name="team_a_name" value="{{team_a_name}}" placeholder="Team A Name" />
+                <!--<label class="my-1 mr-2" for="tradeTeamB">Team B:</label>-->
+                <input type="text" class="form-control mb-2 mr-sm-2" id="tradeTeamB" name="team_b_name" value="{{team_b_name}}" placeholder="Team B Name" />
+                {% endif %}
+                <button type="submit" class="btn btn-primary mb-2">Analyze</button>
+            </form>
+        </div>
+        <div class="col">
+        </div>
+    </div>
+    <br/>
+    <div class="row">
+        <div class="col">
+            <h4>Projected Final Standings</h4>
+            <form class="form-inline" method="post" action="../../projections/projected_standings/">
+                {% csrf_token %}
+                {% if request.user and not request.user.is_anonymous %}
+                <!--<label class="my-1 mr-2" for="finalStandingsProjection">Current Leagues:</label>-->
+                <select class="custom-select my-1 mr-sm-2" id="finalStandingsProjection" name="proj_league_key">
+                    {% for league in current_leagues %}
+                    <option value="{{league.league_key}}">{{league.league_name}} - {{league.season}}</option>
+                    {% endfor %}
+                </select>
+                {% else %}
+                <!--<label class="my-1 mr-2" for="finalStandingsLeagueNo">League Number:</label>-->
+                <input type="text" class="form-control mb-2 mr-sm-2" id="finalStandingsLeagueNo" name="league_no" value="{{league_no}}" placeholder="League Number" />
+                {% endif %}
+                <button type="submit" class="btn btn-primary mb-2">Project</button>
+            </form>
+        </div>
+        <div class="col">
+        </div>
+    </div>
+    <br/>
+    <div class="row">
+        <div class="col">
+            <h4>All Keepers</h4>
+            <form class="form-inline" method="post" action="../../projections/all_keepers/">
+                {% csrf_token %}
+                {% if request.user and not request.user.is_anonymous %}
+                <!--<label class="my-1 mr-2" for="finalStandingsProjection">Current Leagues:</label>-->
+                <select class="custom-select my-1 mr-sm-2" id="allKeepersLeagueNo" name="all_keepers_key">
+                    {% for league in current_leagues %}
+                    <option value="{{league.league_key}}">{{league.league_name}} - {{league.season}}</option>
+                    {% endfor %}
+                </select>
+                {% else %}
+                <!--<label class="my-1 mr-2" for="allKeepersLeagueNo">League Number:</label>-->
+                <input type="text" class="form-control mb-2 mr-sm-2" id="allKeepersLeagueNo" name="all_keepers_key" value="{{all_keepers_key}}" placeholder="League Number" />
+                {% endif %}
+                <button type="submit" class="btn btn-primary mb-2">Display</button>
+            </form>
+        </div>
+        <div class="col">
+            <h4>Projected Keepers</h4>
+            <form class="form-inline" method="post" action="../../projections/projected_keepers/">
+                {% csrf_token %}
+                {% if request.user and not request.user.is_anonymous %}
+                <!--<label class="my-1 mr-2" for="projKeepersLeagueNo">Current Leagues:</label>-->
+                <select class="custom-select my-1 mr-sm-2" id="projKeepersLeagueNo" name="proj_keepers_key">
+                    {% for league in current_leagues %}
+                    <option value="{{league.league_key}}">{{league.league_name}} - {{league.season}}</option>
+                    {% endfor %}
+                </select>
+                {% else %}
+                <!--<label class="my-1 mr-2" for="projKeepersLeagueNo">League Number:</label>-->
+                <input type="text" class="form-control mb-2 mr-sm-2" id="projKeepersLeagueNo" name="proj_keepers_key" value="{{proj_keepers_key}}" placeholder="League Number" />
+                {% endif %}
+                <button type="submit" class="btn btn-primary mb-2">Project</button>
+            </form>
+        </div>
+    </div>
 </div>
 {% endblock %}

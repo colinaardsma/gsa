@@ -63,12 +63,12 @@ def scrape_proj(request):
 
 
 def team_tools(request):
-    max_year_leagues_ = None
-    if request.user:
+    if request.user and not request.user.is_anonymous:
         max_year_leagues_ = max_year_leagues(request.user)
         return render(request, 'team_tools.html', {'current_leagues': max_year_leagues_, 'redirect': TEAM_TOOLS_REDIRECT})
     else:
-        return redirect(TEAM_TOOLS_REDIRECT)
+        return render(request, 'team_tools.html', {'redirect': TEAM_TOOLS_REDIRECT})
+        # return redirect(TEAM_TOOLS_REDIRECT)
 
 
 def top_fa(request):
