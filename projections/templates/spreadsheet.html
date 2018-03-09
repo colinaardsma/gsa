@@ -1,16 +1,24 @@
 {% extends "base.html" %}
 {% block content %}
 {% load projection_filters %}
-<!-- TODO: move this into bootstrap -->
-<style type="text/css">
-  th, td
-  {
-      padding:0 10px 0 10px;
-  }
-</style>
 <p>Last Update: {{players.0.last_modified|date:'n.j.Y' }}</p>
 <br />
-<table>
+<label class="my-1 mr-2" for="posFilterChoice">Filter By Position:</label>
+<select class="custom-select my-1 mr-sm-2" id="posFilterChoice" onchange="positionFilter()">
+    {% if cat == "batter" %}
+    <option value="C">C</option>
+    <option value="1B">1B</option>
+    <option value="2B">2B</option>
+    <option value="SS">SS</option>
+    <option value="3B">3B</option>
+    <option value="OF">OF</option>
+    {% elif cat == "pitcher" %}
+    <option value="SP">SP</option>
+    <option value="RP">RP</option>
+    {% endif %}
+</select>
+<br/>
+<table id="stat_table" class="sortable display table table-hover">
     <thead>
     <tr>
         <th>Value</th>
@@ -43,6 +51,7 @@
         <td>${{player.dollarValue|floatformat:2}}</td>
         <td><a href="https://baseball.fantasysports.yahoo.com/b1/5091/playersearch?&search={{player.name|url_safe_spaces}}" target="_blank">{{player.name}}</a></td>
         <td>{{player.team}}</td>
+        <!--<td>{% for pos in player.pos %}{{pos}},{% endfor %}</td>-->
         <td>{{player.pos}}</td>
         {% if 'DL' in player.status %}
         <td style="color:red">{{player.status}}</td>
@@ -72,4 +81,25 @@
     </tr>
     {% endfor %}
 </table>
+
+<!--TODO: move this into custom JS-->
+<script>
+function positionFilter() {
+  var input, filter, table, tr, td, i;
+  input = document.getElementById("posFilterChoice");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("stat_table");
+  tr = table.getElementsByTagName("tr");
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[3];
+    if (td) {
+      if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+}
+</script>
 {% endblock %}
