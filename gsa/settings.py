@@ -3,17 +3,15 @@ try:
 except ImportError:
     pass
 
-
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'em0q#e0^ulf%d9%qy+32m9wyj&#_(fn884va^i%ve9(c3x6__#'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [
     'localhost',
-    '10.211.55.2',
-    'mbp',
+    'gsa-dev.us-west-2.elasticbeanstalk.com',
 ]
 
 # Database
@@ -21,19 +19,19 @@ ALLOWED_HOSTS = [
 
 DATABASES = {
     'default': {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": "gsa",
-        "USER": "gsa_admin",
-        "PASSWORD": "",
-        "HOST": "localhost",
-        "PORT": "",
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': os.environ['RDS_DB_NAME'],
+        'USER': os.environ['RDS_USERNAME'],
+        'PASSWORD': os.environ['RDS_PASSWORD'],
+        'HOST': os.environ['RDS_HOSTNAME'],
+        'PORT': os.environ['RDS_PORT'],
     }
 }
 
 # Global Variables
-TOKEN_REDIRECT_PATH = "/localhost_token"
+TOKEN_REDIRECT_PATH = "/get_token"
 # consumer key
-CLIENT_ID = "dj0yJmk9cEQyTkhmUUt5ekN5JmQ9WVdrOWFtRkdUSHB0Tm1zbWNHbzlNQS0tJnM9Y29uc3VtZXJzZWNyZXQmeD0yYQ--"
+CLIENT_ID = "dj0yJmk9WElwNkFUbG1MVmZJJmQ9WVdrOVduWldOalpKTXpBbWNHbzlNQS0tJnM9Y29uc3VtZXJzZWNyZXQmeD03Yw--"
 # consumer secret
-CLIENT_SECRET = "2fdb054293ed5c071e62048411c9f3f204512bcc"
-REDIRECT_URI = "http://grays-sports-almanac.appspot.com"
+CLIENT_SECRET = "cff931b83bf07509ef93e8ef107eee5cf5412489"
+REDIRECT_URI = "http://gsa-dev.us-west-2.elasticbeanstalk.com"
