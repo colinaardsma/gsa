@@ -1,156 +1,154 @@
 {% extends "base.html" %}
 {% block content %}
 {% load projection_filters %}
-<div>
-    {% if trade_result %}
-    <h2>Projected Final Standings</h2>
-    <table>
-        <tr>
-            <th>Total Points</th>
-            <th>Team Name</th>
-            <th>R</th>
-            <th>HR</th>
-            <th>RBI</th>
-            <th>SB</th>
-            <th>OPS</th>
-            <th>W</th>
-            <th>SV</th>
-            <th>K</th>
-            <th>ERA</th>
-            <th>WHIP</th>
-            <th>IP</th>
-        </tr>
-        <tbody>
-        {% for team in trade_result %}
-        <tr>
-            <td>{{team.PointsTotal}}</td>
-            <td>{{team.TEAM_NAME}}</td>
-            <td>{{team.PointsR}}</td>
-            <td>{{team.PointsHR}}</td>
-            <td>{{team.PointsRBI}}</td>
-            <td>{{team.PointsSB}}</td>
-            <td>{{team.PointsOPS}}</td>
-            <td>{{team.PointsW}}</td>
-            <td>{{team.PointsSV}}</td>
-            <td>{{team.PointsK}}</td>
-            <td>{{team.PointsERA}}</td>
-            <td>{{team.PointsWHIP}}</td>
-            <td>{{team.StatsIP}}</td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    <h2>Projected Final Stats</h2>
-    <table>
-        <tr>
-            <th>Team Name</th>
-            <th>R</th>
-            <th>HR</th>
-            <th>RBI</th>
-            <th>SB</th>
-            <th>OPS</th>
-            <th>W</th>
-            <th>SV</th>
-            <th>K</th>
-            <th>ERA</th>
-            <th>WHIP</th>
-            <th>IP</th>
-        </tr>
-        <tbody>
-        {% for team in trade_result %}
-        <tr>
-            <td>{{team.TEAM_NAME}}</td>
-            <td>{{team.StatsR}}</td>
-            <td>{{team.StatsHR}}</td>
-            <td>{{team.StatsRBI}}</td>
-            <td>{{team.StatsSB}}</td>
-            <td>{{team.StatsOPS|floatformat:3}}</td>
-            <td>{{team.StatsW}}</td>
-            <td>{{team.StatsSV}}</td>
-            <td>{{team.StatsK}}</td>
-            <td>{{team.StatsERA|floatformat:2}}</td>
-            <td>{{team.StatsWHIP|floatformat:2}}</td>
-            <td>{{team.StatsIP}}</td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    <h2>Projected Final Volatility</h2>
-    <table>
-        <tr>
-            <th>Volatility(<small>Down</small> Up)</th>
-            <th>Team Name</th>
-            <th>R</th>
-            <th>HR</th>
-            <th>RBI</th>
-            <th>SB</th>
-            <th>OPS</th>
-            <th>W</th>
-            <th>SV</th>
-            <th>K</th>
-            <th>ERA</th>
-            <th>WHIP</th>
-        </tr>
-        <tbody>
-        {% for team in trade_result %}
-        <tr>
-            <td><small>{{team.Total_Downward_Volatility}} </small>{{team.Total_Upward_Volatility}}</td>
-            <td>{{team.TEAM_NAME}}</td>
-            <td><small>{{team.DownVol_R}} </small>{{team.UpVol_R}}</td>
-            <td><small>{{team.DownVol_HR}} </small>{{team.UpVol_HR}}</td>
-            <td><small>{{team.DownVol_RBI}} </small>{{team.UpVol_RBI}}</td>
-            <td><small>{{team.DownVol_SB}} </small>{{team.UpVol_SB}}</td>
-            <td><small>{{team.DownVol_OPS}} </small>{{team.UpVol_OPS}}</td>
-            <td><small>{{team.DownVol_W}} </small>{{team.UpVol_W}}</td>
-            <td><small>{{team.DownVol_SV}} </small>{{team.UpVol_SV}}</td>
-            <td><small>{{team.DownVol_K}} </small>{{team.UpVol_K}}</td>
-            <td><small>{{team.DownVol_ERA}} </small>{{team.UpVol_ERA}}</td>
-            <td><small>{{team.DownVol_WHIP}} </small>{{team.UpVol_WHIP}}</td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    {% else %}
-    <h2>Trade Analyzer</h2>
+{% if trade_result %}
+<!-- TODO: how to combine this with projected_standings.html-->
+<h2>Projected Final Standings</h2>
+<table id="proj_final_standings" class="sortable display table table-hover">
+    <thead>
+    <tr>
+        <th>Total Points</th>
+        <th>Team Name</th>
+        <th>R</th>
+        <th>HR</th>
+        <th>RBI</th>
+        <th>SB</th>
+        <th>OPS</th>
+        <th>W</th>
+        <th>SV</th>
+        <th>K</th>
+        <th>ERA</th>
+        <th>WHIP</th>
+        <th>IP</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for team in trade_result %}
+    <tr>
+        <td>{{team.PointsTotal}}</td>
+        <td>{{team.TEAM_NAME}}</td>
+        <td>{{team.PointsR}}</td>
+        <td>{{team.PointsHR}}</td>
+        <td>{{team.PointsRBI}}</td>
+        <td>{{team.PointsSB}}</td>
+        <td>{{team.PointsOPS}}</td>
+        <td>{{team.PointsW}}</td>
+        <td>{{team.PointsSV}}</td>
+        <td>{{team.PointsK}}</td>
+        <td>{{team.PointsERA}}</td>
+        <td>{{team.PointsWHIP}}</td>
+        <td>{{team.StatsIP}}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<h2>Projected Final Stats</h2>
+<table id="proj_final_stats" class="sortable display table table-hover">
+    <thead>
+    <tr>
+        <th>Team Name</th>
+        <th>R</th>
+        <th>HR</th>
+        <th>RBI</th>
+        <th>SB</th>
+        <th>OPS</th>
+        <th>W</th>
+        <th>SV</th>
+        <th>K</th>
+        <th>ERA</th>
+        <th>WHIP</th>
+        <th>IP</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for team in trade_result %}
+    <tr>
+        <td>{{team.TEAM_NAME}}</td>
+        <td>{{team.StatsR}}</td>
+        <td>{{team.StatsHR}}</td>
+        <td>{{team.StatsRBI}}</td>
+        <td>{{team.StatsSB}}</td>
+        <td>{{team.StatsOPS|floatformat:3}}</td>
+        <td>{{team.StatsW}}</td>
+        <td>{{team.StatsSV}}</td>
+        <td>{{team.StatsK}}</td>
+        <td>{{team.StatsERA|floatformat:2}}</td>
+        <td>{{team.StatsWHIP|floatformat:2}}</td>
+        <td>{{team.StatsIP}}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<h2>Projected Final Volatility</h2>
+<table id="proj_final_volatility" class="sortable display table table-hover">
+    <thead>
+    <tr>
+        <th>Volatility(<small>Down</small> Up)</th>
+        <th>Team Name</th>
+        <th>R</th>
+        <th>HR</th>
+        <th>RBI</th>
+        <th>SB</th>
+        <th>OPS</th>
+        <th>W</th>
+        <th>SV</th>
+        <th>K</th>
+        <th>ERA</th>
+        <th>WHIP</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for team in trade_result %}
+    <tr>
+        <td><small>{{team.Total_Downward_Volatility}} </small>{{team.Total_Upward_Volatility}}</td>
+        <td>{{team.TEAM_NAME}}</td>
+        <td><small>{{team.DownVol_R}} </small>{{team.UpVol_R}}</td>
+        <td><small>{{team.DownVol_HR}} </small>{{team.UpVol_HR}}</td>
+        <td><small>{{team.DownVol_RBI}} </small>{{team.UpVol_RBI}}</td>
+        <td><small>{{team.DownVol_SB}} </small>{{team.UpVol_SB}}</td>
+        <td><small>{{team.DownVol_OPS}} </small>{{team.UpVol_OPS}}</td>
+        <td><small>{{team.DownVol_W}} </small>{{team.UpVol_W}}</td>
+        <td><small>{{team.DownVol_SV}} </small>{{team.UpVol_SV}}</td>
+        <td><small>{{team.DownVol_K}} </small>{{team.UpVol_K}}</td>
+        <td><small>{{team.DownVol_ERA}} </small>{{team.UpVol_ERA}}</td>
+        <td><small>{{team.DownVol_WHIP}} </small>{{team.UpVol_WHIP}}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<h2>Trade Analyzer</h2>
+<div class="form-group">
     <form method="post">
         {% csrf_token %}
         <p>League Key: {{league_key}}</p>
-        <table>
-            <thead>
-            <tr>
-                <th>{{team_a.TEAM_NAME}}</br>Players to Trade:</th>
-                <th>{{team_b.TEAM_NAME}}</br>Players to Trade:</th>
-            </tr>
-            </thead>
-            <tr>
-                <td>
-                    <select name="team_a_players" name="team_b_players" multiple size="30">
-                        {% for player in team_a.ROSTER %}
-                        <option value="{{player}}" id="{{player}}" name="{{player}}">{{player.NAME}}</option>
-                        {% endfor %}
-                    </select>
-                </td>
-                <td>
-                    <select name="team_b_players" id="team_b_players" multiple size="30">
-                        {% for player in team_b.ROSTER %}
-                        <option value="{{player}}" id="{{player}}" name="{{player}}">{{player.NAME}}</option>
-                        {% endfor %}
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <input type="hidden" name="team_a" value="{{team_a}}" />
-                    <input type="hidden" name="team_b" value="{{team_b}}" />
-                    <input type="hidden" name="league_no" value="{{league_no}}" />
-                    <input type="hidden" name="league_key" value="{{league_key}}" />
-                    <input type="hidden" name="team_list" value="{{team_list}}" />
-                    <input type="submit" />
-                </td>
-            </tr>
-        </table>
+        <div class="row">
+            <div class="col">
+                <label for="team_a_players"><strong>{{team_a.TEAM_NAME}}</strong></br>Players to Trade:</label>
+                <select name="team_a_players" id="team_a_players" class="form-control" multiple size="30">
+                    {% for player in team_a.ROSTER %}
+                    <option value="{{player}}" id="{{player_a}}" name="{{player}}">{{player.NAME}} - {{player.POS}} - {{player.TEAM}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col">
+                <label for="team_b_players"><strong>{{team_b.TEAM_NAME}}</strong></br>Players to Trade:</label>
+                <select name="team_b_players" id="team_b_players" class="form-control" multiple size="30">
+                    {% for player in team_b.ROSTER %}
+                    <option value="{{player}}" id="{{player_b}}" name="{{player}}">{{player.NAME}} - {{player.POS}} - {{player.TEAM}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <input type="hidden" name="team_a" value="{{team_a}}" />
+        <input type="hidden" name="team_b" value="{{team_b}}" />
+        <input type="hidden" name="trade_league_no" value="{{league_no}}" />
+        <input type="hidden" name="trade_league_key" value="{{league_key}}" />
+        <input type="hidden" name="team_list" value="{{team_list}}" />
+        <br/>
+        <button class="btn btn-lg btn-primary btn-block" type="submit">trade</button>
     </form>
-    <p>Hold down the Ctrl (windows) / Command (Mac) button to select multiple options.</p>
-    {% endif %}
 </div>
+<p>Hold down the Ctrl (windows) / Command (Mac) button to select multiple options.</p>
+{% endif %}
 {% endblock %}

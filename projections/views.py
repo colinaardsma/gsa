@@ -92,10 +92,10 @@ def single_player(request):
 def trade_projection(request):
     if request.method == 'POST':
         try:
-            league_key = request.POST["league_key"]
+            league_key = request.POST["trade_league_key"]
             league_no = None
         except MultiValueDictKeyError:
-            league_no = request.POST["league_no"]
+            league_no = request.POST["trade_league_no"]
             league_key = None
         try:
             team_a_name = request.POST['team_a_name']
@@ -118,6 +118,8 @@ def trade_projection(request):
             team_list = get_all_team_rosters(league_key, request.user, TEAM_TOOLS_REDIRECT)
             team_a = [team for team in team_list if team['TEAM_NAME'].lower() == team_a_name.lower()][0]
             team_b = [team for team in team_list if team['TEAM_NAME'].lower() == team_b_name.lower()][0]
+            import pprint
+            pprint.pprint(team_a)
             return render(request, 'trade_projection.html', {'team_a': team_a, 'team_b': team_b,
                                                              'league_key': league_key, 'team_list': team_list,
                                                              'league_no': league_no, 'redirect': TEAM_TOOLS_REDIRECT})
@@ -147,6 +149,7 @@ def all_keepers(request):
         user = request.user
         all_keepers_key = request.POST["all_keepers_key"]
         all_keepers_ = get_keeper_costs(all_keepers_key, user, TEAM_TOOLS_REDIRECT)
+        print(all_keepers_)
         return render(request, 'all_keepers.html', {'all_keepers': all_keepers_, 'redirect': TEAM_TOOLS_REDIRECT})
     else:
         return redirect(TEAM_TOOLS_REDIRECT)

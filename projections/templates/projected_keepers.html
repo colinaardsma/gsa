@@ -2,173 +2,187 @@
 {% load projection_filters %}
 {% block content %}
 <!-- TODO: move this into bootstrap -->
-<style type="text/css">
-  th, td
-  {
-      padding:0 10px 0 10px;
-  }
-</style>
-<div>
-    <h2>Projected Keepers</h2>
-    {% for key, value in proj_keepers.projected_keepers.items %}
-    <h3>{{key}}</h3>
-    <h4>Total Kept: ${{value.total_cost|floatformat}} on {{value.players|length}} players</h4>
-    <h5>${{value.dollar_spent_per_point|floatformat:2}} spent per point</h5>
-    <h4>Avg Stats Kept:</h4>
-    <table>
-        <thead>
-        <tr>
-            <th>TOTAL POINTS</th>
-            <th>TOTAL GP</th>
-            <th>R</th>
-            <th>HR</th>
-            <th>RBI</th>
-            <th>SB</th>
-            <th>OPS</th>
-            <th>TOTAL IP</th>
-            <th>W</th>
-            <th>SV</th>
-            <th>K</th>
-            <th>ERA</th>
-            <th>WHIP</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td>{{value.keeper_stats_avg.PointsTotal|floatformat}}</td>
-            <td>{{value.keeper_stats_avg.StatsTotalGP|floatformat:2}}</td>
-            <td>{{value.keeper_stats_avg.PointsR|floatformat}}</td>
-            <td>{{value.keeper_stats_avg.PointsHR|floatformat}}</td>
-            <td>{{value.keeper_stats_avg.PointsRBI|floatformat}}</td>
-            <td>{{value.keeper_stats_avg.PointsSB|floatformat}}</td>
-            <td>{{value.keeper_stats_avg.PointsOPS|floatformat}}</td>
-            <td>{{value.keeper_stats_avg.StatsIP|floatformat:2}}</td>
-            <td>{{value.keeper_stats_avg.PointsW|floatformat}}</td>
-            <td>{{value.keeper_stats_avg.PointsSV|floatformat}}</td>
-            <td>{{value.keeper_stats_avg.PointsK|floatformat}}</td>
-            <td>{{value.keeper_stats_avg.PointsERA|floatformat}}</td>
-            <td>{{value.keeper_stats_avg.PointsWHIP|floatformat}}</td>
-        </tr>
-        </tbody>
-    </table>
-    <h4>Players Kept:</h4>
-    <table>
-        <thead>
-        <tr>
-            <th>Cost</th>
-            <th>Value</th>
-            <th>Name</th>
-            <th>Team</th>
-            <th>POS</th>
-            <th>Status</th>
-        </tr>
-        </thead>
-        {% for player in value.players %}
-        {% if player.worth_keeping %}
-        <tr>
-            <td>${{player.keeper_cost|floatformat}}</td>
-            <td>${{player.value|floatformat:2}}</td>
-            <td><a href="https://baseball.fantasysports.yahoo.com/b1/5091/playersearch?&search={{player.full_name|url_safe_spaces}}" target="_blank">{{player.full_name}}</a></td>
-            <td>{{player.team}}</td>
-            <td>{{player.positions}}</td>
-            {% if 'DL' in player.status %}
-            <td style="color:red">{{player.status}}</td>
-            {% elif 'MiLB' in player.status %}
-            <td style="color:blue">{{player.status}}</td>
-            {% else %}
-            <td></td>
-            {% endif %}
-        </tr>
+<h2>Projected Keepers</h2>
+{% for key, value in proj_keepers.projected_keepers.items %}
+<h3>{{key}}</h3>
+<h4>Total Kept: ${{value.total_cost|floatformat}} on {{value.players|length}} players</h4>
+<h5>${{value.dollar_spent_per_point|floatformat:2}} spent per point</h5>
+<h4>Avg Stats Kept:</h4>
+<table id="proj_points_table" class="sortable display table table-hover">
+    <thead>
+    <tr>
+        <th>TOTAL POINTS</th>
+        <th>TOTAL GP</th>
+        <th>R</th>
+        <th>HR</th>
+        <th>RBI</th>
+        <th>SB</th>
+        <th>OPS</th>
+        <th>TOTAL IP</th>
+        <th>W</th>
+        <th>SV</th>
+        <th>K</th>
+        <th>ERA</th>
+        <th>WHIP</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>{{value.keeper_stats_avg.PointsTotal|floatformat}}</td>
+        <td>{{value.keeper_stats_avg.StatsTotalGP|floatformat:2}}</td>
+        <td>{{value.keeper_stats_avg.PointsR|floatformat}}</td>
+        <td>{{value.keeper_stats_avg.PointsHR|floatformat}}</td>
+        <td>{{value.keeper_stats_avg.PointsRBI|floatformat}}</td>
+        <td>{{value.keeper_stats_avg.PointsSB|floatformat}}</td>
+        <td>{{value.keeper_stats_avg.PointsOPS|floatformat}}</td>
+        <td>{{value.keeper_stats_avg.StatsIP|floatformat:2}}</td>
+        <td>{{value.keeper_stats_avg.PointsW|floatformat}}</td>
+        <td>{{value.keeper_stats_avg.PointsSV|floatformat}}</td>
+        <td>{{value.keeper_stats_avg.PointsK|floatformat}}</td>
+        <td>{{value.keeper_stats_avg.PointsERA|floatformat}}</td>
+        <td>{{value.keeper_stats_avg.PointsWHIP|floatformat}}</td>
+    </tr>
+    </tbody>
+</table>
+<h4>Players Kept:</h4>
+<table id="proj_keepers_table" class="sortable display table table-hover">
+    <thead>
+    <tr>
+        <th>Cost</th>
+        <th>Value</th>
+        <th>Name</th>
+        <th>Team</th>
+        <th>POS</th>
+        <th>Status</th>
+    </tr>
+    </thead>
+    {% for player in value.players %}
+    {% if player.worth_keeping %}
+    <tr>
+        <td>${{player.keeper_cost|floatformat}}</td>
+        <td>${{player.value|floatformat:2}}</td>
+        <td><a href="https://baseball.fantasysports.yahoo.com/b1/5091/playersearch?&search={{player.full_name|url_safe_spaces}}" target="_blank">{{player.full_name}}</a></td>
+        <td>{{player.team}}</td>
+        <td>{{player.positions}}</td>
+        {% if 'DL' in player.status %}
+        <td style="color:red">{{player.status}}</td>
+        {% elif 'MiLB' in player.status %}
+        <td style="color:blue">{{player.status}}</td>
+        {% else %}
+        <td></td>
         {% endif %}
-        {% endfor %}
-    </table>
-    <br/>
+    </tr>
+    {% endif %}
     {% endfor %}
-</div>
+</table>
+<br/>
+{% endfor %}
 
-<div>
-    <h2>Projected Player Pool Values</h2>
-    <h3>Batters</h3>
-    <table>
-        <tr>
-            <th>Value</th>
-            <th>Player Name</th>
-            <th>Team</th>
-            <th>Position</th>
-            <th>Status</th>
-            <th>R</th>
-            <th>HR</th>
-            <th>RBI</th>
-            <th>SB</th>
-            <th>OPS</th>
-        </tr>
-        <tbody>
-        {% for batter in proj_keepers.batter_pool %}
-        {% if batter.dollarValue > 0 %}
-        <tr>
-            <td>${{batter.dollarValue|floatformat:2}}</td>
-            <td><a href="https://baseball.fantasysports.yahoo.com/b1/5091/playersearch?&search={{batter.name|url_safe_spaces}}" target="_blank">{{batter.name}}</a></td>
-            <td>{{batter.team}}</td>
-            <td>{{batter.pos}}</td>
-            {% if 'DL' in batter.status %}
-            <td style="color:red">{{batter.status}}</td>
-            {% elif 'MiLB' in batter.status %}
-            <td style="color:blue">{{batter.status}}</td>
-            {% else %}
-            <td></td>
-            {% endif %}
-            <td>{{batter.r|floatformat}}</td>
-            <td>{{batter.hr|floatformat}}</td>
-            <td>{{batter.rbi|floatformat}}</td>
-            <td>{{batter.sb|floatformat}}</td>
-            <td>{{batter.ops|floatformat:3}}</td>
-        </tr>
+<h2>Projected Player Pool Values</h2>
+<h3>Batters</h3>
+<label class="my-1 mr-2" for="batterPosFilterChoice">Filter By Position:</label>
+<select class="custom-select my-1 mr-sm-2" id="batterPosFilterChoice" onchange="tableFilter('proj_batter_pool_table', this.id, 3)">
+    <option value="C">C</option>
+    <option value="1B">1B</option>
+    <option value="2B">2B</option>
+    <option value="SS">SS</option>
+    <option value="3B">3B</option>
+    <option value="OF">OF</option>
+</select>
+<table id="proj_batter_pool_table" class="sortable display table table-hover">
+    <thead>
+    <tr>
+        <th>Value</th>
+        <th>Player Name</th>
+        <th>Team</th>
+        <th>Position</th>
+        <th>Status</th>
+        <th>R</th>
+        <th>HR</th>
+        <th>RBI</th>
+        <th>SB</th>
+        <th>OPS</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for batter in proj_keepers.batter_pool %}
+    {% if batter.dollarValue > 0 %}
+    <tr>
+        <td>${{batter.dollarValue|floatformat:2}}</td>
+        <td><a href="https://baseball.fantasysports.yahoo.com/b1/5091/playersearch?&search={{batter.name|url_safe_spaces}}" target="_blank">{{batter.name}}</a></td>
+        <td>{{batter.team}}</td>
+        <td>{{batter.pos}}</td>
+        {% if 'DL' in batter.status %}
+        <td style="color:red">{{batter.status}}</td>
+        {% elif 'MiLB' in batter.status %}
+        <td style="color:blue">{{batter.status}}</td>
+        {% else %}
+        <td></td>
         {% endif %}
-        {% endfor %}
-        </tbody>
-    </table>
-    <h3>Pitchers</h3>
-    <table>
-        <tr>
-            <th>Value</th>
-            <th>Player Name</th>
-            <th>Team</th>
-            <th>Position</th>
-            <th>Status</th>
-            <th>W</th>
-            <th>SV</th>
-            <th>K</th>
-            <th>ERA</th>
-            <th>WHIP</th>
-            <th>IP</th>
-            <th>K/IP</th>
-        </tr>
-        <tbody>
-        {% for pitcher in proj_keepers.pitcher_pool %}
-        {% if pitcher.dollarValue > 0 %}
-        <tr>
-            <td>${{pitcher.dollarValue|floatformat:2}}</td>
-            <td><a href="https://baseball.fantasysports.yahoo.com/b1/5091/playersearch?&search={{pitcher.name|url_safe_spaces}}" target="_blank">{{pitcher.name}}</a></td>
-            <td>{{pitcher.team}}</td>
-            <td>{{pitcher.pos}}</td>
-            {% if 'DL' in pitcher.status %}
-            <td style="color:red">{{pitcher.status}}</td>
-            {% elif 'MiLB' in pitcher.status %}
-            <td style="color:blue">{{pitcher.status}}</td>
-            {% else %}
-            <td></td>
-            {% endif %}
-            <td>{{pitcher.w|floatformat:2}}</td>
-            <td>{{pitcher.sv|floatformat:2}}</td>
-            <td>{{pitcher.k|floatformat:2}}</td>
-            <td>{{pitcher.era|floatformat:2}}</td>
-            <td>{{pitcher.whip|floatformat:2}}</td>
-            <td>{{pitcher.ip|floatformat}}</td>
-            <td>{{pitcher.kip|floatformat:2}}</td>
-        </tr>
+        <td>{{batter.r|floatformat}}</td>
+        <td>{{batter.hr|floatformat}}</td>
+        <td>{{batter.rbi|floatformat}}</td>
+        <td>{{batter.sb|floatformat}}</td>
+        <td>{{batter.ops|floatformat:3}}</td>
+    </tr>
+    {% endif %}
+    {% endfor %}
+    </tbody>
+</table>
+
+<h3>Pitchers</h3>
+<label class="my-1 mr-2" for="pitcherPosFilterChoice">Filter By Position:</label>
+<select class="custom-select my-1 mr-sm-2" id="pitcherPosFilterChoice" onchange="tableFilter('proj_pitcher_pool_table', this.id, 3)">
+    <option value="SP">SP</option>
+    <option value="RP">RP</option>
+    <option value="CL">CL</option>
+    <option value="CL1">CL1</option>
+    <option value="CL2">CL2</option>
+    <option value="CL3">CL3</option>
+    <option value="CLC">CLC</option>
+</select>
+<table id="proj_pitcher_pool_table" class="sortable display table table-hover">
+    <thead>
+    <tr>
+        <th>Value</th>
+        <th>Player Name</th>
+        <th>Team</th>
+        <th>Position</th>
+        <th>Status</th>
+        <th>W</th>
+        <th>SV</th>
+        <th>K</th>
+        <th>ERA</th>
+        <th>WHIP</th>
+        <th>IP</th>
+        <th>K/IP</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for pitcher in proj_keepers.pitcher_pool %}
+    {% if pitcher.dollarValue > 0 %}
+    <tr>
+        <td>${{pitcher.dollarValue|floatformat:2}}</td>
+        <td><a href="https://baseball.fantasysports.yahoo.com/b1/5091/playersearch?&search={{pitcher.name|url_safe_spaces}}" target="_blank">{{pitcher.name}}</a></td>
+        <td>{{pitcher.team}}</td>
+        <td>{{pitcher.pos}}</td>
+        {% if 'DL' in pitcher.status %}
+        <td style="color:red">{{pitcher.status}}</td>
+        {% elif 'MiLB' in pitcher.status %}
+        <td style="color:blue">{{pitcher.status}}</td>
+        {% else %}
+        <td></td>
         {% endif %}
-        {% endfor %}
-        </tbody>
-    </table>
-</div>
+        <td>{{pitcher.w|floatformat:2}}</td>
+        <td>{{pitcher.sv|floatformat:2}}</td>
+        <td>{{pitcher.k|floatformat:2}}</td>
+        <td>{{pitcher.era|floatformat:2}}</td>
+        <td>{{pitcher.whip|floatformat:2}}</td>
+        <td>{{pitcher.ip|floatformat}}</td>
+        <td>{{pitcher.kip|floatformat:2}}</td>
+    </tr>
+    {% endif %}
+    {% endfor %}
+    </tbody>
+</table>
 {% endblock %}

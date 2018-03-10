@@ -246,7 +246,7 @@ def trade_analyzer_(league_key, user, redirect, team_a, team_a_players, team_b, 
     league_settings = get_league_settings(league_key, user, redirect)
     league_status, current_standings = get_league_standings(league_key, user, redirect)
     league = user.profile.leagues.get(league_key=league_key)
-    update_league(league, status=league_status)
+    update_league(league, draft_status=league_status)
 
     sgp_dict = create_sgp_dict(league)
 

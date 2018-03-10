@@ -1,120 +1,117 @@
 {% extends "base.html" %}
 {% block content %}
 {% load projection_filters %}
-<!-- TODO: move this into bootstrap -->
-<style type="text/css">
-  th, td
-  {
-      padding:0 10px 0 10px;
-  }
-</style>
-<div>
-    <h2>Projected Final Standings</h2>
-    <table>
-        <tr>
-            <th>Total Points</th>
-            <th>Team Name</th>
-            <th>R</th>
-            <th>HR</th>
-            <th>RBI</th>
-            <th>SB</th>
-            <th>OPS</th>
-            <th>W</th>
-            <th>SV</th>
-            <th>K</th>
-            <th>ERA</th>
-            <th>WHIP</th>
-            <th>IP</th>
-        </tr>
-        <tbody>
-        {% for team in projected_standings %}
-        <tr>
-            <td>{{team.PointsTotal}}</td>
-            <td>{{team.TEAM_NAME}}</td>
-            <td>{{team.PointsR}}</td>
-            <td>{{team.PointsHR}}</td>
-            <td>{{team.PointsRBI}}</td>
-            <td>{{team.PointsSB}}</td>
-            <td>{{team.PointsOPS}}</td>
-            <td>{{team.PointsW}}</td>
-            <td>{{team.PointsSV}}</td>
-            <td>{{team.PointsK}}</td>
-            <td>{{team.PointsERA}}</td>
-            <td>{{team.PointsWHIP}}</td>
-            <td>{{team.StatsIP}}</td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    <h2>Projected Final Stats</h2>
-    <table>
-        <tr>
-            <th>Team Name</th>
-            <th>R</th>
-            <th>HR</th>
-            <th>RBI</th>
-            <th>SB</th>
-            <th>OPS</th>
-            <th>W</th>
-            <th>SV</th>
-            <th>K</th>
-            <th>ERA</th>
-            <th>WHIP</th>
-            <th>IP</th>
-        </tr>
-        <tbody>
-        {% for team in projected_standings %}
-        <tr>
-            <td>{{team.TEAM_NAME}}</td>
-            <td>{{team.StatsR}}</td>
-            <td>{{team.StatsHR}}</td>
-            <td>{{team.StatsRBI}}</td>
-            <td>{{team.StatsSB}}</td>
-            <td>{{team.StatsOPS|floatformat:3}}</td>
-            <td>{{team.StatsW}}</td>
-            <td>{{team.StatsSV}}</td>
-            <td>{{team.StatsK}}</td>
-            <td>{{team.StatsERA|floatformat:2}}</td>
-            <td>{{team.StatsWHIP|floatformat:2}}</td>
-            <td>{{team.StatsIP}}</td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    <h2>Projected Final Volatility</h2>
-    <table>
-        <tr>
-            <th>Volatility(<small>Down</small> Up)</th>
-            <th>Team Name</th>
-            <th>R</th>
-            <th>HR</th>
-            <th>RBI</th>
-            <th>SB</th>
-            <th>OPS</th>
-            <th>W</th>
-            <th>SV</th>
-            <th>K</th>
-            <th>ERA</th>
-            <th>WHIP</th>
-        </tr>
-        <tbody>
-        {% for team in projected_standings %}
-        <tr>
-            <td><small>{{team.Total_Downward_Volatility}} </small>{{team.Total_Upward_Volatility}}</td>
-            <td>{{team.TEAM_NAME}}</td>
-            <td><small>{{team.DownVol_R}} </small>{{team.UpVol_R}}</td>
-            <td><small>{{team.DownVol_HR}} </small>{{team.UpVol_HR}}</td>
-            <td><small>{{team.DownVol_RBI}} </small>{{team.UpVol_RBI}}</td>
-            <td><small>{{team.DownVol_SB}} </small>{{team.UpVol_SB}}</td>
-            <td><small>{{team.DownVol_OPS}} </small>{{team.UpVol_OPS}}</td>
-            <td><small>{{team.DownVol_W}} </small>{{team.UpVol_W}}</td>
-            <td><small>{{team.DownVol_SV}} </small>{{team.UpVol_SV}}</td>
-            <td><small>{{team.DownVol_K}} </small>{{team.UpVol_K}}</td>
-            <td><small>{{team.DownVol_ERA}} </small>{{team.UpVol_ERA}}</td>
-            <td><small>{{team.DownVol_WHIP}} </small>{{team.UpVol_WHIP}}</td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-</div>
+<h2>Projected Final Standings</h2>
+<table id="proj_final_standings" class="sortable display table table-hover">
+    <thead>
+    <tr>
+        <th>Total Points</th>
+        <th>Team Name</th>
+        <th>R</th>
+        <th>HR</th>
+        <th>RBI</th>
+        <th>SB</th>
+        <th>OPS</th>
+        <th>W</th>
+        <th>SV</th>
+        <th>K</th>
+        <th>ERA</th>
+        <th>WHIP</th>
+        <th>IP</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for team in projected_standings %}
+    <tr>
+        <td>{{team.PointsTotal}}</td>
+        <td>{{team.TEAM_NAME}}</td>
+        <td>{{team.PointsR}}</td>
+        <td>{{team.PointsHR}}</td>
+        <td>{{team.PointsRBI}}</td>
+        <td>{{team.PointsSB}}</td>
+        <td>{{team.PointsOPS}}</td>
+        <td>{{team.PointsW}}</td>
+        <td>{{team.PointsSV}}</td>
+        <td>{{team.PointsK}}</td>
+        <td>{{team.PointsERA}}</td>
+        <td>{{team.PointsWHIP}}</td>
+        <td>{{team.StatsIP}}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<h2>Projected Final Stats</h2>
+<table id="proj_final_stats" class="sortable display table table-hover">
+    <thead>
+    <tr>
+        <th>Team Name</th>
+        <th>R</th>
+        <th>HR</th>
+        <th>RBI</th>
+        <th>SB</th>
+        <th>OPS</th>
+        <th>W</th>
+        <th>SV</th>
+        <th>K</th>
+        <th>ERA</th>
+        <th>WHIP</th>
+        <th>IP</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for team in projected_standings %}
+    <tr>
+        <td>{{team.TEAM_NAME}}</td>
+        <td>{{team.StatsR}}</td>
+        <td>{{team.StatsHR}}</td>
+        <td>{{team.StatsRBI}}</td>
+        <td>{{team.StatsSB}}</td>
+        <td>{{team.StatsOPS|floatformat:3}}</td>
+        <td>{{team.StatsW}}</td>
+        <td>{{team.StatsSV}}</td>
+        <td>{{team.StatsK}}</td>
+        <td>{{team.StatsERA|floatformat:2}}</td>
+        <td>{{team.StatsWHIP|floatformat:2}}</td>
+        <td>{{team.StatsIP}}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<h2>Projected Final Volatility</h2>
+<table id="proj_final_volatility" class="sortable display table table-hover">
+    <thead>
+    <tr>
+        <th>Volatility(<small>Down</small> Up)</th>
+        <th>Team Name</th>
+        <th>R</th>
+        <th>HR</th>
+        <th>RBI</th>
+        <th>SB</th>
+        <th>OPS</th>
+        <th>W</th>
+        <th>SV</th>
+        <th>K</th>
+        <th>ERA</th>
+        <th>WHIP</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for team in projected_standings %}
+    <tr>
+        <td><small>{{team.Total_Downward_Volatility}} </small>{{team.Total_Upward_Volatility}}</td>
+        <td>{{team.TEAM_NAME}}</td>
+        <td><small>{{team.DownVol_R}} </small>{{team.UpVol_R}}</td>
+        <td><small>{{team.DownVol_HR}} </small>{{team.UpVol_HR}}</td>
+        <td><small>{{team.DownVol_RBI}} </small>{{team.UpVol_RBI}}</td>
+        <td><small>{{team.DownVol_SB}} </small>{{team.UpVol_SB}}</td>
+        <td><small>{{team.DownVol_OPS}} </small>{{team.UpVol_OPS}}</td>
+        <td><small>{{team.DownVol_W}} </small>{{team.UpVol_W}}</td>
+        <td><small>{{team.DownVol_SV}} </small>{{team.UpVol_SV}}</td>
+        <td><small>{{team.DownVol_K}} </small>{{team.UpVol_K}}</td>
+        <td><small>{{team.DownVol_ERA}} </small>{{team.UpVol_ERA}}</td>
+        <td><small>{{team.DownVol_WHIP}} </small>{{team.UpVol_WHIP}}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
 {% endblock %}

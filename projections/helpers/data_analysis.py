@@ -257,13 +257,17 @@ def pitching_roster_optimizer(team_dict, ros_projection_list, league_pos_dict, c
         i = 0
         regex_pos = re.compile(pos)
         multi_pos = False
-        if current_ip >= league.max_ip:
+        if isinstance(league, dict):
+            max_ip = league['Max Innings Pitched']
+        else:
+            max_ip = league.max_ip
+        if current_ip >= max_ip:
             break
         else:
             while i < len(team_player_list):
                 player = team_player_list[i]
-                if player.ip + current_ip > league.max_ip:
-                    player = partial_pitcher(player, league.max_ip, current_ip)
+                if player.ip + current_ip > max_ip:
+                    player = partial_pitcher(player, max_ip, current_ip)
                 if filter(regex_pos.match, player.pos) or pos == "P":
                     if (pos == "SP" and not player.is_sp) or (pos == "RP" and player.is_sp):
                         i += 1
@@ -353,9 +357,13 @@ def bench_roster_optimizer(team_dict, ros_batter_projection_list, ros_pitcher_pr
     current_ip += starter_ip
     for player in team_player_list:
         if player.category == "pitcher":
-            if current_ip < league.max_ip:
-                if player.ip + current_ip > league.max_ip:
-                    player = partial_pitcher(player, league.max_ip, current_ip)
+            if isinstance(league, dict):
+                max_ip = league['Max Innings Pitched']
+            else:
+                max_ip = league.max_ip
+            if current_ip < max_ip:
+                if player.ip + current_ip > max_ip:
+                    player = partial_pitcher(player, max_ip, current_ip)
                 bench_players['pitchers'].append(player)
                 current_ip += player.ip
                 bench_ip += player.ip
@@ -470,8 +478,15 @@ def final_stats_projection(team_list, ros_proj_b_list, ros_proj_p_list, current_
     """
     final_standings = []
     for team in team_list:
-        roster_pos = {'Batting POS': list(league.batting_pos), 'Pitching POS': list(league.pitcher_pos),
-                      'Bench POS': list(league.bench_pos), 'DL POS': list(league.dl_pos), 'NA_POS': list(league.na_pos)}
+        # TODO: refactor these lists before they get to this point
+        if isinstance(league, dict):
+            roster_pos = {'Batting POS': list(league['Batting POS']), 'Pitching POS': list(league['Pitching POS']),
+                          'Bench POS': list(league['Bench POS']), 'DL POS': list(league['DL POS']),
+                          'NA_POS': list(league['NA POS'])}
+        else:
+            roster_pos = {'Batting POS': list(league.batting_pos), 'Pitching POS': list(league.pitcher_pos),
+                          'Bench POS': list(league.bench_pos), 'DL POS': list(league.dl_pos),
+                          'NA_POS': list(league.na_pos)}
         optimized_team = team_optimizer(team, ros_proj_b_list, ros_proj_p_list, roster_pos, current_stangings,
                                         league)
         # TODO: this is a shitty way of finding a missing team, what if the guids simply don't match (ie new manager)?

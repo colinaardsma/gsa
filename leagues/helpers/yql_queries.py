@@ -303,8 +303,7 @@ def get_all_team_rosters(league_key, user, redirect):
 def get_single_team_roster(league_key, user, redirect):
     game_id = league_key.split(".l.")[0]
     query_dict = get_user_query(user, redirect, "/teams/roster", game_id)
-    rosters_dict = (query_dict['fantasy_content']['users']['0']['user'][1]
-    ['games']['0']['game'][1]['teams'])
+    rosters_dict = (query_dict['fantasy_content']['users']['0']['user'][1]['games']['0']['game'][1]['teams'])
     user_team_list = format_single_team_rosters_dict(rosters_dict)
     for team in user_team_list:
         if league_key in team['TEAM_KEY']:
@@ -329,6 +328,8 @@ def format_team_rosters_dict(team_count, rosters):
         team_dict = {}
         team_rosters_dict = rosters['{}'.format(i)]['team']
         team_dict_info = dict([(key, dct[key]) for dct in team_rosters_dict[0] for key in dct])
+        pprint.pprint(team_rosters_dict)
+        team_dict['TEAM_KEY'] = team_dict_info['team_key']
         team_dict['TEAM_NAME'] = team_dict_info['name']
         team_dict['TEAM_NUMBER'] = team_dict_info['team_id']
 
@@ -340,10 +341,14 @@ def format_team_rosters_dict(team_count, rosters):
         team_dict['manager_guids'] = manager_guid_list
 
         roster = []
-        roster_count = team_rosters_dict[1]['roster']['0']['players']['count']
+        if team_rosters_dict[1]:
+            roster_dict = team_rosters_dict[1]['roster']['0']['players']
+        else:
+            roster_dict = team_rosters_dict[2]['roster']['0']['players']
+        roster_count = roster_dict['count']
         for j in range(roster_count):
             player_dict = {}
-            info = team_rosters_dict[1]['roster']['0']['players']['{}'.format(j)]['player'][0]
+            info = roster_dict['{}'.format(j)]['player'][0]
             player_data_dict = dict([(key, dct[key]) for dct in info for key in dct])
 
             first_name = player_data_dict['name']['ascii_first']
@@ -354,6 +359,7 @@ def format_team_rosters_dict(team_count, rosters):
             player_dict["NORMALIZED_FIRST_NAME"] = norm_name['First']
             player_dict["LAST_NAME"] = norm_name['Last']
             team = player_data_dict['editorial_team_abbr']
+            player_dict['POS'] = player_data_dict['display_position'].split(',')
             player_dict['TEAM'] = team_normalizer(team)
             roster.append(player_dict)
         team_dict['ROSTER'] = roster
@@ -592,6 +598,8 @@ def get_league_transactions(league_key, user, redirect):
             for j in range(player_count):
                 player = {}
                 player_list = player_dict['{}'.format(j)]['player']
+                # team_dict = dict([(key, dct[key]) for dct in team_data[0] for key in dct])
+
                 player['player_key'] = player_list[0][0]['player_key']
                 ascii_first_name = player_list[0][2]['name']['ascii_first']
                 ascii_last_name = player_list[0][2]['name']['ascii_last']
