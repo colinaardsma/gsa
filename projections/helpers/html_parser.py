@@ -19,7 +19,10 @@ def html_to_document(url, headers=None):
     Raises:\n
         None.
     """
-    req = request.Request(url, headers=headers)
+    if headers:
+        req = request.Request(url, headers=headers)
+    else:
+        req = request.Request(url)
     while True:
         try:
             content = request.urlopen(req).read().decode('utf-8')
@@ -119,14 +122,7 @@ def parse_pos_from_url(playerid):
 
 
 def razzball_get_projection_page(url):
-    headers = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) '
-                             'Chrome/23.0.1271.64 Safari/537.11',
-               'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-               'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
-               'Accept-Encoding': 'none',
-               'Accept-Language': 'en-US,en;q=0.8',
-               'Connection': 'keep-alive'}
-    document = html_to_document(url, headers)
+    document = html_to_document(url, HEADERS)
     return document
 
 
@@ -178,8 +174,6 @@ def scrape_razzball_batters(url):
             batter['isFA'] = False
         if 'keeper' not in batter:
             batter['keeper'] = 0.0
-        if 'category' not in batter:
-            batter['category'] = "batter"
         if 'status' not in batter:
             batter['status'] = ''
     return batter_list
@@ -210,8 +204,6 @@ def scrape_razzball_pitchers(url):
             pitcher['keeper'] = 0.0
         if 'is_sp' not in pitcher:
             pitcher['is_sp'] = True if 'SP' in pitcher['pos'] else False
-        if 'category' not in pitcher:
-            pitcher['category'] = "pitcher"
         if 'kip' not in pitcher:
             pitcher['kip'] = pitcher['k'] / pitcher['ip']
         if 'winsip' not in pitcher:
@@ -219,6 +211,38 @@ def scrape_razzball_pitchers(url):
         if 'status' not in pitcher:
             pitcher['status'] = ''
     return pitcher_list
+
+
+def scrape_closer_monkey():
+    url = 'http://closermonkey.com/2015/05/04/updated-closer-depth-chart/'
+    document = html_to_document(url, HEADERS)
+    div = document.xpath("//div[@class='entry-content']")
+    table = div[0].xpath("descendant::table")
+    tr_list = table[0].xpath("descendant::tr")
+    cl_list = []
+    for tr in tr_list[1:len(tr_list) - 1]:
+        td_list = tr.xpath("descendant::td/descendant-or-self::*/text()")
+        team_one_cl_one = {'last_name': td_list[1].strip('*').lower(), 'team': td_list[0], 'pos': 'CL1'}
+        team_one_cl_two = {'last_name': td_list[2].lower(), 'team': td_list[0], 'pos': 'CL2'}
+        team_one_cl_three = {'last_name': td_list[3].lower(), 'team': td_list[0], 'pos': 'CL3'}
+        if "*" in td_list[1]:
+            team_one_cl_one['pos'] = 'CLC'
+            team_one_cl_two['pos'] = 'CLC'
+            team_one_cl_three['pos'] = 'CLC'
+        cl_list.append(team_one_cl_one)
+        cl_list.append(team_one_cl_two)
+        cl_list.append(team_one_cl_three)
+        team_two_cl_one = {'last_name': td_list[6].strip('*').lower(), 'team': td_list[5], 'pos': 'CL1'}
+        team_two_cl_two = {'last_name': td_list[7].lower(), 'team': td_list[5], 'pos': 'CL2'}
+        team_two_cl_three = {'last_name': td_list[8].lower(), 'team': td_list[5], 'pos': 'CL3'}
+        if "*" in td_list[6]:
+            team_two_cl_one['pos'] = 'CLC'
+            team_two_cl_two['pos'] = 'CLC'
+            team_two_cl_three['pos'] = 'CLC'
+        cl_list.append(team_two_cl_one)
+        cl_list.append(team_two_cl_two)
+        cl_list.append(team_two_cl_three)
+    return cl_list
 
 
 def pretty_print_element(element):
@@ -242,3 +266,12 @@ def timezone_switch_case(tz_string):
                 'PDT': '-0700',
                 'PST': '-0800'}
     return switcher.get(tz_string, '-0000')
+
+
+HEADERS = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) '
+                         'Chrome/23.0.1271.64 Safari/537.11',
+           'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+           'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
+           'Accept-Encoding': 'none',
+           'Accept-Language': 'en-US,en;q=0.8',
+           'Connection': 'keep-alive'}

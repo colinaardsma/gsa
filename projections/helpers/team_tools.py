@@ -355,8 +355,8 @@ def pull_players_csv(user, league, pitcher_csv, batter_csv):
 
 def pull_players_html(user, league, batter_url, pitcher_url):
     start = time.time()
-    batter_list = scrape_razzball_batters(batter_url)
-    pitcher_list = scrape_razzball_pitchers(pitcher_url)
+    pitcher_list = create_full_pitcher_html(pitcher_url)
+    batter_list = create_full_batter_html(batter_url)
     end = time.time()
     elapsed = end - start
     logging.info("\r\n***************\r\nPlayer Creation in %f seconds", elapsed)

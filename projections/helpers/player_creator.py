@@ -9,13 +9,13 @@ from django.forms.models import model_to_dict
 
 from .advanced_stat_calc import avg_calc, std_dev_calc, z_score_calc, z_score_calc_era_whip
 from .csv_parser import parse_batters_from_csv, parse_pitchers_from_csv
-from .html_parser import fantasy_pro_players
+from .html_parser import fantasy_pro_players, scrape_closer_monkey, scrape_razzball_batters, scrape_razzball_pitchers
 from .normalizer import name_normalizer
 
 
 def create_full_batter_html(url):
     """Create batters using html"""
-    raw_batter_list = fantasy_pro_players(url)
+    raw_batter_list = scrape_razzball_batters(url)
     return create_full_batter(raw_batter_list)
 
 
@@ -168,7 +168,7 @@ def calc_batter_z_score(batter_list, players_over_zero_dollars, one_dollar_playe
 
 def create_full_pitcher_html(url):
     """Create pitchers using html"""
-    raw_pitcher_list = fantasy_pro_players(url)
+    raw_pitcher_list = scrape_razzball_pitchers(url)
     return create_full_pitcher(raw_pitcher_list)
 
 
@@ -185,8 +185,14 @@ def create_full_pitcher(raw_pitcher_list):
     # for raw_pitcher in raw_pitcher_list:
     #     if raw_pitcher.get("IP") > max_ip:
     #         max_ip = raw_pitcher.get("IP")
+    closers = scrape_closer_monkey()
+    pprint.pprint(closers)
     for raw_pitcher in raw_pitcher_list:
         raw_pitcher['category'] = "pitcher"
+        for closer in closers:
+            if raw_pitcher['last_name'] == closer['last_name'] and raw_pitcher['team'] == closer['team']:
+                raw_pitcher['pos'].append(closer['pos'])
+                continue
         pitcher_model_list.append(raw_pitcher)
     return pitcher_model_list
 
