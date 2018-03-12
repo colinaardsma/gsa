@@ -132,9 +132,6 @@ STATICFILES_FINDERS = (
     #'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
-# TODO: add a redirect to link yahoo account?
-LOGIN_REDIRECT_URL = '/user'
-
 # Global Variables
 TEAM_TOOLS_REDIRECT = '/team_tools'
 USER_REDIRECT = '/user'

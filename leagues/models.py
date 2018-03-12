@@ -249,7 +249,7 @@ def calc_three_year_avgs(league_key):
     one_dollar_pitchers_avg_list = []
     b_dollar_per_fvaaz_avg_list = []
     p_dollar_per_fvaaz_avg_list = []
-    # TODO: populate mults
+    # TODO: populate mults, i think this is already done?
     b_player_pool_mult_avg_list = []
     p_player_pool_mult_avg_list = []
 

@@ -105,67 +105,42 @@ def get_leagues(user, redirect):
         league_dict = current_year_league_base['{}'.format(i)]['league'][0]
         current_year_league_list.append(league_dict)
     league_history_list = []
-    # TODO: refactor this to be a loop (or separate method) instead of 3-4 individual calls
     for current_year_league in current_year_league_list:
-        current_year_league_dict = {}
-        current_year_league_key = current_year_league['league_key']
-        current_year_league_dict['league_key'] = current_year_league_key
-        current_year_league_dict['name'] = current_year_league['name']
-        current_year_league_dict['season'] = current_year_league['season']
-        if current_year_league['renew'] == '':
-            current_year_league_dict['prev_year'] = None
-            league_history_list.append(current_year_league_dict)
-            continue
-        current_year_league_dict['prev_year'] = current_year_league['renew'].replace("_", ".l.")
+        current_year_league_dict = get_league_dict(current_year_league)
         league_history_list.append(current_year_league_dict)
 
-        one_year_prior_league_dict = {}
-        one_year_prior_league_key = current_year_league_dict['prev_year']
-        one_year_prior_dict_base = get_league_query(one_year_prior_league_key, user, redirect, "")
-        one_year_prior_dict = (one_year_prior_dict_base['fantasy_content']['leagues']['0']['league'][0])
-        one_year_prior_league_dict['league_key'] = one_year_prior_league_key
-        one_year_prior_league_dict['season'] = one_year_prior_dict['season']
-        one_year_prior_league_dict['name'] = one_year_prior_dict['name']
-        if one_year_prior_dict['renew'] == '':
-            one_year_prior_league_dict['prev_year'] = None
-            league_history_list.append(one_year_prior_league_dict)
-            continue
-        one_year_prior_league_dict['prev_year'] = one_year_prior_dict['renew'].replace("_", ".l.")
+        one_year_prior_league_dict = get_league_dict(current_year_league_dict, True, user, redirect)
         league_history_list.append(one_year_prior_league_dict)
 
-        two_years_prior_league_dict = {}
-        two_years_prior_league_key = one_year_prior_league_dict['prev_year']
-        two_years_prior_dict_base = get_league_query(two_years_prior_league_key, user, redirect, "")
-        two_years_prior_dict = (two_years_prior_dict_base['fantasy_content']['leagues']['0']['league'][0])
-        two_years_prior_league_dict['league_key'] = two_years_prior_league_key
-        two_years_prior_league_dict['season'] = two_years_prior_dict['season']
-        two_years_prior_league_dict['name'] = two_years_prior_dict['name']
-        if two_years_prior_dict['renew'] == '':
-            two_years_prior_league_dict['prev_year'] = None
-            league_history_list.append(two_years_prior_league_dict)
-            continue
-        two_years_prior_league_dict['prev_year'] = two_years_prior_dict['renew'].replace("_", ".l.")
+        two_years_prior_league_dict = get_league_dict(one_year_prior_league_dict, True, user, redirect)
         league_history_list.append(two_years_prior_league_dict)
 
+        # TODO: i dont think this is working?
         current_league_start_datetime = datetime.strptime(current_year_league['start_date'], '%Y-%m-%d')
         now = datetime.now()
         if current_league_start_datetime > now:
-            three_years_prior_league_dict = {}
-            three_years_prior_league_key = two_years_prior_league_dict['prev_year']
-            three_years_prior_dict_base = get_league_query(three_years_prior_league_key, user, redirect, "")
-            three_years_prior_dict = (three_years_prior_dict_base['fantasy_content']['leagues']['0']['league'][0])
-            three_years_prior_league_dict['league_key'] = three_years_prior_league_key
-            three_years_prior_league_dict['season'] = three_years_prior_dict['season']
-            three_years_prior_league_dict['name'] = three_years_prior_dict['name']
-            if three_years_prior_dict['renew'] == '':
-                three_years_prior_league_dict['prev_year'] = None
-                league_history_list.append(three_years_prior_league_dict)
-                continue
-            three_years_prior_league_dict['prev_year'] = three_years_prior_dict['renew'].replace("_", ".l.")
+            three_years_prior_league_dict = get_league_dict(two_years_prior_league_dict, True, user, redirect)
             league_history_list.append(three_years_prior_league_dict)
 
     sorted_league_history_list = sorted(league_history_list, key=itemgetter('season'), reverse=False)
     return sorted_league_history_list
+
+
+def get_league_dict(league, get_prev_league=False, user=None, redirect=None):
+    league_dict = {}
+    if get_prev_league:
+        year_prior_league_key = league['prev_year']
+        year_prior_dict_base = get_league_query(year_prior_league_key, user, redirect, "")
+        league = (year_prior_dict_base['fantasy_content']['leagues']['0']['league'][0])
+    league_key = league['league_key']
+    league_dict['league_key'] = league_key
+    league_dict['name'] = league['name']
+    league_dict['season'] = league['season']
+    if league['renew'] == '':
+        league_dict['prev_year'] = None
+        return league_dict
+    league_dict['prev_year'] = league['renew'].replace("_", ".l.")
+    return league_dict
 
 
 def get_current_leagues(league_list):

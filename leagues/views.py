@@ -31,19 +31,6 @@ from gsa.settings import TOKEN_REDIRECT_PATH, TEAM_TOOLS_REDIRECT, USER_REDIRECT
 #     return user
 
 
-def index(request):
-    # TODO: this POST/GET logic is correct syntax, but currently does nothing
-    if request.method == 'POST':
-        elapsed = request.POST['elapsed']
-        yahoo_link = request.POST['yahoo_link']
-    else:
-        # question = get_object_or_404(Question, pk=question_id)
-        # return render(request, 'index.html', {'question': question})
-        yahoo_link = request_auth(TOKEN_REDIRECT_PATH)
-        elapsed = None
-    return render(request, 'index.html', {'yahoo_link': yahoo_link, 'elapsed': elapsed})
-
-
 # def link_yahoo(request):
 #     yahoo_link = request_auth(TOKEN_REDIRECT_PATH)
 #     self.render_user(link_yahoo=link_yahoo)
@@ -86,7 +73,7 @@ def update_main_league(request):
 def main_page(request):
     return render(request, "main_page.html", {})
 
-# TODO: improved this via https://simpleisbetterthancomplex.com/tutorial/2017/02/18/how-to-create-user-sign-up-view.html
+
 def registration(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
