@@ -211,13 +211,15 @@ def user_(request):
     else:
         batter_url = 'http://razzball.com/steamer-hitter-projections/'
         pitcher_url = 'http://razzball.com/steamer-pitcher-projections/'
-        if oldest_last_mod_date.date() < now.date():
-            razzball_proj_update_datetime = razzball_get_update_datetime(batter_url)
-            if razzball_proj_update_datetime < oldest_last_mod_date:
-                razzball_proj_update_datetime = None
+        # TODO: old way of checking for updated razzball, can delete
+        # if oldest_last_mod_date.date() < now.date():
+        #     razzball_proj_update_datetime = razzball_get_update_datetime(batter_url)
+        #     if razzball_proj_update_datetime < oldest_last_mod_date:
+        #         razzball_proj_update_datetime = None
 
     return render(request, 'user.html', {'yahoo_link': yahoo_link, 'elapsed': elapsed,
                                          'max_year_leagues': max_year_leagues_,
-                                         'razzball_proj_update_datetime': razzball_proj_update_datetime,
+                                         # 'razzball_proj_update_datetime': razzball_proj_update_datetime,
+                                         'proj_update_datetime': oldest_last_mod_date,
                                          'main_league': main_league, 'batter_url': batter_url,
                                          'pitcher_url': pitcher_url})

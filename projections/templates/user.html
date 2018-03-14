@@ -27,15 +27,7 @@
 <div>
     <h2>Update Database Player Projections</h2>
     <a href="/projections/scrape_proj" class="btn btn-outline-primary btn-sm">Scrape Projections from Razzball</a>
-    <p>
-        {% if razzball_proj_update_datetime %}
-        {% localtime off %}
-        <strong>NEW PROJECTIONS AVAILABLE AS OF {{razzball_proj_update_datetime|date:'n.j.Y'}}</strong>
-        {% endlocaltime %}
-        {% else %}
-        Projections are up to date
-        {% endif %}
-    </p>
+    <p id="razzball_update_check">Checking for updated Projections...</p>
     {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
 
@@ -86,6 +78,27 @@
         <button type="submit" class="btn btn-primary btn-sm">set</button>
     </form>
 </div>
+
+<!--TODO: Move this into a js file-->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script type="text/javascript">
+    function get_razzball_update_date(dbUpdateString) {
+        $.getJSON('http://allorigins.me/get?url=' + encodeURIComponent('https://razzball.com/steamer-hitter-projections/') + '&callback=?', function(data){
+            var razzballUpdateString = $(data.contents).find('abbr').attr("class", 'entry-date published updated').text();
+            var razzballUpdateDate = new Date(razzballUpdateString);
+            var formattedRazzUpdate = `${razzballUpdateDate.getMonth() + 1}.${razzballUpdateDate.getDate()}.${razzballUpdateDate.getFullYear()}`;
+            var dbUpdateDate = new Date(dbUpdateString);
+            var newProjectionString = `<strong>NEW PROJECTIONS AVAILABLE AS OF ${formattedRazzUpdate}</strong>`;
+            var noNewProjectionString = 'Projections are up to date';
+            var updateText = (razzballUpdateDate > dbUpdateDate ? newProjectionString : noNewProjectionString);
+            document.getElementById("razzball_update_check").innerHTML = updateText;
+        });
+    }
+</script>
+<script type="text/javascript">
+     get_razzball_update_date('{{proj_update_datetime|date:"c"}}');
+</script>
+
 {% endblock %}
 
 
