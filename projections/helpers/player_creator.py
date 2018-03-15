@@ -188,11 +188,11 @@ def create_full_pitcher(raw_pitcher_list):
     #     if raw_pitcher.get("IP") > max_ip:
     #         max_ip = raw_pitcher.get("IP")
     closers = scrape_closer_monkey()
-    pprint.pprint(closers)
     for raw_pitcher in raw_pitcher_list:
         raw_pitcher['category'] = "pitcher"
         for closer in closers:
-            if raw_pitcher['last_name'] == closer['last_name'] and raw_pitcher['team'] == closer['team']:
+            if (raw_pitcher['last_name'].lower() == closer['last_name'].lower()
+                    and raw_pitcher['team'].upper() == closer['team'].upper()):
                 raw_pitcher['pos'].append(closer['pos'])
                 continue
         pitcher_model_list.append(raw_pitcher)

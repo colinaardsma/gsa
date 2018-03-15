@@ -6,6 +6,7 @@ import base64
 from datetime import datetime, timezone, timedelta
 import json
 from urllib import parse, request
+from urllib.error import HTTPError
 from http.client import HTTPException
 import logging
 
@@ -91,16 +92,18 @@ def get_json_data(url, access_token):
     return raw_json
 
 
-def get_xml_data(url, access_token):
+def get_xml_data(url, access_token, retries=3):
     headers = {b'Authorization': b'Bearer ' + access_token.encode('utf-8'), b'request': b'None'}
     req = request.Request(url, headers=headers)
     while True:
         try:
+            retries -= 1
             content = request.urlopen(req)
             raw_xml = content.read()
-        except HTTPException as error:
-            print(error)
-            continue
+        except (HTTPException, HTTPError) as error:
+            logging.error(error)
+            # print(error)
+            return get_xml_data(url, access_token, retries)
         break
     return raw_xml
 

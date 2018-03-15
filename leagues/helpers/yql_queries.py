@@ -303,7 +303,6 @@ def format_team_rosters_dict(team_count, rosters):
         team_dict = {}
         team_rosters_dict = rosters['{}'.format(i)]['team']
         team_dict_info = dict([(key, dct[key]) for dct in team_rosters_dict[0] for key in dct])
-        pprint.pprint(team_rosters_dict)
         team_dict['TEAM_KEY'] = team_dict_info['team_key']
         team_dict['TEAM_NAME'] = team_dict_info['name']
         team_dict['TEAM_NUMBER'] = team_dict_info['team_id']
@@ -564,8 +563,8 @@ def get_current_rosters(league_key, user, redirect):
     return current_rosters
 
 
-def get_league_transactions(league_key, user, redirect):
-    query_dict = get_league_query(league_key, user, redirect, "/transactions")
+def get_league_transactions(league, user, redirect):
+    query_dict = get_league_query(league.league_key, user, redirect, "/transactions")
     transactions_dict = query_dict['fantasy_content']['leagues']['0']['league'][1]['transactions']
     transaction_count = transactions_dict['count']
     transactions = []
@@ -630,7 +629,7 @@ def get_keepers(league, user, redirect):
         new_league = ''
     current_rosters = get_current_rosters(prev_league.league_key, user, redirect)
     auction_results = get_auction_results(prev_league, user, redirect)
-    league_transactions = get_league_transactions(prev_league.league_key, user, redirect)
+    league_transactions = get_league_transactions(prev_league, user, redirect)
     list_of_managers = []
     try:
         if not new_league:

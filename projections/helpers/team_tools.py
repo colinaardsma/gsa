@@ -204,13 +204,11 @@ def get_projected_keepers(league_key, user, redirect):
     keeper_team_stats = analyze_keeper_team_stats(league, user, redirect, projected_keepers, ros_proj_b_list, ros_proj_p_list)
     ranked_stats = rank_list(keeper_team_stats)
 
-    # pprint.pprint(ranked_stats)
     for key, value in projected_keepers['projected_keepers'].items():
         for stats in ranked_stats:
             if [mg for mg in value['manager_guids'] if mg in stats['manager_guids']]:
                 value['keeper_stats_avg'] = stats
                 value['dollar_spent_per_point'] = value['total_cost'] / stats['PointsTotal']
-    # pprint.pprint(projected_keepers['projected_keepers'])
 
     end = time.time()
     elapsed = end - start
@@ -226,7 +224,6 @@ def analyze_keeper_team_stats(league, user, redirect, projected_keepers, ros_pro
         new_league = league
     standings = keeper_standing_projection(new_league, user, redirect, projected_keepers, ros_proj_b_list,
                                            ros_proj_p_list)
-    # pprint.pprint(standings)
     league_needs = []
     for std_team in standings:
         for keeper_team_name, keeper_team_values in projected_keepers['projected_keepers'].items():
