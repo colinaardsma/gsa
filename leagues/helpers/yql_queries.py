@@ -383,7 +383,7 @@ def get_players(league_key, user, redirect, total_players, pOrB, player_list_typ
     return formatted_fas
 
 
-def get_auction_results(league_key, user, redirect):
+def get_auction_results(league, user, redirect):
     auction_results = {'results': []}
 
     total_money_spent = 0
@@ -395,6 +395,17 @@ def get_auction_results(league_key, user, redirect):
     total_pitchers_drafted = 0
     one_dollar_batters = 0
     one_dollar_pitchers = 0
+
+    if isinstance(league, dict):
+        if league['draft_status'] == 'predraft':
+            league_key = league['prev_year_key']
+        else:
+            league_key = league['league_key']
+    else:
+        if league.draft_status == 'predraft':
+            league_key = league.prev_year_league.league_key
+        else:
+            league_key = league.league_key
 
     auction_query_results_dict = get_league_query(league_key, user, redirect, '/draftresults')
     auction_results_dict = auction_query_results_dict['fantasy_content']['leagues']['0']['league'][1]['draft_results']
@@ -611,12 +622,19 @@ def get_league_transactions(league_key, user, redirect):
 
 
 def get_keepers(league, user, redirect):
-    current_rosters = get_current_rosters(league.league_key, user, redirect)
-    auction_results = get_auction_results(league.league_key, user, redirect)
-    league_transactions = get_league_transactions(league.league_key, user, redirect)
+    if league.draft_status == 'predraft':
+        new_league = league
+        prev_league = league.prev_year_league
+    else:
+        prev_league = league
+        new_league = ''
+    current_rosters = get_current_rosters(prev_league.league_key, user, redirect)
+    auction_results = get_auction_results(prev_league, user, redirect)
+    league_transactions = get_league_transactions(prev_league.league_key, user, redirect)
     list_of_managers = []
     try:
-        new_league = user.profile.leagues.get(prev_year_key=league.league_key)
+        if not new_league:
+            new_league = user.profile.leagues.get(prev_year_key=league.league_key)
         new_current_rosters = get_current_rosters(new_league.league_key, user, redirect)
         for team in new_current_rosters:
             list_of_managers.extend(team['manager_guids'])
@@ -730,10 +748,10 @@ def update_leagues(user, redirect):
                                 season=settings['Season'])
                 # if preseason & postdraft
                 else:
-                    results = get_auction_results(league['league_key'], user, redirect)
+                    results = get_auction_results(league, user, redirect)
                     drafted_batters_over_one_dollar = (results['total_batters_drafted'] - results['one_dollar_batters'])
                     drafted_pitchers_over_one_dollar = (
-                                results['total_pitchers_drafted'] - results['one_dollar_pitchers'])
+                            results['total_pitchers_drafted'] - results['one_dollar_pitchers'])
 
                     batter_fvaaz_over_one_dollar = heapq.nlargest(drafted_batters_over_one_dollar, batter_fvaaz_list)
                     pitcher_fvaaz_over_one_dollar = heapq.nlargest(drafted_pitchers_over_one_dollar, pitcher_fvaaz_list)
@@ -742,7 +760,7 @@ def update_leagues(user, redirect):
 
                     batter_budget_over_one_dollar = (results['money_spent_on_batters'] - results['one_dollar_batters'])
                     pitcher_budget_over_one_dollar = (
-                                results['money_spent_on_pitchers'] - results['one_dollar_pitchers'])
+                            results['money_spent_on_pitchers'] - results['one_dollar_pitchers'])
 
                     batter_dollar_per_fvaaz = (batter_budget_over_one_dollar / total_batter_fvaaz_over_one_dollar)
                     pitcher_dollar_per_fvaaz = (pitcher_budget_over_one_dollar / total_pitcher_fvaaz_over_one_dollar)
@@ -773,7 +791,7 @@ def update_leagues(user, redirect):
             # if no league & in season
             else:
                 league_status, standings = get_league_standings(league['league_key'], user, redirect)
-                results = get_auction_results(league['league_key'], user, redirect)
+                results = get_auction_results(league, user, redirect)
                 sgp = get_sgp(standings)
                 avg_sgp = 0.00
                 ops_sgp = 0.00
@@ -836,7 +854,7 @@ def update_leagues(user, redirect):
                               season=settings['Season'])
             # if preseason & postdraft
             else:
-                results = get_auction_results(league['league_key'], user, redirect)
+                results = get_auction_results(league, user, redirect)
                 drafted_batters_over_one_dollar = (results['total_batters_drafted'] - results['one_dollar_batters'])
                 drafted_pitchers_over_one_dollar = (results['total_pitchers_drafted'] - results['one_dollar_pitchers'])
 
@@ -881,6 +899,81 @@ def update_leagues(user, redirect):
             calc_three_year_avgs(settings['League Key'])
             main_league = league
     update_profile(user=user, main_league=main_league['league_key'])
+
+
+# def get_team_query(league_key, user, redirect, endpoint):
+#     endpoint = "/teams" + endpoint
+#     team_base_dict = get_league_query(league_key, user, redirect, endpoint)
+#     return team_base_dict
+#
+#
+# def get_all_team_rosters(league_key, user, redirect):
+#     query_dict = get_team_query(league_key, user, redirect, "/roster")
+#     rosters_dict = query_dict['fantasy_content']['leagues']['0']['league']
+#     return format_all_team_rosters_dict(rosters_dict)
+
+
+def get_keeper_query(league, user, redirect):
+    updated_user = check_token_expiration(user, redirect)
+    if updated_user:
+        user = updated_user
+    keepers = []
+    for i in range(league.team_count):
+        query_path = f'/team/{league.league_key}.t.{i + 1}/players;status=K'
+        team_base_json = yql_query(query_path, user.profile.access_token)
+        team_base_dict = json.loads(team_base_json)
+
+        team_data = team_base_dict['fantasy_content']['team']
+        team_dict = dict([(key, dct[key]) for dct in team_data[0] for key in dct])
+
+        team = {'team_key': team_dict['team_key'], 'team_name': team_dict['name'],
+                'waiver_priority': team_dict['waiver_priority'], 'faab_balance': team_dict['faab_balance']}
+        if 'auction_budget_total' in team_dict:
+            team['auction_budget'] = team_dict['auction_budget_total']
+        managers = team_dict['managers']
+        manager_guid_list = []
+        for manager in managers:
+            guid = manager['manager']['guid']
+            manager_guid_list.append(guid)
+        team['manager_guids'] = manager_guid_list
+
+        roster = []
+        roster_dict = team_data[1]['players']
+        if 'count' in roster_dict:
+            roster_count = roster_dict['count']
+            for j in range(roster_count):
+                player = {}
+                player_data = roster_dict['{}'.format(j)]['player'][0]
+                player_dict = dict([(key, dct[key]) for dct in player_data for key in dct])
+
+                player['player_key'] = player_dict['player_key']
+                ascii_first_name = player_dict['name']['ascii_first']
+                ascii_last_name = player_dict['name']['ascii_last']
+                normalized_name = name_normalizer(ascii_first_name + ' ' + ascii_last_name)
+                player['full_name'] = normalized_name['Full']
+                player['first_name'] = normalized_name['First']
+                player['last_name'] = normalized_name['Last']
+                if 'status_full' in player_dict:
+                    player['status'] = player_dict['status_full']
+                else:
+                    player['status'] = ''
+                player_team = player_dict['editorial_team_abbr']
+                player['team'] = team_normalizer(player_team)
+                player['category'] = 'pitcher'
+                if 'position_type' in player_dict:
+                    if player_dict['position_type'] == 'B':
+                        player['category'] = 'batter'
+                if 'eligible_positions' in player_dict:
+                    positions = player_dict['eligible_positions']
+                position_list = []
+                for position in positions:
+                    pos = position['position']
+                    position_list.append(pos)
+                player['positions'] = position_list
+                roster.append(player)
+            team['roster'] = roster
+            keepers.append(team)
+    return keepers
 
 
 STAT_ID_DICT = {'1': 'TotalGP',

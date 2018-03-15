@@ -5,7 +5,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.db.models import Max
+from django.db.models import Max, Q
 from django.contrib.postgres.fields import ArrayField
 
 
@@ -213,17 +213,19 @@ def update_league(league, user=None, prev_year_league=None, league_name=None, le
     return league
 
 
-# TODO: this needs to be refactored to include multiple years in case of user with multiple leagues and some that have not yet drafted
+# TODO: this needs to be refactored to remove the previous year once the "current" year beings
 def max_year_leagues(user):
     try:
-        user_leagues = user.profile.leagues.filter(draft_status='postdraft')
+        max_season = user.profile.leagues.order_by('-season')[0].season
+        user_leagues = user.profile.leagues.filter(Q(season=max_season) | Q(season=max_season - 1)).order_by('-season')
     except User.DoesNotExist:
         user_leagues = None
     if not user_leagues:
         return None
 
-    max_year = user_leagues.aggregate(Max('season'))['season__max']
-    return user_leagues.filter(season=max_year)
+    # max_year = user_leagues.aggregate(Max('season'))['season__max']
+    # return user_leagues.filter(season=max_year)
+    return user_leagues
 
 
 def calc_three_year_avgs(league_key):

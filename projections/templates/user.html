@@ -2,7 +2,7 @@
 {% block content %}
 {% load projection_filters %}
 {% load tz %}
-<div>
+<div id="helpful_links">
     <h2>Helpful Links</h2>
     <a href="/admin" class="btn btn-outline-primary btn-sm">Admin Console</a>
     <br/>
@@ -24,10 +24,9 @@
     <a href="{{pitcher_url}}" target="_blank" class="btn btn-outline-primary btn-sm">Razzball Pitcher Projections</a>
 </div>
 
-<div>
+<div id="update_projections">
     <h2>Update Database Player Projections</h2>
-    <a href="/projections/scrape_proj" class="btn btn-outline-primary btn-sm">Scrape Projections from Razzball</a>
-    <p id="razzball_update_check">Checking for updated Projections...</p>
+    <div id="razzball_update_check">Checking for updated Projections...</div>
     {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
 
@@ -36,7 +35,45 @@
     <!--<input type="file" class="custom-file-input" id="customFile">-->
     <!--<label class="custom-file-label" for="customFile">Choose file</label>-->
     <!--</div>-->
+    <!---->
+    <!--{% if elapsed %}-->
+    <!--<h6>Updated in {{elapsed|floatformat:2}} seconds</h6>-->
+    <!--{% endif %}-->
+    <br/>
+</div>
 
+<div class="form-group" id="max_league">
+    {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+    <form method="post" action="../../projections/set_main_league/">
+        {% csrf_token %}
+        <label for="setMainLeague">Set Main League</label>
+        <select class="form-control" id="setMainLeague" name="main_league_key">
+            {% for league in max_year_leagues %}
+            <option value="{{league.league_key}}">{{league.league_name}} - {{league.season}}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="btn btn-primary btn-sm">set</button>
+    </form>
+</div>
+
+<!--TODO: Move this into a js file-->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script type="text/javascript">
+    function get_razzball_update_date(dbUpdateString) {
+        var today = new Date();
+        var dbUpdateDate = new Date(dbUpdateString);
+        var updateText = '';
+        var noNewProjectionString = 'Projections are up to date';
+        if (dbUpdateDate.getDate() === today.getDate()) {
+            document.getElementById("razzball_update_check").innerHTML = noNewProjectionString;
+        }
+        else {
+            $.getJSON('http://allorigins.me/get?url=' + encodeURIComponent('https://razzball.com/steamer-hitter-projections/') + '&callback=?', function(data){
+                var razzballUpdateString = $(data.contents).find('abbr').attr("class", 'entry-date published updated').text();
+                var razzballUpdateDate = new Date(razzballUpdateString);
+                var formattedRazzUpdate = `${razzballUpdateDate.getMonth() + 1}.${razzballUpdateDate.getDate()}.${razzballUpdateDate.getFullYear()}`;
+                var newProjectionString = `<p><strong>NEW PROJECTIONS AVAILABLE AS OF ${formattedRazzUpdate}</strong></p>
+    <a href="/projections/scrape_proj" class="btn btn-outline-primary btn-sm">Scrape Projections from Razzball</a>
     <div>
         <form action="/projections/process_players/" method="post" enctype="multipart/form-data" encoding='multipart/form-data'>
             {% csrf_token %}
@@ -57,42 +94,11 @@
             </div>
             <button type="submit" class="btn btn-primary btn-sm">import</button>
         </form>
-    </div>
-
-    {% if elapsed %}
-    <h6>Updated in {{elapsed|floatformat:2}} seconds</h6>
-    {% endif %}
-    <br/>
-</div>
-
-<div class="form-group">
-    {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-    <form method="post" action="../../projections/trade_projection/">
-        {% csrf_token %}
-        <label for="setMainLeague">Set Main League</label>
-        <select class="form-control" id="setMainLeague" name="league_key">
-            {% for league in max_year_leagues %}
-            <option value="{{league.league_key}}">{{league.league_name}} - {{league.season}}</option>
-            {% endfor %}
-        </select>
-        <button type="submit" class="btn btn-primary btn-sm">set</button>
-    </form>
-</div>
-
-<!--TODO: Move this into a js file-->
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-<script type="text/javascript">
-    function get_razzball_update_date(dbUpdateString) {
-        $.getJSON('http://allorigins.me/get?url=' + encodeURIComponent('https://razzball.com/steamer-hitter-projections/') + '&callback=?', function(data){
-            var razzballUpdateString = $(data.contents).find('abbr').attr("class", 'entry-date published updated').text();
-            var razzballUpdateDate = new Date(razzballUpdateString);
-            var formattedRazzUpdate = `${razzballUpdateDate.getMonth() + 1}.${razzballUpdateDate.getDate()}.${razzballUpdateDate.getFullYear()}`;
-            var dbUpdateDate = new Date(dbUpdateString);
-            var newProjectionString = `<strong>NEW PROJECTIONS AVAILABLE AS OF ${formattedRazzUpdate}</strong>`;
-            var noNewProjectionString = 'Projections are up to date';
-            var updateText = (razzballUpdateDate > dbUpdateDate ? newProjectionString : noNewProjectionString);
-            document.getElementById("razzball_update_check").innerHTML = updateText;
-        });
+    </div>`;
+                updateText = (razzballUpdateDate < dbUpdateDate ? newProjectionString : noNewProjectionString);
+                document.getElementById("razzball_update_check").innerHTML = updateText;
+            });
+        }
     }
 </script>
 <script type="text/javascript">

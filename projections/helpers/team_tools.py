@@ -5,17 +5,17 @@ import logging
 import urllib
 import pprint
 
-from .data_analysis import rate_fa, rate_team, single_player_rater_db, single_player_rater_html, final_stats_projection, \
-    league_volatility, rank_list, evaluate_keepers, trade_analyzer
+from .data_analysis import rate_fa, rate_team, single_player_rater_db, single_player_rater_html, \
+    final_stats_projection, league_volatility, rank_list, evaluate_keepers, trade_analyzer
 from .player_creator import calc_batter_z_score, calc_pitcher_z_score, create_full_batter_html, \
     create_full_pitcher_html, create_full_batter_csv, create_full_pitcher_csv
 from .html_parser import scrape_razzball_batters, scrape_razzball_pitchers
 from ..models import BatterProjection, BatterValue, PitcherProjection, PitcherValue, save_batter, save_batter_values, \
     save_pitcher, save_pitcher_values
 from leagues.helpers.yql_queries import get_league_settings, get_league_standings, get_all_team_rosters, get_keepers, \
-    get_players, get_single_team_roster
-from .keepers import project_keepers
-from leagues.models import League, update_league
+    get_players, get_single_team_roster, get_keeper_query
+from .keepers import project_keepers, get_draft_values
+from leagues.models import League, update_league, dummy_league
 
 # static variables
 
@@ -174,6 +174,18 @@ def get_keeper_costs(league_key, user, redirect):
 #     return eval_keepers
 
 
+def get_draft_values_(league, user, redirect):
+    ros_proj_b_list = BatterProjection.objects.all()
+    ros_proj_p_list = PitcherProjection.objects.all()
+
+    actual_keepers = get_keeper_query(league, user, redirect)
+    potential_keepers = get_keepers(league, user, redirect)
+
+    draft_values = get_draft_values(league, ros_proj_b_list, ros_proj_p_list, potential_keepers, actual_keepers)
+    return draft_values
+
+
+
 def get_projected_keepers(league_key, user, redirect):
     """Returns current keepers\n
     Args:\n
@@ -278,10 +290,16 @@ def pull_batters(user, league, csv):
     logging.info("\r\n***************\r\nBatter Deletion in %f seconds", elapsed)
 
     start = time.time()
-    batters_over_zero_dollars = league.batters_over_zero_dollars_avg or league.batters_over_zero_dollars
-    one_dollar_batters = league.one_dollar_batters_avg or league.one_dollar_batters
-    b_dollar_per_fvaaz = league.b_dollar_per_fvaaz_avg or league.b_dollar_per_fvaaz
-    b_player_pool_mult = league.b_player_pool_mult_avg or league.b_player_pool_mult
+    lg = league
+    if league.draft_status == 'predraft':
+        if league.prev_year_league:
+            lg = league.prev_year_league
+        else:
+            lg = dummy_league()
+    batters_over_zero_dollars = lg.batters_over_zero_dollars_avg or lg.batters_over_zero_dollars
+    one_dollar_batters = lg.one_dollar_batters_avg or lg.one_dollar_batters
+    b_dollar_per_fvaaz = lg.b_dollar_per_fvaaz_avg or lg.b_dollar_per_fvaaz
+    b_player_pool_mult = lg.b_player_pool_mult_avg or lg.b_player_pool_mult
 
     batters = calc_batter_z_score(batter_list, batters_over_zero_dollars, one_dollar_batters, b_dollar_per_fvaaz,
                                   b_player_pool_mult)
@@ -322,10 +340,16 @@ def pull_pitchers(user, league, csv):
     logging.info("\r\n***************\r\nPitcher Deletion in %f seconds", elapsed)
 
     start = time.time()
-    pitchers_over_zero_dollars = league.pitchers_over_zero_dollars_avg or league.pitchers_over_zero_dollars
-    one_dollar_pitchers = league.one_dollar_pitchers_avg or league.one_dollar_pitchers
-    p_dollar_per_fvaaz = league.p_dollar_per_fvaaz_avg or league.p_dollar_per_fvaaz
-    p_player_pool_mult = league.p_player_pool_mult_avg or league.p_player_pool_mult
+    lg = league
+    if league.draft_status == 'predraft':
+        if league.prev_year_league:
+            lg = league.prev_year_league
+        else:
+            lg = dummy_league()
+    pitchers_over_zero_dollars = lg.pitchers_over_zero_dollars_avg or lg.pitchers_over_zero_dollars
+    one_dollar_pitchers = lg.one_dollar_pitchers_avg or lg.one_dollar_pitchers
+    p_dollar_per_fvaaz = lg.p_dollar_per_fvaaz_avg or lg.p_dollar_per_fvaaz
+    p_player_pool_mult = lg.p_player_pool_mult_avg or lg.p_player_pool_mult
 
     pitchers = calc_pitcher_z_score(pitcher_list, pitchers_over_zero_dollars, one_dollar_pitchers, p_dollar_per_fvaaz,
                                     p_player_pool_mult)
@@ -382,14 +406,20 @@ def pull_players_(user, league, pitcher_list, batter_list):
     logging.info("\r\n***************\r\nPlayer Deletion in %f seconds", elapsed)
 
     start = time.time()
-    batters_over_zero_dollars = league.batters_over_zero_dollars_avg or league.batters_over_zero_dollars
-    one_dollar_batters = league.one_dollar_batters_avg or league.one_dollar_batters
-    b_dollar_per_fvaaz = league.b_dollar_per_fvaaz_avg or league.b_dollar_per_fvaaz
-    b_player_pool_mult = league.b_player_pool_mult_avg or league.b_player_pool_mult
-    pitchers_over_zero_dollars = league.pitchers_over_zero_dollars_avg or league.pitchers_over_zero_dollars
-    one_dollar_pitchers = league.one_dollar_pitchers_avg or league.one_dollar_pitchers
-    p_dollar_per_fvaaz = league.p_dollar_per_fvaaz_avg or league.p_dollar_per_fvaaz
-    p_player_pool_mult = league.p_player_pool_mult_avg or league.p_player_pool_mult
+    lg = league
+    if league.draft_status == 'predraft':
+        if league.prev_year_league:
+            lg = league.prev_year_league
+        else:
+            lg = dummy_league()
+    batters_over_zero_dollars = lg.batters_over_zero_dollars_avg or lg.batters_over_zero_dollars
+    one_dollar_batters = lg.one_dollar_batters_avg or lg.one_dollar_batters
+    b_dollar_per_fvaaz = lg.b_dollar_per_fvaaz_avg or lg.b_dollar_per_fvaaz
+    b_player_pool_mult = lg.b_player_pool_mult_avg or lg.b_player_pool_mult
+    pitchers_over_zero_dollars = lg.pitchers_over_zero_dollars_avg or lg.pitchers_over_zero_dollars
+    one_dollar_pitchers = lg.one_dollar_pitchers_avg or lg.one_dollar_pitchers
+    p_dollar_per_fvaaz = lg.p_dollar_per_fvaaz_avg or lg.p_dollar_per_fvaaz
+    p_player_pool_mult = lg.p_player_pool_mult_avg or lg.p_player_pool_mult
 
     pitchers = calc_pitcher_z_score(pitcher_list, pitchers_over_zero_dollars, one_dollar_pitchers, p_dollar_per_fvaaz,
                                     p_player_pool_mult)

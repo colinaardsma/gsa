@@ -12,9 +12,10 @@ from django.views import generic
 from gsa.settings import TOKEN_REDIRECT_PATH, TEAM_TOOLS_REDIRECT, USER_REDIRECT
 from leagues.helpers.api_connector import request_auth, get_token
 from leagues.models import League, dummy_league, update_profile, max_year_leagues
-from leagues.helpers.yql_queries import get_current_leagues, get_all_team_rosters
+from leagues.helpers.yql_queries import get_current_leagues, get_all_team_rosters, get_keeper_query
 from leagues.helpers.html_parser import get_single_yahoo_team
-from .helpers.team_tools import pull_batters, pull_pitchers, fa_finder, final_standing_projection, single_player_rater, get_keeper_costs, get_projected_keepers, trade_analyzer_, pull_players_html
+from .helpers.team_tools import pull_batters, pull_pitchers, fa_finder, final_standing_projection, \
+    single_player_rater, get_keeper_costs, get_projected_keepers, trade_analyzer_, pull_players_html, get_draft_values_
 from .helpers.html_parser import razzball_get_update_datetime, scrape_razzball
 from .helpers.keepers import project_keepers
 from .models import BatterProjection, PitcherProjection
@@ -45,7 +46,7 @@ def process_players(request):
     end = time.time()
     elapsed = end - start
     logging.info('%s seconds elapsed' % elapsed)
-    return redirect("/user/")
+    return redirect(USER_REDIRECT)
 
 
 def scrape_proj(request):
@@ -59,7 +60,7 @@ def scrape_proj(request):
         batter_url = 'http://razzball.com/steamer-hitter-projections/'
         pitcher_url = 'http://razzball.com/steamer-pitcher-projections/'
     pull_players_html(request.user, main_league, batter_url, pitcher_url)
-    return redirect("/user/")
+    return redirect(USER_REDIRECT)
 
 
 def team_tools(request):
@@ -149,7 +150,8 @@ def all_keepers(request):
         user = request.user
         all_keepers_key = request.POST["all_keepers_key"]
         all_keepers_ = get_keeper_costs(all_keepers_key, user, TEAM_TOOLS_REDIRECT)
-        print(all_keepers_)
+        import pprint
+        pprint.pprint(all_keepers_)
         return render(request, 'all_keepers.html', {'all_keepers': all_keepers_, 'redirect': TEAM_TOOLS_REDIRECT})
     else:
         return redirect(TEAM_TOOLS_REDIRECT)
@@ -167,6 +169,25 @@ def projected_keepers(request):
         return redirect(TEAM_TOOLS_REDIRECT)
 
 
+# TODO: finish this
+def draft_values(request):
+    if request.method == 'POST':
+        draft_values_key = request.POST["draft_values_key"]
+        main_league = request.user.profile.leagues.get(league_key=request.user.profile.main_league)
+        league_settings = request.user.profile.leagues.get(league_key=draft_values_key)
+        draft_values_ = get_draft_values_(main_league, request.user, TEAM_TOOLS_REDIRECT)
+        import pprint
+        pprint.pprint(draft_values_)
+        # return render(request, 'draft_values.html', {'draft_values': draft_values_, 'league_settings': league_settings,
+        #                                              'redirect': TEAM_TOOLS_REDIRECT})
+        return render(request, 'projected_keepers.html', {'proj_keepers': draft_values_,
+                                                          'league_settings': league_settings,
+                                                          'redirect': TEAM_TOOLS_REDIRECT})
+
+    else:
+        return redirect(TEAM_TOOLS_REDIRECT)
+
+
 def batting_projections(request):
     players = BatterProjection.objects.all().order_by('-fvaaz')
     return render(request, 'spreadsheet.html', {'players': players, 'cat': "batter"})
@@ -175,6 +196,21 @@ def batting_projections(request):
 def pitching_projections(request):
     players = PitcherProjection.objects.all().order_by('-fvaaz')
     return render(request, 'spreadsheet.html', {'players': players, 'cat': "pitcher"})
+
+
+def set_main_league(request):
+    if request.method == 'POST':
+        main_league_key = request.POST["main_league_key"]
+        # main_league = request.user.profile.leagues.get(league_key=main_league_key)
+
+        update_profile(request.user, main_league=main_league_key)
+
+        # profile = request.user.profile
+        # main_league = League.objects.get(league_key=main_league_key)
+        # profile.main_league_key = main_league_key
+        # profile.main_league = main_league
+        # profile.save()
+    return redirect(USER_REDIRECT)
 
 
 # TODO: change to update pitching and batting at same time
@@ -223,3 +259,10 @@ def user_(request):
                                          'proj_update_datetime': oldest_last_mod_date,
                                          'main_league': main_league, 'batter_url': batter_url,
                                          'pitcher_url': pitcher_url})
+
+
+def test(request):
+    main_league = request.user.profile.leagues.get(league_key=request.user.profile.main_league)
+    draft_values_ = get_keeper_query(main_league, request.user, USER_REDIRECT)
+    import pprint
+    pprint.pprint(draft_values_)

@@ -153,7 +153,8 @@ def scrape_razzball_batters(url):
     for batter in batter_list:
         if 'yahoo' in batter:
             batter['pos'] = batter['yahoo']
-
+        elif 'y!' in batter:
+            batter['pos'] = batter['y!']
         for key, value in batter.items():
             if not isinstance(value, list) and not isinstance(value, float) and not isinstance(value, int):
                 try:
@@ -174,6 +175,8 @@ def scrape_razzball_batters(url):
             batter['isFA'] = False
         if 'keeper' not in batter:
             batter['keeper'] = 0.0
+        if 'category' not in batter:
+            batter['category'] = "batter"
         if 'status' not in batter:
             batter['status'] = ''
     return batter_list
@@ -182,6 +185,10 @@ def scrape_razzball_batters(url):
 def scrape_razzball_pitchers(url):
     pitcher_list = scrape_razzball(url)
     for pitcher in pitcher_list:
+        if 'yahoo' in pitcher:
+            pitcher['pos'] = pitcher['yahoo']
+        elif 'y!' in pitcher:
+            pitcher['pos'] = pitcher['y!']
         for key, value in pitcher.items():
             if not isinstance(value, list) and not isinstance(value, float) and not isinstance(value, int):
                 try:
@@ -204,6 +211,8 @@ def scrape_razzball_pitchers(url):
             pitcher['keeper'] = 0.0
         if 'is_sp' not in pitcher:
             pitcher['is_sp'] = True if 'SP' in pitcher['pos'] else False
+        if 'category' not in pitcher:
+            pitcher['category'] = "pitcher"
         if 'kip' not in pitcher:
             pitcher['kip'] = pitcher['k'] / pitcher['ip']
         if 'winsip' not in pitcher:
@@ -222,9 +231,10 @@ def scrape_closer_monkey():
     cl_list = []
     for tr in tr_list[1:len(tr_list) - 1]:
         td_list = tr.xpath("descendant::td/descendant-or-self::*/text()")
-        team_one_cl_one = {'last_name': td_list[1].strip('*').lower(), 'team': td_list[0], 'pos': 'CL1'}
-        team_one_cl_two = {'last_name': td_list[2].lower(), 'team': td_list[0], 'pos': 'CL2'}
-        team_one_cl_three = {'last_name': td_list[3].lower(), 'team': td_list[0], 'pos': 'CL3'}
+        team_one = team_normalizer(td_list[0])
+        team_one_cl_one = {'last_name': td_list[1], 'team': team_one, 'pos': 'CL1'}
+        team_one_cl_two = {'last_name': td_list[2], 'team': team_one, 'pos': 'CL2'}
+        team_one_cl_three = {'last_name': td_list[3], 'team': team_one, 'pos': 'CL3'}
         if "*" in td_list[1]:
             team_one_cl_one['pos'] = 'CLC'
             team_one_cl_two['pos'] = 'CLC'
@@ -232,10 +242,11 @@ def scrape_closer_monkey():
         cl_list.append(team_one_cl_one)
         cl_list.append(team_one_cl_two)
         cl_list.append(team_one_cl_three)
-        team_two_cl_one = {'last_name': td_list[6].strip('*').lower(), 'team': td_list[5], 'pos': 'CL1'}
-        team_two_cl_two = {'last_name': td_list[7].lower(), 'team': td_list[5], 'pos': 'CL2'}
-        team_two_cl_three = {'last_name': td_list[8].lower(), 'team': td_list[5], 'pos': 'CL3'}
-        if "*" in td_list[6]:
+        team_two = team_normalizer(td_list[5])
+        team_two_cl_one = {'last_name': td_list[6], 'team': team_two, 'pos': 'CL1'}
+        team_two_cl_two = {'last_name': td_list[7], 'team': team_two, 'pos': 'CL2'}
+        team_two_cl_three = {'last_name': td_list[8], 'team': team_two, 'pos': 'CL3'}
+        if "*" in td_list[1]:
             team_two_cl_one['pos'] = 'CLC'
             team_two_cl_two['pos'] = 'CLC'
             team_two_cl_three['pos'] = 'CLC'

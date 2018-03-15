@@ -255,33 +255,20 @@ def team_comparer(team_a, team_b):
     return False
 
 
-def player_comparer(yahoo_player, proj_player):
-    if (yahoo_player['LAST_NAME'] == proj_player.last_name and
-            yahoo_player['TEAM'] == proj_player.team and
-            yahoo_player['NORMALIZED_FIRST_NAME'] == proj_player.normalized_first_name):
-        return True
+def player_comparer(player, proj_player):
+    if isinstance(proj_player, dict):
+        if (player['LAST_NAME'] == proj_player['LAST_NAME'] and
+                player['TEAM'] == proj_player['TEAM'] and
+                player['NORMALIZED_FIRST_NAME'] == proj_player['NORMALIZED_FIRST_NAME']):
+            return True
+    else:
+        if (player['LAST_NAME'] == proj_player.last_name and
+                player['TEAM'] == proj_player.team and
+                player['NORMALIZED_FIRST_NAME'] == proj_player.normalized_first_name):
+            return True
     return False
 
 
 def regex_groups(full_name):
     groups = re.search(r'^([\w-]*)(.*?(?=\sjr)|.*)(\sjr)?', full_name)
     return groups
-
-# NAME_A = "Joe H. Smith"
-# NAME_B = "Joseph Smith"
-# NAME_C = "Joe Smith"
-# NAME_D = "Jorge De La Rosa"
-# NAME_E = "Rubby De La Rosa"
-# CHARS_A = name_char_pair_creator(NAME_A)
-# CHARS_B = name_char_pair_creator(NAME_B)
-# CHARS_C = name_char_pair_creator(NAME_C)
-# CHARS_D = name_char_pair_creator(NAME_D)
-# CHARS_E = name_char_pair_creator(NAME_E)
-# print CHARS_A
-# print CHARS_C
-# print name_char_pair_comparer(CHARS_D, CHARS_E)
-
-# print name_checker(NAME_D, NAME_E)
-# # # 60
-
-# print name_normalizer('Ken Giles Jr.')
