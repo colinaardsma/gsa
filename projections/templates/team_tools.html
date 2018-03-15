@@ -28,7 +28,7 @@
                 <!--<label class="my-1 mr-2" for="faTeamName">Team Name</label>-->
                 <input type="text" class="form-control mb-2 mr-sm-2" id="faTeamName" name="team_name" value="{{team_name}}" placeholder="Team Name" />
                 {% endif %}
-                <button type="submit" class="btn btn-primary mb-2">Find FAs</button>
+                <button type="submit" class="btn btn-primary mb-2" onclick="getSpinner()">Find FAs</button>
             </form>
         </div>
         <div class="col">
@@ -37,7 +37,7 @@
                 {% csrf_token %}
                 <!--<label class="my-1 mr-2" for="playerName">Player Name</label>-->
                 <input type="text" class="form-control mb-2 mr-sm-2" id="playerName" name="player_name" value="{{player_name}}" placeholder="Player Name" />
-                <button type="submit" class="btn btn-primary mb-2">Search</button>
+                <button type="submit" class="btn btn-primary mb-2" onclick="getSpinner()">Search</button>
             </form>
         </div>
     </div>
@@ -67,7 +67,7 @@
                 <!--<label class="my-1 mr-2" for="tradeTeamB">Team B:</label>-->
                 <input type="text" class="form-control mb-2 mr-sm-2" id="tradeTeamB" name="team_b_name" value="{{team_b_name}}" placeholder="Team B Name" />
                 {% endif %}
-                <button type="submit" class="btn btn-primary mb-2">Analyze</button>
+                <button type="submit" class="btn btn-primary mb-2" onclick="getSpinner()">Analyze</button>
             </form>
         </div>
         <div class="col">
@@ -90,7 +90,7 @@
                 <!--<label class="my-1 mr-2" for="finalStandingsLeagueNo">League Number:</label>-->
                 <input type="text" class="form-control mb-2 mr-sm-2" id="finalStandingsLeagueNo" name="league_no" value="{{league_no}}" placeholder="League Number" />
                 {% endif %}
-                <button type="submit" class="btn btn-primary mb-2">Project</button>
+                <button type="submit" class="btn btn-primary mb-2" onclick="getSpinner()">Project</button>
             </form>
         </div>
         <div class="col">
@@ -113,7 +113,7 @@
                 <!--<label class="my-1 mr-2" for="allKeepersLeagueNo">League Number:</label>-->
                 <input type="text" class="form-control mb-2 mr-sm-2" id="allKeepersLeagueNo" name="all_keepers_key" value="{{all_keepers_key}}" placeholder="League Number" />
                 {% endif %}
-                <button type="submit" class="btn btn-primary mb-2">Display</button>
+                <button type="submit" class="btn btn-primary mb-2" onclick="getSpinner()">Display</button>
             </form>
         </div>
         <div class="col">
@@ -131,7 +131,7 @@
                 <!--<label class="my-1 mr-2" for="projKeepersLeagueNo">League Number:</label>-->
                 <input type="text" class="form-control mb-2 mr-sm-2" id="projKeepersLeagueNo" name="proj_keepers_key" value="{{proj_keepers_key}}" placeholder="League Number" />
                 {% endif %}
-                <button type="submit" class="btn btn-primary mb-2">Project</button>
+                <button type="submit" class="btn btn-primary mb-2" onclick="getSpinner()">Project</button>
             </form>
         </div>
     </div>
@@ -152,10 +152,11 @@
                 <!--<label class="my-1 mr-2" for="projKeepersLeagueNo">League Number:</label>-->
                 <input type="text" class="form-control mb-2 mr-sm-2" id="draftValuesLeagueNo" name="draft_values_key" value="{{draft_values_key}}" placeholder="League Number" />
                 {% endif %}
-                <button type="submit" class="btn btn-primary mb-2" onclick="getSpinner()">Project</button>
+                <button type="submit" class="btn btn-primary mb-2">Project</button>
             </form>
         </div>
+        <div class="col">
+        </div>
     </div>
-
 </div>
 {% endblock %}

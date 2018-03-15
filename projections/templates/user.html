@@ -73,7 +73,7 @@
                 var razzballUpdateDate = new Date(razzballUpdateString);
                 var formattedRazzUpdate = `${razzballUpdateDate.getMonth() + 1}.${razzballUpdateDate.getDate()}.${razzballUpdateDate.getFullYear()}`;
                 var newProjectionString = `<p><strong>NEW PROJECTIONS AVAILABLE AS OF ${formattedRazzUpdate}</strong></p>
-    <a href="/projections/scrape_proj" class="btn btn-outline-primary btn-sm">Scrape Projections from Razzball</a>
+    <a href="/projections/scrape_proj" class="btn btn-outline-primary btn-sm" onclick="getSpinner()">Scrape Projections from Razzball</a>
     <div>
         <form action="/projections/process_players/" method="post" enctype="multipart/form-data" encoding='multipart/form-data'>
             {% csrf_token %}
