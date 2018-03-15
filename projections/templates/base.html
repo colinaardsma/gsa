@@ -122,8 +122,8 @@
         case '0':
           return;
         case '1':
-          for (var j = 0; j < parentDiv.children.length; j++) {
-            parentDiv.children[j].style.display = "";
+          for (var i = 0; i < parentDiv.children.length; i++) {
+            parentDiv.children[i].style.display = "";
           }
           break;
         default:
@@ -131,6 +131,30 @@
           filterDiv.style.display = "";
       }
     }
+</script>
+<script>
+function openProjections(evt, projectionCategory) {
+    var i, tabcontent, tablinks, playerProjections;
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+    if (projectionCategory === 1) {
+        playerProjections = document.getElementById("playerProjections");
+        for (var i = 0; i < playerProjections.children.length; i++) {
+            playerProjections.children[i].style.display = "";
+        }
+        evt.currentTarget.className += " active";
+    }
+    else {
+        document.getElementById(projectionCategory).style.display = "block";
+        evt.currentTarget.className += " active";
+    }
+}
 </script>
 
 
