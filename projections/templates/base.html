@@ -87,25 +87,50 @@
 <!-- Table Sorting -->
 <script type="text/javascript" src="https://kryogenix.org/code/browser/sorttable/sorttable.js"></script>
 
-<!--TODO: move this into custom JS-->
+<!--TODO: move these into custom JS-->
 <script>
-function tableFilter(tableId, filterId, columnNumber) {
-  var input, filter, table, tr, td, i;
-  input = document.getElementById(filterId);
-  filter = input.value.toUpperCase();
-  table = document.getElementById(tableId);
-  tr = table.getElementsByTagName("tr");
-  for (i = 0; i < tr.length; i++) {
-    td = tr[i].getElementsByTagName("td")[columnNumber];
-    if (td) {
-      if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
-        tr[i].style.display = "";
-      } else {
-        tr[i].style.display = "none";
+    function tableFilter(tableId, filterId, columnNumber) {
+      var input, filter, table, tr, td, i;
+      input = document.getElementById(filterId);
+      filter = input.value.toUpperCase();
+      table = document.getElementById(tableId);
+      tr = table.getElementsByTagName("tr");
+      for (i = 0; i < tr.length; i++) {
+        td = tr[i].getElementsByTagName("td")[columnNumber];
+        if (td) {
+          if (td.innerHTML.toUpperCase().indexOf(filter) > -1 || filter === '1') {
+            tr[i].style.display = "";
+          } else {
+            tr[i].style.display = "none";
+          }
+        }
       }
     }
-  }
-}
+</script>
+<script>
+    function objectFilterByTeamName(filterId) {
+      var input, filter, filterDiv, parentDiv;
+      input = document.getElementById(filterId);
+      parentDiv = document.getElementById('all_keepers');
+
+      for (var i = 0; i < parentDiv.children.length; i++) {
+        parentDiv.children[i].style.display = "none";
+      }
+
+      filter = input.value;
+      switch(filter) {
+        case '0':
+          return;
+        case '1':
+          for (var j = 0; j < parentDiv.children.length; j++) {
+            parentDiv.children[j].style.display = "";
+          }
+          break;
+        default:
+          filterDiv = document.getElementById(filter);
+          filterDiv.style.display = "";
+      }
+    }
 </script>
 
 
