@@ -35,7 +35,7 @@ def create_full_batter(raw_batter_list):
 
 
 def calc_batter_z_score(batter_list, players_over_zero_dollars, one_dollar_players,
-                        dollar_per_fvaaz, player_pool_multiplier):
+                        dollar_per_fvaaz, player_pool_multiplier, add_original_value=False):
     """Calculate zScores for batters"""
     player_pool = int(players_over_zero_dollars * player_pool_multiplier)
     # Standard Calculations
@@ -54,6 +54,8 @@ def calc_batter_z_score(batter_list, players_over_zero_dollars, one_dollar_playe
     else:
         batter_dict_list = batter_list
     for batter in batter_dict_list:
+        if add_original_value:
+            batter['original_value'] = batter['dollarValue']
 
         run_list.append(batter['r'])
         hr_list.append(batter['hr'])
@@ -198,7 +200,7 @@ def create_full_pitcher(raw_pitcher_list):
 
 
 def calc_pitcher_z_score(pitcher_list, players_over_zero_dollars, one_dollar_players,
-                         dollar_per_fvaaz, player_pool_multiplier):
+                         dollar_per_fvaaz, player_pool_multiplier, add_original_value=False):
     """Calculate zScores for pitchers"""
     player_pool = int(players_over_zero_dollars * player_pool_multiplier)
     # max_ip = max(pitcher['ips ']for pitcher in pitcher_list)
@@ -217,6 +219,8 @@ def calc_pitcher_z_score(pitcher_list, players_over_zero_dollars, one_dollar_pla
     else:
         pitcher_dict_list = pitcher_list
     for pitcher in pitcher_dict_list:
+        if add_original_value:
+            pitcher['original_value'] = pitcher['dollarValue']
 
         if (pitcher['w'] < 0 or pitcher['sv'] < 0 or pitcher['k'] < 0 or
                 pitcher['era'] < 0 or pitcher['whip'] < 0):

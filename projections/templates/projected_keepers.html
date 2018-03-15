@@ -117,6 +117,7 @@
             <thead>
             <tr>
                 <th>Value</th>
+                <th>Original Value</th>
                 <th>Player Name</th>
                 <th>Team</th>
                 <th>Position</th>
@@ -132,7 +133,15 @@
             {% for batter in proj_keepers.batter_pool %}
             {% if batter.dollarValue > 0 %}
             <tr>
-                <td>${{batter.dollarValue|floatformat:2}}</td>
+                {% with 'style=""' as style %}
+                {% if batter.dollarValue < batter.original_value %}
+                {% update_variable 'style="color:red;"' as style %}
+                {% elif batter.dollarValue|great_draft_pick:batter.original_value %}
+                {% update_variable 'style="color:green;"' as style %}
+                {% endif %}
+                <td><p {{style}}>${{batter.dollarValue|floatformat:2}}</p></td>
+                {% endwith %}
+                <td>${{batter.original_value|floatformat:2}}</td>
                 <td><a href="https://baseball.fantasysports.yahoo.com/b1/5091/playersearch?&search={{batter.name|url_safe_spaces}}" target="_blank">{{batter.name}}</a></td>
                 <td>{{batter.team}}</td>
                 <td>{{batter.pos}}</td>
@@ -172,6 +181,7 @@
             <thead>
             <tr>
                 <th>Value</th>
+                <th>Original Value</th>
                 <th>Player Name</th>
                 <th>Team</th>
                 <th>Position</th>
@@ -189,7 +199,15 @@
             {% for pitcher in proj_keepers.pitcher_pool %}
             {% if pitcher.dollarValue > 0 %}
             <tr>
-                <td>${{pitcher.dollarValue|floatformat:2}}</td>
+                {% with 'style=""' as style %}
+                {% if pitcher.dollarValue < pitcher.original_value %}
+                {% update_variable 'style="color:red;"' as style %}
+                {% elif pitcher.dollarValue|great_draft_pick:pitcher.original_value %}
+                {% update_variable 'style="color:green;"' as style %}
+                {% endif %}
+                <td><p {{style}}>${{pitcher.dollarValue|floatformat:2}}</p></td>
+                {% endwith %}
+                <td>${{pitcher.original_value|floatformat:2}}</td>
                 <td><a href="https://baseball.fantasysports.yahoo.com/b1/5091/playersearch?&search={{pitcher.name|url_safe_spaces}}" target="_blank">{{pitcher.name}}</a></td>
                 <td>{{pitcher.team}}</td>
                 <td>{{pitcher.pos}}</td>

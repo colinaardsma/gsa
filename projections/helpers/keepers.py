@@ -5,6 +5,7 @@ import pprint
 from .player_creator import calc_batter_z_score, calc_pitcher_z_score
 from .data_analysis import evaluate_keepers
 from .normalizer import player_comparer
+from ..models import BatterProjection, PitcherProjection
 
 
 def analyze_csv(csv_file):
@@ -152,9 +153,9 @@ def run_keeper_passes(batter_pool, pitcher_pool, potential_keepers, total_dollar
     # print(p_over_zero_remaining)
     # print("-----------------------------------------------")
     batter_pool_ = calc_batter_z_score(processed_keepers['remaining_batters'], b_over_zero_remaining, b_one_dollar,
-                                       b_dollar_per_fvaaz, b_mult)
+                                       b_dollar_per_fvaaz, b_mult, True)
     pitcher_pool_ = calc_pitcher_z_score(processed_keepers['remaining_pitchers'], p_over_zero_remaining, p_one_dollar,
-                                         p_dollar_per_fvaaz, p_mult)
+                                         p_dollar_per_fvaaz, p_mult, True)
     all_projected_keepers.extend(processed_keepers['projected_keepers'])
     potential_keepers_ = processed_keepers['remaining_potential_keepers']
 
@@ -231,8 +232,20 @@ def get_draft_values(league, batter_pool, pitcher_pool, potential_keepers, actua
             keeper['manager_guids'] = team['manager_guids']
             keeper['worth_keeping'] = True
             if keeper['category'] == 'batter':
+                try:
+                    original_batter = batter_pool.get(last_name=keeper['last_name'], team=keeper['team'],
+                                                      normalized_first_name=keeper['first_name'])
+                    keeper['value'] = original_batter.dollarValue
+                except BatterProjection.DoesNotExist:
+                    keeper['value'] = 0
                 total_batters_kept += 1
             if keeper['category'] == 'pitcher':
+                try:
+                    original_pitcher = pitcher_pool.get(last_name=keeper['last_name'], team=keeper['team'],
+                                                        normalized_first_name=keeper['first_name'])
+                    keeper['value'] = original_pitcher.dollarValue
+                except PitcherProjection.DoesNotExist:
+                    keeper['value'] = 0
                 total_pitchers_kept += 1
             for tm in potential_keepers:
                 for ptkpr in tm['roster']:
@@ -245,20 +258,14 @@ def get_draft_values(league, batter_pool, pitcher_pool, potential_keepers, actua
                 keeper['keeper_cost'] = 10
             keeper_dict_list.append(keeper)
 
-    # orig_batter_pool = list(batter_dict_list)
-    # orig_pitcher_pool = list(pitcher_dict_list)
     processed_keepers = remove_projected_keepers(list(keeper_dict_list), list(batter_pool), list(pitcher_pool))
-    # batters = len(batter_dict_list) - len(processed_keepers['remaining_batters'])
-    # processed_keepers['pitchers_kept'] = len(pitcher_dict_list) - len(processed_keepers['remaining_pitchers'])
-
-    total_dollars_spent_on_keepers += processed_keepers['dollars_kept']
     b_over_zero_remaining = b_over_zero - total_batters_kept
     p_over_zero_remaining = p_over_zero - total_pitchers_kept
 
     batter_pool_ = calc_batter_z_score(processed_keepers['remaining_batters'], b_over_zero_remaining, b_one_dollar,
-                                       b_dollar_per_fvaaz, b_mult)
+                                       b_dollar_per_fvaaz, b_mult, True)
     pitcher_pool_ = calc_pitcher_z_score(processed_keepers['remaining_pitchers'], p_over_zero_remaining, p_one_dollar,
-                                         p_dollar_per_fvaaz, p_mult)
+                                         p_dollar_per_fvaaz, p_mult, True)
 
     result = {'projected_keepers': keeper_dict_by_team(keeper_dict_list), 'batter_pool': batter_pool_,
               'pitcher_pool': pitcher_pool_, 'dollars_spent_on_keepers': total_dollars_spent_on_keepers}

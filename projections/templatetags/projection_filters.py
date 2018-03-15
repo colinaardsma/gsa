@@ -17,6 +17,10 @@ def divide(value, denom):
     return value / denom
 
 @register.filter
+def subtract(value, arg):
+    return value - arg
+
+@register.filter
 @stringfilter
 def lower_and_remove_spaces(value):
     """Replaces a string with another string"""
@@ -36,3 +40,14 @@ def is_checkbox(field):
 def remove_colon(value):
     """Replaces a string with another string"""
     return value.lower().replace(':', '')
+
+@register.simple_tag
+def update_variable(value):
+    """Allows to update existing variable in template"""
+    return value
+
+@register.filter
+def great_draft_pick(value, arg):
+    profit = value - arg
+    great_threshold = arg * 0.10
+    return profit >= great_threshold
