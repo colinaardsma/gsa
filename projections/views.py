@@ -174,7 +174,7 @@ def draft_values(request):
         main_league = request.user.profile.leagues.get(league_key=request.user.profile.main_league)
         league_settings = request.user.profile.leagues.get(league_key=draft_values_key)
         draft_values_ = get_draft_values_(main_league, request.user, TEAM_TOOLS_REDIRECT)
-
+        # TODO: html needs to be broken out, fixed, or both
         # return render(request, 'draft_values.html', {'draft_values': draft_values_, 'league_settings': league_settings,
         #                                              'redirect': TEAM_TOOLS_REDIRECT})
         return render(request, 'projected_keepers.html', {'proj_keepers': draft_values_,

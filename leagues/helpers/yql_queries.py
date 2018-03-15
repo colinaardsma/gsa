@@ -654,7 +654,7 @@ def get_keepers(league, user, redirect):
             for transaction in league_transactions:
                 if transaction['transaction_datetime'] > prev_league.start_date.replace(tzinfo=None):
                     for plyr in transaction['players']:
-                        if plyr['player_key'] == player['player_key']:
+                        if plyr['player_key'] == player['player_key'] and not pickup_found:
                             # FA pickup
                             if plyr['source_type'] == 'freeagents':
                                 pickup_found = True
@@ -702,8 +702,6 @@ def get_keepers(league, user, redirect):
                             #         reduction = int(math.floor(int(current_cost) / 10.0))
                             #         keeper_cost = int(current_cost) - reduction
                             #     player['keeper_cost'] = keeper_cost
-                    if pickup_found:
-                        continue
             if not pickup_found:
                 player['keeper_cost'] += [int(result['cost']) for result in auction_results['results']
                                           if result['player_key'] == player['player_key']][0]
