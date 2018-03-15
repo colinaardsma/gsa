@@ -667,41 +667,42 @@ def get_keepers(league, user, redirect):
                                 pickup_found = True
                                 player['keeper_found'] = True
                                 continue
-                            # # TODO: this is super custom, and also could be refactored, not sure this is even possible with how yahoo handles offseason trades, below doesnt work
-                            # # Off-season trade
-                            # if (not player['preseason_trade'] and transaction['transaction_type'] == 'trade' and
-                            #         transaction['transaction_datetime'] < league.start_date.replace(tzinfo=None)):
-                            #     player['preseason_trade'] = True
-                            #     print(transaction['transaction_datetime'])
-                            #     print(league.start_date.replace(tzinfo=None))
-                            #     print("PRESEASON TRADE:")
-                            #     current_cost = [int(result['cost']) for result in auction_results['results']
-                            #                     if result['player_key'] == player['player_key']][0]
-                            #     print(current_cost)
-                            #     if current_cost <= 10:
-                            #         continue
-                            #     else:
-                            #         player['keeper_found'] = True
-                            #         reduction = int(math.floor(int(current_cost) / 10.0))
-                            #         keeper_cost = int(current_cost) - reduction
-                            #     player['keeper_cost'] = keeper_cost
-                            #
-                            # if (not player['postseason_trade'] and transaction['transaction_type'] == 'trade' and
-                            #         transaction['transaction_datetime'] > league.end_date.replace(tzinfo=None)):
-                            #     player['postseason_trade'] = True
-                            #     print(transaction['transaction_datetime'])
-                            #     print(league.end_date.replace(tzinfo=None))
-                            #     print("POSTSEASON TRADE:")
-                            #     current_cost = [int(result['cost']) for result in auction_results['results']
-                            #                     if result['player_key'] == player['player_key']][0]
-                            #     print(current_cost)
-                            #     if current_cost <= 10:
-                            #         continue
-                            #     else:
-                            #         player['keeper_found'] = True
-                            #         reduction = int(math.floor(int(current_cost) / 10.0))
-                            #         keeper_cost = int(current_cost) - reduction
-                            #     player['keeper_cost'] = keeper_cost
+                # Off-season trade
+                # else:
+                # # TODO: this is super custom, and also could be refactored, not sure this is even possible with how yahoo handles offseason trades, below doesnt work
+                # if (not player['preseason_trade'] and transaction['transaction_type'] == 'trade' and
+                #         transaction['transaction_datetime'] < league.start_date.replace(tzinfo=None)):
+                #     player['preseason_trade'] = True
+                #     print(transaction['transaction_datetime'])
+                #     print(league.start_date.replace(tzinfo=None))
+                #     print("PRESEASON TRADE:")
+                #     current_cost = [int(result['cost']) for result in auction_results['results']
+                #                     if result['player_key'] == player['player_key']][0]
+                #     print(current_cost)
+                #     if current_cost <= 10:
+                #         continue
+                #     else:
+                #         player['keeper_found'] = True
+                #         reduction = int(math.floor(int(current_cost) / 10.0))
+                #         keeper_cost = int(current_cost) - reduction
+                #     player['keeper_cost'] = keeper_cost
+                #
+                # if (not player['postseason_trade'] and transaction['transaction_type'] == 'trade' and
+                #         transaction['transaction_datetime'] > league.end_date.replace(tzinfo=None)):
+                #     player['postseason_trade'] = True
+                #     print(transaction['transaction_datetime'])
+                #     print(league.end_date.replace(tzinfo=None))
+                #     print("POSTSEASON TRADE:")
+                #     current_cost = [int(result['cost']) for result in auction_results['results']
+                #                     if result['player_key'] == player['player_key']][0]
+                #     print(current_cost)
+                #     if current_cost <= 10:
+                #         continue
+                #     else:
+                #         player['keeper_found'] = True
+                #         reduction = int(math.floor(int(current_cost) / 10.0))
+                #         keeper_cost = int(current_cost) - reduction
+                #     player['keeper_cost'] = keeper_cost
             if not pickup_found:
                 player['keeper_cost'] += [int(result['cost']) for result in auction_results['results']
                                           if result['player_key'] == player['player_key']][0]
