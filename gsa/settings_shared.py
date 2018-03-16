@@ -135,3 +135,4 @@ STATICFILES_FINDERS = (
 # Global Variables
 TEAM_TOOLS_REDIRECT = '/team_tools'
 USER_REDIRECT = '/user'
+LOGIN_REDIRECT_URL = '/user'
