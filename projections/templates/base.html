@@ -8,6 +8,13 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <!--TODO: move these into custom CSS, this could also be improved-->
+    <style>
+        .dropdown-menu a:hover {
+            color: black !important;
+            cursor: pointer;
+        }
+    </style>
 
     <title>grays sports almanac</title>
 </head>
@@ -30,11 +37,27 @@
                 <li class="nav-item">
                     <a class="nav-link" href="/projections/pitching">pitching projections</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/team_tools">team tools</a>
+            {% if request.user and not request.user.is_anonymous %}
+                <!--TODO: improve this by only showing when the main_league is in the offseason-->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="../team_tools" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        team tools
+                    </a>
+                    <div class="dropdown-menu bg-dark border border-light" aria-labelledby="navbarDropdown">
+                        {% for league in request.user.profile.leagues.all|dictsortreversed:"season" %}
+                        <form action="../team_tools/" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="league_key" value="{{league.league_key}}" />
+                            <a class="dropdown-item" href="#" onclick="this.parentNode.submit()" style="color:rgba(255,255,255,.5)">{{league.league_name}} - {{league.season}}</a>
+                        </form>
+                        <!--<a class="dropdown-item" href="/team_tools?league={{league.league_key}}">{{league.league_name}} - {{league.season}}</a>-->
+                        {% endfor %}
+                        <!--<a class="dropdown-item" href="#">Another action</a>-->
+                        <!--<div class="dropdown-divider"></div>-->
+                        <!--<a class="dropdown-item" href="#">Something else here</a>-->
+                    </div>
                 </li>
             </ul>
-            {% if request.user and not request.user.is_anonymous %}
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
                     <a class="nav-link" href="/user">{{request.user}}</a>
@@ -44,6 +67,10 @@
                 </li>
             </ul>
             {% else %}
+            <li class="nav-item">
+                <a class="nav-link" href="/team_tools">team tools</a>
+            </li>
+            </ul>
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
                     <a class="nav-link" href="/registration">register</a>
@@ -53,19 +80,6 @@
                 </li>
             </ul>
             {% endif %}
-
-            <!--<li class="nav-item dropdown">-->
-            <!--<a class="nav-link dropdown-toggle" href="http://example.com" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Dropdown</a>-->
-            <!--<div class="dropdown-menu" aria-labelledby="dropdown05">-->
-            <!--<a class="dropdown-item" href="#">Action</a>-->
-            <!--<a class="dropdown-item" href="#">Another action</a>-->
-            <!--<a class="dropdown-item" href="#">Something else here</a>-->
-            <!--</div>-->
-            <!--</li>-->
-            <!--</ul>-->
-            <!--<form class="form-inline my-2 my-md-0">-->
-            <!--<input class="form-control" type="text" placeholder="Search">-->
-            <!--</form>-->
         </div>
 </nav>
 <br/>
@@ -183,7 +197,7 @@ function openProjections(evt, projectionCategory) {
           shadow: false, // Whether to render a shadow
           hwaccel: false, // Whether to use hardware acceleration
           className: 'spinner', // The CSS class to assign to the spinner
-          zIndex: 2e9, // The z-index (defaults to 2000000000)
+          zIndex: 1029, // Be sure this is behind the navbar
           top: '50%', // Top position relative to parent
           left: '50%' // Left position relative to parent
         };
@@ -202,7 +216,7 @@ function openProjections(evt, projectionCategory) {
 
         var spinElem = this;
 
-        $('body').append('<div id="spinner_modal" style="background-color: rgba(0, 0, 0, 0.3); width:100%; height:100%; position:fixed; top:56px; left:0px; z-index:' + (opts.zIndex - 1) + '"/>');
+        $('body').append('<div id="spinner_modal" style="background-color: rgba(0, 0, 0, 0.3); width:100%; height:100%; position:fixed; top:0px; left:0px; z-index:' + (opts.zIndex - 1) + '"/>');
         spinElem = $("#spinner_modal")[0];
 
         data.spinner = new Spinner($.extend({

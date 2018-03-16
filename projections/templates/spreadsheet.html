@@ -55,7 +55,11 @@
     {% for player in players %}
     <tr>
         <td>${{player.dollarValue|floatformat:2}}</td>
-        <td><a href="https://baseball.fantasysports.yahoo.com/b1/5091/playersearch?&search={{player.name|url_safe_spaces}}" target="_blank">{{player.name}}</a></td>
+        {% if request.user.profile.main_league %}
+        <td><a href="https://baseball.fantasysports.yahoo.com/b1/{{request.user.profile.main_league|get_league_no}}/playersearch?&search={{player.name|url_safe_spaces}}" target="_blank">{{player.name}}</a></td>
+        {% else %}
+        <td>{{player.name}}</td>
+        {% endif %}
         <td>{{player.team}}</td>
         <!--<td>{% for pos in player.pos %}{{pos}},{% endfor %}</td>-->
         <td>{{player.pos}}</td>

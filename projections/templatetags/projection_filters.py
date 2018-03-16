@@ -51,3 +51,7 @@ def great_draft_pick(value, arg):
     profit = value - arg
     great_threshold = arg * 0.10
     return profit >= great_threshold
+
+@register.filter
+def get_league_no(value):
+    return value.split('.l.')[1]

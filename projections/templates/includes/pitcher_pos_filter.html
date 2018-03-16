@@ -1,0 +1,13 @@
+{% block content %}
+<label class="my-1 mr-2" for="pitchersPosFilter">Filter By Position:</label>
+<select class="custom-select my-1 mr-sm-2" id="pitchersPosFilter" onchange="tableFilter('{{tableId}}', this.id, 3)">
+    <option value=1>all pos</option>
+    <option value="SP">SP</option>
+    <option value="RP">RP</option>
+    <option value="CL">CL</option>
+    <option value="CL1">CL1</option>
+    <option value="CL2">CL2</option>
+    <option value="CL3">CL3</option>
+    <option value="CLC">CLC</option>
+</select>
+{% endblock %}

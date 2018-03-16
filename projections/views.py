@@ -65,8 +65,12 @@ def scrape_proj(request):
 
 def team_tools(request):
     if request.user and not request.user.is_anonymous:
-        max_year_leagues_ = max_year_leagues(request.user)
-        return render(request, 'team_tools.html', {'current_leagues': max_year_leagues_, 'redirect': TEAM_TOOLS_REDIRECT})
+        if request.method == 'POST':
+            league_key = request.POST['league_key']
+            league = request.user.profile.leagues.get(league_key=league_key)
+        else:
+            league = request.user.profile.main_league
+        return render(request, 'team_tools.html', {'league': league, 'redirect': TEAM_TOOLS_REDIRECT})
     else:
         return render(request, 'team_tools.html', {'redirect': TEAM_TOOLS_REDIRECT})
         # return redirect(TEAM_TOOLS_REDIRECT)
@@ -251,7 +255,7 @@ def user_(request):
         #         razzball_proj_update_datetime = None
 
     return render(request, 'user.html', {'yahoo_link': yahoo_link, 'elapsed': elapsed,
-                                         'max_year_leagues': max_year_leagues_,
+                                         'leagues': max_year_leagues_,
                                          # 'razzball_proj_update_datetime': razzball_proj_update_datetime,
                                          'proj_update_datetime': oldest_last_mod_date,
                                          'main_league': main_league, 'batter_url': batter_url,

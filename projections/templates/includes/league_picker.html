@@ -1,0 +1,17 @@
+{% block content %}
+<form class="form-inline" method="post" action="{{link}}">
+    {% csrf_token %}
+    <select class="custom-select my-1 mr-sm-2" id="selectLeague" name="{{name}}">
+        {% for league in leagues %}
+        {% if request.user.profile.main_league %}
+        {% ifequal league.league_key request.user.profile.main_league %}
+        <option value="{{league.league_key}}" selected="selected">{{league.league_name}} - {{league.season}}</option>
+        {% else %}
+        <option value="{{league.league_key}}">{{league.league_name}} - {{league.season}}</option>
+        {% endifequal %}
+        {% endif %}
+        {% endfor %}
+    </select>
+    <button type="submit" class="btn btn-primary btn-sm">{{buttonLabel}}</button>
+</form>
+{% endblock %}

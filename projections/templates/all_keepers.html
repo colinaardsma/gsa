@@ -6,7 +6,7 @@
     {% for team in all_keepers %}
     <option value="{{team.team_name}}">{{team.team_name}}</option>
     {% endfor %}
-        <option value="WHIP">WHIP</option>
+    <option value="WHIP">WHIP</option>
 </select>
 <br/>
 <h2>All Keepers</h2>
@@ -25,7 +25,7 @@
     {% for player in team.roster %}
     <tr>
         <td>${{player.keeper_cost|floatformat}}</td>
-        <td><a href="https://baseball.fantasysports.yahoo.com/b1/5091/playersearch?&search={{player.full_name|url_safe_spaces}}" target="_blank">{{player.full_name}}</a></td>
+        <td><a href="https://baseball.fantasysports.yahoo.com/b1/{{request.user.profile.main_league|get_league_no}}/playersearch?&search={{player.full_name|url_safe_spaces}}" target="_blank">{{player.full_name}}</a></td>
         <td>{{player.team}}</td>
         <td>{{player.positions}}</td>
         {% if 'DL' in player.status %}

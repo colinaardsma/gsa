@@ -37,7 +37,7 @@
 <div class="row" id="razzball">
     <div class="col" id="razzball_links">
         <p><a href="{{batter_url}}" target="_blank" class="btn btn-outline-primary btn-sm">Razzball Hitter Projections</a>
-        <a href="{{pitcher_url}}" target="_blank" class="btn btn-outline-primary btn-sm">Razzball Pitcher Projections</a></p>
+            <a href="{{pitcher_url}}" target="_blank" class="btn btn-outline-primary btn-sm">Razzball Pitcher Projections</a></p>
     </div>
     <div class="col">
     </div>
@@ -68,16 +68,9 @@
     <div class="col" id="max_league">
         <h4>Set Main League</h4>
         {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-        <form class="form-inline" method="post" action="../../projections/set_main_league/">
-            {% csrf_token %}
-            <!--<label for="setMainLeague">Set Main League</label>-->
-            <select class="custom-select my-1 mr-sm-2" id="setMainLeague" name="main_league_key">
-                {% for league in max_year_leagues %}
-                <option value="{{league.league_key}}">{{league.league_name}} - {{league.season}}</option>
-                {% endfor %}
-            </select>
-            <button type="submit" class="btn btn-primary btn-sm">set</button>
-        </form>
+        {% with link='../../projections/set_main_league/' name='main_league_key' buttonLabel='set'%}
+        {% include 'includes/league_picker.html' %}
+        {% endwith %}
     </div>
     <div class="col">
     </div>
