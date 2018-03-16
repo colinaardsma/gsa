@@ -84,7 +84,7 @@
         var dbUpdateDate = new Date(dbUpdateString);
         var updateText = '';
         var noNewProjectionString = 'Projections are up to date';
-        if (dbUpdateDate.getDate() === today.getDate()) {
+        if (dbUpdateDate.getFullYear() === today.getFullYear() && dbUpdateDate.getMonth() === today.getMonth() && dbUpdateDate.getDate() === today.getDate()) {
             document.getElementById("razzball_update_check").innerHTML = noNewProjectionString;
         }
         else {
@@ -115,7 +115,7 @@
             <button type="submit" class="btn btn-primary btn-sm">import</button>
         </form>
     </div>`;
-                updateText = (razzballUpdateDate < dbUpdateDate ? newProjectionString : noNewProjectionString);
+                updateText = (razzballUpdateDate > dbUpdateDate ? newProjectionString : noNewProjectionString);
                 document.getElementById("razzball_update_check").innerHTML = updateText;
             });
         }

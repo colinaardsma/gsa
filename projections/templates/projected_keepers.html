@@ -103,16 +103,9 @@
 <div id="playerProjections">
     <div id="batters" class="tabcontent">
         <h3>Batters</h3>
-        <label class="my-1 mr-2" for="batterPosFilterChoice">Filter By Position:</label>
-        <select class="custom-select my-1 mr-sm-2" id="batterPosFilterChoice" onchange="tableFilter('proj_batter_pool_table', this.id, 3)">
-            <option value=1>all pos</option>
-            <option value="C">C</option>
-            <option value="1B">1B</option>
-            <option value="2B">2B</option>
-            <option value="SS">SS</option>
-            <option value="3B">3B</option>
-            <option value="OF">OF</option>
-        </select>
+        {% with tableId='proj_batter_pool_table' %}
+        {% include 'includes/batter_pos_filter.html' %}
+        {% endwith %}
         <table id="proj_batter_pool_table" class="sortable display table table-hover">
             <thead>
             <tr>
@@ -166,17 +159,9 @@
 
     <div id="pitchers" class="tabcontent">
         <h3>Pitchers</h3>
-        <label class="my-1 mr-2" for="pitcherPosFilterChoice">Filter By Position:</label>
-        <select class="custom-select my-1 mr-sm-2" id="pitcherPosFilterChoice" onchange="tableFilter('proj_pitcher_pool_table', this.id, 3)">
-            <option value=1>all pos</option>
-            <option value="SP">SP</option>
-            <option value="RP">RP</option>
-            <option value="CL">CL</option>
-            <option value="CL1">CL1</option>
-            <option value="CL2">CL2</option>
-            <option value="CL3">CL3</option>
-            <option value="CLC">CLC</option>
-        </select>
+        {% with tableId='proj_pitcher_pool_table' %}
+        {% include 'includes/pitcher_pos_filter.html' %}
+        {% endwith %}
         <table id="proj_pitcher_pool_table" class="sortable display table table-hover">
             <thead>
             <tr>
