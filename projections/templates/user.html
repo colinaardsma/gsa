@@ -2,58 +2,85 @@
 {% block content %}
 {% load projection_filters %}
 {% load tz %}
-<div id="helpful_links">
-    <h2>Helpful Links</h2>
-    <a href="/admin" class="btn btn-outline-primary btn-sm">Admin Console</a>
-    <br/>
-    {% if not request.user.profile.access_token %}
-    <a href="{{yahoo_link}}" class="btn btn-outline-primary btn-sm">Link Yahoo! Account</a>
-    {% endif %}
-    <a href="/get_leagues" class="btn btn-outline-primary btn-sm">
-        {% if not request.user.profile.leagues %}
-        Get Yahoo! Leagues
-        {% else %}
-        Update Yahoo! Leagues
+
+<h4>Helpful Links</h4>
+<div class="row" id="helpful_links">
+    <div class="col" id="yahoo">
+        {% if not request.user.profile.access_token %}
+        <p><a href="{{yahoo_link}}" class="btn btn-outline-primary btn-sm">Link Yahoo! Account</a></p>
         {% endif %}
-    </a>
-    <br/>
-    <a href="https://baseball.fantasysports.yahoo.com/league/{{main_league.league_name|lower_and_remove_spaces}}/{{main_league.season}}" target="_blank" class="btn btn-outline-primary btn-sm">
-        {{main_league.season}} - {{main_league.league_name}} - League Page</a>
-    <br/>
-    <a href="{{batter_url}}" target="_blank" class="btn btn-outline-primary btn-sm">Razzball Hitter Projections</a>
-    <a href="{{pitcher_url}}" target="_blank" class="btn btn-outline-primary btn-sm">Razzball Pitcher Projections</a>
+        <p><a href="/get_leagues" class="btn btn-outline-primary btn-sm">
+            {% if not request.user.profile.leagues %}
+            Link Your Yahoo! Leagues
+            {% else %}
+            Update Your Yahoo! Leagues
+            {% endif %}
+        </a></p>
+        <p><a href="https://baseball.fantasysports.yahoo.com/league/{{main_league.league_name|lower_and_remove_spaces}}/{{main_league.season}}" target="_blank" class="btn btn-outline-primary btn-sm">
+            {{main_league.season}} - {{main_league.league_name}} - League Page</a></p>
+    </div>
+    <div class="col">
+    </div>
 </div>
 
-<div id="update_projections">
-    <h2>Update Database Player Projections</h2>
-    <div id="razzball_update_check">Checking for updated Projections...</div>
-    {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-
-
-
-    <!--<div class="custom-file">-->
-    <!--<input type="file" class="custom-file-input" id="customFile">-->
-    <!--<label class="custom-file-label" for="customFile">Choose file</label>-->
-    <!--</div>-->
-    <!---->
-    <!--{% if elapsed %}-->
-    <!--<h6>Updated in {{elapsed|floatformat:2}} seconds</h6>-->
-    <!--{% endif %}-->
-    <br/>
+{% if request.user and not request.user.is_anonymous and request.user.is_superuser %}
+<hr/>
+<h4>Admin</h4>
+<div class="row" id="admin">
+    <div class="col" id="admin_console">
+        <p><a href="/admin" class="btn btn-outline-primary btn-sm">Admin Console</a></p>
+    </div>
+    <div class="col">
+    </div>
 </div>
 
-<div class="form-group" id="max_league">
-    {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-    <form method="post" action="../../projections/set_main_league/">
-        {% csrf_token %}
-        <label for="setMainLeague">Set Main League</label>
-        <select class="form-control" id="setMainLeague" name="main_league_key">
-            {% for league in max_year_leagues %}
-            <option value="{{league.league_key}}">{{league.league_name}} - {{league.season}}</option>
-            {% endfor %}
-        </select>
-        <button type="submit" class="btn btn-primary btn-sm">set</button>
-    </form>
+<div class="row" id="razzball">
+    <div class="col" id="razzball_links">
+        <p><a href="{{batter_url}}" target="_blank" class="btn btn-outline-primary btn-sm">Razzball Hitter Projections</a>
+        <a href="{{pitcher_url}}" target="_blank" class="btn btn-outline-primary btn-sm">Razzball Pitcher Projections</a></p>
+    </div>
+    <div class="col">
+    </div>
+</div>
+
+<div class="row" id="projections">
+    <div class="col" id="update_projections">
+        <strong>Update Database Player Projections</strong>
+        <div id="razzball_update_check">Checking for updated Projections...</div>
+        {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+
+
+        <!--<div class="custom-file">-->
+        <!--<input type="file" class="custom-file-input" id="customFile">-->
+        <!--<label class="custom-file-label" for="customFile">Choose file</label>-->
+        <!--</div>-->
+        <!---->
+        <!--{% if elapsed %}-->
+        <!--<h6>Updated in {{elapsed|floatformat:2}} seconds</h6>-->
+        <!--{% endif %}-->
+    </div>
+</div>
+{% endif %}
+
+<hr/>
+<div class="row form-group" id="league_settings">
+    <div class="col" id="max_league">
+        <h4>Set Main League</h4>
+        {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+        <form class="form-inline" method="post" action="../../projections/set_main_league/">
+            {% csrf_token %}
+            <!--<label for="setMainLeague">Set Main League</label>-->
+            <select class="custom-select my-1 mr-sm-2" id="setMainLeague" name="main_league_key">
+                {% for league in max_year_leagues %}
+                <option value="{{league.league_key}}">{{league.league_name}} - {{league.season}}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-primary btn-sm">set</button>
+        </form>
+    </div>
+    <div class="col">
+    </div>
 </div>
 
 <!--TODO: Move this into a js file-->

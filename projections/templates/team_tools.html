@@ -22,13 +22,14 @@
                     <option value="{{league.league_key}}">{{league.league_name}} - {{league.season}}</option>
                     {% endfor %}
                 </select>
+                <!--TODO: this doesnt work-->
                 {% else %}
                 <!--<label class="my-1 mr-2" for="faLeagueNumber">League Number</label>-->
-                <input type="text" class="form-control mb-2 mr-sm-2" id="faLeagueNumber" name="league_no" value="{{league_no}}" placeholder="League Number" />
+                <input type="text" class="form-control my-1 mr-sm-2" id="faLeagueNumber" name="league_no" value="{{league_no}}" placeholder="League Number" />
                 <!--<label class="my-1 mr-2" for="faTeamName">Team Name</label>-->
-                <input type="text" class="form-control mb-2 mr-sm-2" id="faTeamName" name="team_name" value="{{team_name}}" placeholder="Team Name" />
+                <input type="text" class="form-control my-1 mr-sm-2" id="faTeamName" name="team_name" value="{{team_name}}" placeholder="Team Name" />
                 {% endif %}
-                <button type="submit" class="btn btn-primary mb-2" onclick="getSpinner()">Find FAs</button>
+                <button type="submit" class="btn btn-primary btn-sm" onclick="getSpinner()">find FAs</button>
             </form>
         </div>
         <div class="col">
@@ -36,12 +37,12 @@
             <form class="form-inline" method="post" action="../../projections/single_player/">
                 {% csrf_token %}
                 <!--<label class="my-1 mr-2" for="playerName">Player Name</label>-->
-                <input type="text" class="form-control mb-2 mr-sm-2" id="playerName" name="player_name" value="{{player_name}}" placeholder="Player Name" />
-                <button type="submit" class="btn btn-primary mb-2" onclick="getSpinner()">Search</button>
+                <input type="text" class="form-control my-1 mr-sm-2" id="playerName" name="player_name" value="{{player_name}}" placeholder="Player Name" />
+                <button type="submit" class="btn btn-primary btn-sm" onclick="getSpinner()">search</button>
             </form>
         </div>
     </div>
-    <br/>
+    <hr/>
     <div class="row" id="inSeasonTools2">
         <div class="col">
             <h4>Trade Analyzer</h4>
@@ -58,22 +59,23 @@
                 <input type="text" class="form-control mb-2 mr-sm-2" id="tradeTeamA" name="team_a_name" value="{{team_a_name}}" placeholder="Team A Name" />
                 <!--<label class="my-1 mr-2" for="tradeTeamB">Team B:</label>-->
                 <input type="text" class="form-control mb-2 mr-sm-2" id="tradeTeamB" name="team_b_name" value="{{team_b_name}}" placeholder="Team B Name" />
+                <!--TODO: this doesnt work-->
                 {% else %}
                 <!--<label class="my-1 mr-2" for="tradeLeagueNo">League Number:</label>-->
-                <input type="text" class="form-control mb-2 mr-sm-2" id="tradeLeagueNo" name="league_no" value="{{league_no}}" placeholder="League Number" />
+                <input type="text" class="form-control my-1 mr-sm-2" id="tradeLeagueNo" name="league_no" value="{{league_no}}" placeholder="League Number" />
                 <br/>
                 <!--<label class="my-1 mr-2" for="tradeTeamA">Team A:</label>-->
-                <input type="text" class="form-control mb-2 mr-sm-2" id="tradeTeamA" name="team_a_name" value="{{team_a_name}}" placeholder="Team A Name" />
+                <input type="text" class="form-control my-1 mr-sm-2" id="tradeTeamA" name="team_a_name" value="{{team_a_name}}" placeholder="Team A Name" />
                 <!--<label class="my-1 mr-2" for="tradeTeamB">Team B:</label>-->
-                <input type="text" class="form-control mb-2 mr-sm-2" id="tradeTeamB" name="team_b_name" value="{{team_b_name}}" placeholder="Team B Name" />
+                <input type="text" class="form-control my-1 mr-sm-2" id="tradeTeamB" name="team_b_name" value="{{team_b_name}}" placeholder="Team B Name" />
                 {% endif %}
-                <button type="submit" class="btn btn-primary mb-2" onclick="getSpinner()">Analyze</button>
+                <button type="submit" class="btn btn-primary btn-sm" onclick="getSpinner()">analyze</button>
             </form>
         </div>
         <div class="col">
         </div>
     </div>
-    <br/>
+    <hr/>
     <div class="row" id="inSeasonTools3">
         <div class="col">
             <h4>Projected Final Standings</h4>
@@ -86,17 +88,18 @@
                     <option value="{{league.league_key}}">{{league.league_name}} - {{league.season}}</option>
                     {% endfor %}
                 </select>
+                <!--TODO: this doesnt work-->
                 {% else %}
                 <!--<label class="my-1 mr-2" for="finalStandingsLeagueNo">League Number:</label>-->
-                <input type="text" class="form-control mb-2 mr-sm-2" id="finalStandingsLeagueNo" name="league_no" value="{{league_no}}" placeholder="League Number" />
+                <input type="text" class="form-control my-1 mr-sm-2" id="finalStandingsLeagueNo" name="league_no" value="{{league_no}}" placeholder="League Number" />
                 {% endif %}
-                <button type="submit" class="btn btn-primary mb-2" onclick="getSpinner()">Project</button>
+                <button type="submit" class="btn btn-primary btn-sm" onclick="getSpinner()">project</button>
             </form>
         </div>
         <div class="col">
         </div>
     </div>
-    <br/>
+    <hr/>
     <div class="row" id="keeperProjections">
         <div class="col">
             <h4>All Keepers</h4>
@@ -109,11 +112,12 @@
                     <option value="{{league.league_key}}">{{league.league_name}} - {{league.season}}</option>
                     {% endfor %}
                 </select>
+                <!--TODO: this doesnt work-->
                 {% else %}
                 <!--<label class="my-1 mr-2" for="allKeepersLeagueNo">League Number:</label>-->
-                <input type="text" class="form-control mb-2 mr-sm-2" id="allKeepersLeagueNo" name="all_keepers_key" value="{{all_keepers_key}}" placeholder="League Number" />
+                <input type="text" class="form-control my-1 mr-sm-2" id="allKeepersLeagueNo" name="all_keepers_key" value="{{all_keepers_key}}" placeholder="League Number" />
                 {% endif %}
-                <button type="submit" class="btn btn-primary mb-2" onclick="getSpinner()">Display</button>
+                <button type="submit" class="btn btn-primary btn-sm" onclick="getSpinner()">display</button>
             </form>
         </div>
         <div class="col">
@@ -127,11 +131,12 @@
                     <option value="{{league.league_key}}">{{league.league_name}} - {{league.season}}</option>
                     {% endfor %}
                 </select>
+                <!--TODO: this doesnt work-->
                 {% else %}
                 <!--<label class="my-1 mr-2" for="projKeepersLeagueNo">League Number:</label>-->
-                <input type="text" class="form-control mb-2 mr-sm-2" id="projKeepersLeagueNo" name="proj_keepers_key" value="{{proj_keepers_key}}" placeholder="League Number" />
+                <input type="text" class="form-control my-1 mr-sm-2" id="projKeepersLeagueNo" name="proj_keepers_key" value="{{proj_keepers_key}}" placeholder="League Number" />
                 {% endif %}
-                <button type="submit" class="btn btn-primary mb-2" onclick="getSpinner()">Project</button>
+                <button type="submit" class="btn btn-primary btn-sm" onclick="getSpinner()">project</button>
             </form>
         </div>
     </div>
@@ -148,11 +153,12 @@
                     <option value="{{league.league_key}}">{{league.league_name}} - {{league.season}}</option>
                     {% endfor %}
                 </select>
+                <!--TODO: this doesnt work-->
                 {% else %}
                 <!--<label class="my-1 mr-2" for="projKeepersLeagueNo">League Number:</label>-->
-                <input type="text" class="form-control mb-2 mr-sm-2" id="draftValuesLeagueNo" name="draft_values_key" value="{{draft_values_key}}" placeholder="League Number" />
+                <input type="text" class="form-control my-1 mr-sm-2" id="draftValuesLeagueNo" name="draft_values_key" value="{{draft_values_key}}" placeholder="League Number" />
                 {% endif %}
-                <button type="submit" class="btn btn-primary mb-2" onclick="getSpinner()">Project</button>
+                <button type="submit" class="btn btn-primary btn-sm" onclick="getSpinner()">project</button>
             </form>
         </div>
         <div class="col">
