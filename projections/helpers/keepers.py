@@ -90,7 +90,7 @@ def process_keepers(batter_dict_list, pitcher_dict_list, potential_keepers):
     processed_keepers = remove_projected_keepers(list(proj_keeper_dict_list), orig_batter_pool, orig_pitcher_pool)
     processed_keepers['batters_kept'] = len(batter_dict_list) - len(processed_keepers['remaining_batters'])
     processed_keepers['pitchers_kept'] = len(pitcher_dict_list) - len(processed_keepers['remaining_pitchers'])
-    processed_keepers['projected_keepers'] = proj_keeper_dict_list
+    processed_keepers['keepers'] = proj_keeper_dict_list
     processed_keepers['remaining_potential_keepers'] = evaluated_keepers
     return processed_keepers
 
@@ -156,7 +156,7 @@ def run_keeper_passes(batter_pool, pitcher_pool, potential_keepers, total_dollar
                                        b_dollar_per_fvaaz, b_mult, True)
     pitcher_pool_ = calc_pitcher_z_score(processed_keepers['remaining_pitchers'], p_over_zero_remaining, p_one_dollar,
                                          p_dollar_per_fvaaz, p_mult, True)
-    all_projected_keepers.extend(processed_keepers['projected_keepers'])
+    all_projected_keepers.extend(processed_keepers['keepers'])
     potential_keepers_ = processed_keepers['remaining_potential_keepers']
 
     # TODO: none of this works well, may be a bad idea to begin with
@@ -267,18 +267,18 @@ def get_draft_values(league, batter_pool, pitcher_pool, potential_keepers, actua
     pitcher_pool_ = calc_pitcher_z_score(processed_keepers['remaining_pitchers'], p_over_zero_remaining, p_one_dollar,
                                          p_dollar_per_fvaaz, p_mult, True)
 
-    result = {'projected_keepers': keeper_dict_by_team(keeper_dict_list), 'batter_pool': batter_pool_,
+    result = {'keepers': keeper_dict_by_team(keeper_dict_list), 'batter_pool': batter_pool_,
               'pitcher_pool': pitcher_pool_, 'dollars_spent_on_keepers': total_dollars_spent_on_keepers}
     return result
 
 
 def dump_to_json():
     import json
-    projected_keepers = project_keepers()
+    keepers = project_keepers()
     with open('keepers.txt', 'w') as outfile:
-        json.dump(projected_keepers['projected_keepers'], outfile, indent=4, sort_keys=True)
+        json.dump(keepers['keepers'], outfile, indent=4, sort_keys=True)
     with open('batters.txt', 'w') as outfile:
-        json.dump(projected_keepers['batter_pool'], outfile, indent=4, sort_keys=True)
+        json.dump(keepers['batter_pool'], outfile, indent=4, sort_keys=True)
     with open('pitchers.txt', 'w') as outfile:
-        json.dump(projected_keepers['pitcher_pool'], outfile, indent=4, sort_keys=True)
+        json.dump(keepers['pitcher_pool'], outfile, indent=4, sort_keys=True)
     print("FILE OUTPUT COMPLETE")

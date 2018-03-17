@@ -164,9 +164,8 @@ def projected_keepers(request):
         proj_keepers_key = request.POST["proj_keepers_key"]
         league = request.user.profile.leagues.get(league_key=proj_keepers_key)
         proj_keepers = get_projected_keepers(league, request.user, TEAM_TOOLS_REDIRECT)
-        return render(request, 'projected_keepers.html', {'proj_keepers': proj_keepers,
-                                                          'league_settings': league,
-                                                          'redirect': TEAM_TOOLS_REDIRECT})
+        return render(request, 'keepers.html', {'all_players': proj_keepers, 'league_settings': league,
+                                                'redirect': TEAM_TOOLS_REDIRECT})
     else:
         return redirect(TEAM_TOOLS_REDIRECT)
 
@@ -181,9 +180,8 @@ def draft_values(request):
         # TODO: html needs to be broken out, fixed, or both
         # return render(request, 'draft_values.html', {'draft_values': draft_values_, 'league_settings': league_settings,
         #                                              'redirect': TEAM_TOOLS_REDIRECT})
-        return render(request, 'projected_keepers.html', {'proj_keepers': draft_values_,
-                                                          'league_settings': league_settings,
-                                                          'redirect': TEAM_TOOLS_REDIRECT})
+        return render(request, 'keepers.html', {'all_players': draft_values_, 'league_settings': league_settings,
+                                                'redirect': TEAM_TOOLS_REDIRECT})
 
     else:
         return redirect(TEAM_TOOLS_REDIRECT)

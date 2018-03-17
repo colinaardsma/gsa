@@ -87,9 +87,8 @@ def final_standing_projection(league, user, redirect):
     return standing_projection(league, user, redirect, rosters, ros_proj_b_list, ros_proj_p_list, sgp_dict)
 
 
-def keeper_standing_projection(league, user, redirect, projected_keepers, ros_proj_b_list, ros_proj_p_list):
-    # TODO: change 'projected_keepers' to 'keepers'
-    rosters = keeper_to_roster_converter(projected_keepers['projected_keepers'])
+def keeper_standing_projection(league, user, redirect, post_keeper_projections, ros_proj_b_list, ros_proj_p_list):
+    rosters = keeper_to_roster_converter(post_keeper_projections['keepers'])
     sgp_dict = create_sgp_dict(league)
     return standing_projection(league, user, redirect, rosters, ros_proj_b_list, ros_proj_p_list, sgp_dict)
 
@@ -178,7 +177,7 @@ def get_draft_values_(league, user, redirect):
     keeper_team_stats = analyze_keeper_team_stats(league, user, redirect, draft_values, ros_proj_b_list, ros_proj_p_list)
     ranked_stats = rank_list(keeper_team_stats)
 
-    for key, value in draft_values['projected_keepers'].items():
+    for key, value in draft_values['keepers'].items():
         for stats in ranked_stats:
             if [mg for mg in value['manager_guids'] if mg in stats['manager_guids']]:
                 value['keeper_stats_avg'] = stats
@@ -227,7 +226,7 @@ def get_projected_keepers(league, user, redirect):
     keeper_team_stats = analyze_keeper_team_stats(league, user, redirect, projected_keepers, ros_proj_b_list, ros_proj_p_list)
     ranked_stats = rank_list(keeper_team_stats)
 
-    for key, value in projected_keepers['projected_keepers'].items():
+    for key, value in projected_keepers['keepers'].items():
         for stats in ranked_stats:
             if [mg for mg in value['manager_guids'] if mg in stats['manager_guids']]:
                 value['keeper_stats_avg'] = stats
@@ -290,7 +289,7 @@ def analyze_keeper_team_stats(league, user, redirect, keepers, ros_proj_b_list, 
         'worth_keeping': True
     }
 
-    for keeper_team_name, keeper_team_data in keepers['projected_keepers'].items():
+    for keeper_team_name, keeper_team_data in keepers['keepers'].items():
         team_batters = 0
         team_pitchers = 0
         replacement_batter['fantasy_team'] = keeper_team_name
@@ -314,7 +313,7 @@ def analyze_keeper_team_stats(league, user, redirect, keepers, ros_proj_b_list, 
                                            ros_proj_p_list)
     league_needs = []
     for std_team in standings:
-        for keeper_team_name, keeper_team_values in keepers['projected_keepers'].items():
+        for keeper_team_name, keeper_team_values in keepers['keepers'].items():
             if [mg for mg in std_team['manager_guids'] if mg in keeper_team_values['manager_guids']]:
                 batters = 0
                 pitchers = 0

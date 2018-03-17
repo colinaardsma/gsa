@@ -6,7 +6,7 @@
 <select class="custom-select my-1 mr-sm-2" id="fantasyTeamFilterChoice" onchange="objectFilterByTeamName(this.id)">
     <option value=0>clear teams</option>
     <option value=1>all teams</option>
-    {% for key, value in proj_keepers.projected_keepers.items %}
+    {% for key, value in all_players.keepers.items %}
     <option value="{{key}}_keepers">{{key}}</option>
     {% endfor %}
 </select>
@@ -33,27 +33,27 @@
         </thead>
         <tbody>
         <tr>
-            <!--<td>{{proj_keepers.top_three_avg.PointsTotal|floatformat}}</td>-->
+            <!--<td>{{all_players.top_three_avg.PointsTotal|floatformat}}</td>-->
             <td></td>
-            <td>{{proj_keepers.top_three_avg.StatsTotalGP|floatformat:2}}</td>
-            <td>{{proj_keepers.top_three_avg.StatsR|floatformat}}</td>
-            <td>{{proj_keepers.top_three_avg.StatsHR|floatformat}}</td>
-            <td>{{proj_keepers.top_three_avg.StatsRBI|floatformat}}</td>
-            <td>{{proj_keepers.top_three_avg.StatsSB|floatformat}}</td>
-            <td>{{proj_keepers.top_three_avg.StatsOPS|floatformat:3}}</td>
-            <td>{{proj_keepers.top_three_avg.StatsIP|floatformat:2}}</td>
-            <td>{{proj_keepers.top_three_avg.StatsW|floatformat}}</td>
-            <td>{{proj_keepers.top_three_avg.StatsSV|floatformat}}</td>
-            <td>{{proj_keepers.top_three_avg.StatsK|floatformat}}</td>
-            <td>{{proj_keepers.top_three_avg.StatsERA|floatformat:2}}</td>
-            <td>{{proj_keepers.top_three_avg.StatsWHIP|floatformat:2}}</td>
+            <td>{{all_players.top_three_avg.StatsTotalGP|floatformat:2}}</td>
+            <td>{{all_players.top_three_avg.StatsR|floatformat}}</td>
+            <td>{{all_players.top_three_avg.StatsHR|floatformat}}</td>
+            <td>{{all_players.top_three_avg.StatsRBI|floatformat}}</td>
+            <td>{{all_players.top_three_avg.StatsSB|floatformat}}</td>
+            <td>{{all_players.top_three_avg.StatsOPS|floatformat:3}}</td>
+            <td>{{all_players.top_three_avg.StatsIP|floatformat:2}}</td>
+            <td>{{all_players.top_three_avg.StatsW|floatformat}}</td>
+            <td>{{all_players.top_three_avg.StatsSV|floatformat}}</td>
+            <td>{{all_players.top_three_avg.StatsK|floatformat}}</td>
+            <td>{{all_players.top_three_avg.StatsERA|floatformat:2}}</td>
+            <td>{{all_players.top_three_avg.StatsWHIP|floatformat:2}}</td>
         </tr>
         </tbody>
     </table>
 </div>
 
 <div id="all_keepers">
-    {% for key, value in proj_keepers.projected_keepers.items %}
+    {% for key, value in all_players.keepers.items %}
     <div id="{{key}}_keepers" style="display:none;">
         <h3>{{key}}</h3>
         <h4>Total Kept: ${{value.total_cost|floatformat}} on {{value.players|length}} players</h4>
@@ -111,7 +111,7 @@
             </tbody>
         </table>
         <h4>Players Kept:</h4>
-        <table id="proj_keepers_table" class="sortable display table table-hover">
+        <table id="keepers_table" class="sortable display table table-hover">
             <thead>
             <tr>
                 <th>Cost</th>
@@ -178,7 +178,7 @@
             </tr>
             </thead>
             <tbody>
-            {% for batter in proj_keepers.batter_pool %}
+            {% for batter in all_players.batter_pool %}
             {% if batter.dollarValue > 0 %}
             <tr>
                 {% with 'style=""' as style %}
@@ -236,7 +236,7 @@
             </tr>
             </thead>
             <tbody>
-            {% for pitcher in proj_keepers.pitcher_pool %}
+            {% for pitcher in all_players.pitcher_pool %}
             {% if pitcher.dollarValue > 0 %}
             <tr>
                 {% with 'style=""' as style %}
