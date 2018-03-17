@@ -182,6 +182,16 @@ def get_draft_values_(league, user, redirect):
     potential_keepers = get_keepers(league, user, redirect)
 
     draft_values = get_draft_values(league, ros_proj_b_list, ros_proj_p_list, potential_keepers, actual_keepers)
+
+    keeper_team_stats = analyze_keeper_team_stats(league, user, redirect, draft_values, ros_proj_b_list, ros_proj_p_list)
+    ranked_stats = rank_list(keeper_team_stats)
+
+    for key, value in draft_values['projected_keepers'].items():
+        for stats in ranked_stats:
+            if [mg for mg in value['manager_guids'] if mg in stats['manager_guids']]:
+                value['keeper_stats_avg'] = stats
+                value['dollar_spent_per_point'] = value['total_cost'] / stats['PointsTotal']
+
     return draft_values
 
 
