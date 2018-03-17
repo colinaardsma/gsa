@@ -4,6 +4,7 @@ import time
 import logging
 import urllib
 import pprint
+import operator
 
 from .data_analysis import rate_fa, rate_team, single_player_rater_db, single_player_rater_html, \
     final_stats_projection, league_volatility, rank_list, evaluate_keepers, trade_analyzer
@@ -192,8 +193,30 @@ def get_draft_values_(league, user, redirect):
                 value['keeper_stats_avg'] = stats
                 value['dollar_spent_per_point'] = value['total_cost'] / stats['PointsTotal']
 
-    return draft_values
+    prev_year_league = league.prev_year_league or league
+    draft_status, prev_year_standings = get_league_standings(prev_year_league.league_key, user, redirect)
 
+    prev_year_standings.sort(key=operator.itemgetter('PointsRank'))
+    batting_pos = len(prev_year_league.batting_pos)
+    pitching_pos = len(prev_year_league.pitcher_pos)
+
+    draft_values['top_three_avg'] = {
+        # 'PointsTotal': (prev_year_standings[0]['PointsTotal'] + prev_year_standings[1]['PointsTotal'] + prev_year_standings[2]['PointsTotal']) / 3,
+        'StatsTotalGP': ((prev_year_standings[0]['StatsTotalGP'] / batting_pos) + (prev_year_standings[1]['StatsTotalGP'] / batting_pos) + (prev_year_standings[2]['StatsTotalGP'] / batting_pos)) / 3,
+        'StatsR': ((prev_year_standings[0]['StatsR'] / batting_pos) + (prev_year_standings[1]['StatsR'] / batting_pos) + (prev_year_standings[2]['StatsR'] / batting_pos)) / 3,
+        'StatsHR': ((prev_year_standings[0]['StatsHR'] / batting_pos) + (prev_year_standings[1]['StatsHR'] / batting_pos) + (prev_year_standings[2]['StatsHR'] / batting_pos)) / 3,
+        'StatsRBI': ((prev_year_standings[0]['StatsRBI'] / batting_pos) + (prev_year_standings[1]['StatsRBI'] / batting_pos) + (prev_year_standings[2]['StatsRBI'] / batting_pos)) / 3,
+        'StatsSB': ((prev_year_standings[0]['StatsSB'] / batting_pos) + (prev_year_standings[1]['StatsSB'] / batting_pos) + (prev_year_standings[2]['StatsSB'] / batting_pos)) / 3,
+        'StatsOPS': (prev_year_standings[0]['StatsOPS'] + prev_year_standings[1]['StatsOPS'] + prev_year_standings[2]['StatsOPS']) / 3,
+        'StatsIP': ((prev_year_standings[0]['StatsIP'] / pitching_pos) + (prev_year_standings[1]['StatsIP'] / pitching_pos) + (prev_year_standings[2]['StatsIP'] / pitching_pos)) / 3,
+        'StatsW': ((prev_year_standings[0]['StatsW'] / pitching_pos) + (prev_year_standings[1]['StatsW'] / pitching_pos) + (prev_year_standings[2]['StatsW'] / pitching_pos)) / 3,
+        'StatsSV': ((prev_year_standings[0]['StatsSV'] / pitching_pos) + (prev_year_standings[1]['StatsSV'] / pitching_pos) + (prev_year_standings[2]['StatsSV'] / pitching_pos)) / 3,
+        'StatsK': ((prev_year_standings[0]['StatsK'] / pitching_pos) + (prev_year_standings[1]['StatsK'] / pitching_pos) + (prev_year_standings[2]['StatsK'] / pitching_pos)) / 3,
+        'StatsERA': (prev_year_standings[0]['StatsERA'] + prev_year_standings[1]['StatsERA'] + prev_year_standings[2]['StatsERA']) / 3,
+        'StatsWHIP': (prev_year_standings[0]['StatsWHIP'] + prev_year_standings[1]['StatsWHIP'] + prev_year_standings[2]['StatsWHIP']) / 3
+    }
+
+    return draft_values
 
 
 def get_projected_keepers(league_key, user, redirect):

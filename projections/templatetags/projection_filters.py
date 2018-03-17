@@ -47,7 +47,13 @@ def update_variable(value):
     return value
 
 @register.filter
-def great_draft_pick(value, arg):
+def greater_than_eq_10_pct(value, arg):
+    profit = value - arg
+    great_threshold = arg * 0.10
+    return profit >= great_threshold
+
+@register.filter
+def less_than_eq_10_pct(value, arg):
     profit = value - arg
     great_threshold = arg * 0.10
     return profit >= great_threshold

@@ -124,10 +124,8 @@ def final_standing_projection(league_no):
     league_settings = get_league_settings(league_no)
     current_standings = get_standings(league_no, int(league_settings['Max Teams:']))
     team_list = yahoo_teams(league_no)
-    league_pos_dict = split_league_pos_types(league_settings["Roster Positions:"])
-    final_stats = final_stats_projection(team_list, ros_proj_b_list,
-                                         ros_proj_p_list, league_pos_dict,
-                                         current_standings, league_settings)
+    final_stats = final_stats_projection(team_list, ros_proj_b_list, ros_proj_p_list, current_standings,
+                                         league_settings)
     volatility_standings = league_volatility(SGP_DICT, final_stats)
     ranked_standings = rank_list(volatility_standings)
     return ranked_standings
@@ -157,11 +155,8 @@ def trade_analyzer_(league_no, team_a, team_a_players, team_b, team_b_players):
     league_settings = get_league_settings(league_no)
     current_standings = get_standings(league_no, int(league_settings['Max Teams:']))
     team_list = yahoo_teams(league_no)
-    league_pos_dict = split_league_pos_types(league_settings["Roster Positions:"])
-    new_standings = trade_analyzer(team_a, team_a_players, team_b, team_b_players,
-                                   team_list, league_pos_dict, ros_proj_b_list,
-                                   ros_proj_p_list, current_standings,
-                                   league_settings, SGP_DICT)
+    new_standings = trade_analyzer(team_a, team_a_players, team_b, team_b_players, team_list, ros_proj_b_list,
+                                   ros_proj_p_list, current_standings, league_settings, SGP_DICT)
     return new_standings
 
 

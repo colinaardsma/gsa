@@ -37,7 +37,7 @@
                 <li class="nav-item">
                     <a class="nav-link" href="/projections/pitching">pitching projections</a>
                 </li>
-            {% if request.user and not request.user.is_anonymous %}
+                {% if request.user and not request.user.is_anonymous %}
                 <!--TODO: improve this by only showing when the main_league is in the offseason-->
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="../team_tools" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -45,6 +45,7 @@
                     </a>
                     <div class="dropdown-menu bg-dark border border-light" aria-labelledby="navbarDropdown">
                         {% for league in request.user.profile.leagues.all|dictsortreversed:"season" %}
+                        {% now "Y" as current_year %}
                         <form action="../team_tools/" method="POST">
                             {% csrf_token %}
                             <input type="hidden" name="league_key" value="{{league.league_key}}" />
