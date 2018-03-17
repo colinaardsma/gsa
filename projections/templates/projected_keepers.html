@@ -12,7 +12,7 @@
 </select>
 
 <div id="top_three_avg">
-    <h3>Average starter stats from top 3 finishers of previous year</h3>
+    <h3>Average final stats from top 3 finishers of previous year</h3>
     <table id="top_three_avg_table" class="sortable display table table-hover">
         <thead>
         <tr>
@@ -123,7 +123,7 @@
             </tr>
             </thead>
             {% for player in value.players %}
-            {% if player.worth_keeping %}
+            {% if player.worth_keeping and player.status != 'REPLACEMENT_LEVEL' %}
             <tr>
                 <td>${{player.keeper_cost|floatformat}}</td>
                 <td>${{player.value|floatformat:2}}</td>

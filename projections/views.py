@@ -162,10 +162,10 @@ def all_keepers(request):
 def projected_keepers(request):
     if request.method == 'POST':
         proj_keepers_key = request.POST["proj_keepers_key"]
-        league_settings = request.user.profile.leagues.get(league_key=proj_keepers_key)
-        proj_keepers = get_projected_keepers(proj_keepers_key, request.user, TEAM_TOOLS_REDIRECT)
+        league = request.user.profile.leagues.get(league_key=proj_keepers_key)
+        proj_keepers = get_projected_keepers(league, request.user, TEAM_TOOLS_REDIRECT)
         return render(request, 'projected_keepers.html', {'proj_keepers': proj_keepers,
-                                                          'league_settings': league_settings,
+                                                          'league_settings': league,
                                                           'redirect': TEAM_TOOLS_REDIRECT})
     else:
         return redirect(TEAM_TOOLS_REDIRECT)

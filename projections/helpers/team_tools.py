@@ -88,19 +88,10 @@ def final_standing_projection(league, user, redirect):
 
 
 def keeper_standing_projection(league, user, redirect, projected_keepers, ros_proj_b_list, ros_proj_p_list):
+    # TODO: change 'projected_keepers' to 'keepers'
     rosters = keeper_to_roster_converter(projected_keepers['projected_keepers'])
-    keeper_sgp_dict = {'R SGP': (league.r_sgp_avg or league.r_sgp) / len(league.batting_pos),
-                       'HR SGP': (league.hr_sgp_avg or league.hr_sgp) / len(league.batting_pos),
-                       'RBI SGP': (league.rbi_sgp_avg or league.rbi_sgp) / len(league.batting_pos),
-                       'SB SGP': (league.sb_sgp_avg or league.sb_sgp) / len(league.batting_pos),
-                       'OPS SGP': league.ops_sgp_avg or league.ops_sgp, 'AVG SGP': league.avg_sgp_avg or league.avg_sgp,
-                       'W SGP': (league.w_sgp_avg or league.w_sgp) / len(league.pitcher_pos),
-                       'SV SGP': (league.sv_sgp_avg or league.sv_sgp) / len(league.pitcher_pos),
-                       'K SGP': (league.k_sgp_avg or league.k_sgp) / len(league.pitcher_pos),
-                       'ERA SGP': league.era_sgp_avg or league.era_sgp,
-                       'WHIP SGP': league.whip_sgp_avg or league.whip_sgp}
-
-    return standing_projection(league, user, redirect, rosters, ros_proj_b_list, ros_proj_p_list, keeper_sgp_dict)
+    sgp_dict = create_sgp_dict(league)
+    return standing_projection(league, user, redirect, rosters, ros_proj_b_list, ros_proj_p_list, sgp_dict)
 
 
 def standing_projection(league, user, redirect, rosters, ros_proj_b_list, ros_proj_p_list, sgp_dict):
@@ -194,32 +185,32 @@ def get_draft_values_(league, user, redirect):
                 value['dollar_spent_per_point'] = value['total_cost'] / stats['PointsTotal']
 
     prev_year_league = league.prev_year_league or league
-    draft_status, prev_year_standings = get_league_standings(prev_year_league.league_key, user, redirect)
-
-    prev_year_standings.sort(key=operator.itemgetter('PointsRank'))
-    batting_pos = len(prev_year_league.batting_pos)
-    pitching_pos = len(prev_year_league.pitcher_pos)
-
-    draft_values['top_three_avg'] = {
-        # 'PointsTotal': (prev_year_standings[0]['PointsTotal'] + prev_year_standings[1]['PointsTotal'] + prev_year_standings[2]['PointsTotal']) / 3,
-        'StatsTotalGP': ((prev_year_standings[0]['StatsTotalGP'] / batting_pos) + (prev_year_standings[1]['StatsTotalGP'] / batting_pos) + (prev_year_standings[2]['StatsTotalGP'] / batting_pos)) / 3,
-        'StatsR': ((prev_year_standings[0]['StatsR'] / batting_pos) + (prev_year_standings[1]['StatsR'] / batting_pos) + (prev_year_standings[2]['StatsR'] / batting_pos)) / 3,
-        'StatsHR': ((prev_year_standings[0]['StatsHR'] / batting_pos) + (prev_year_standings[1]['StatsHR'] / batting_pos) + (prev_year_standings[2]['StatsHR'] / batting_pos)) / 3,
-        'StatsRBI': ((prev_year_standings[0]['StatsRBI'] / batting_pos) + (prev_year_standings[1]['StatsRBI'] / batting_pos) + (prev_year_standings[2]['StatsRBI'] / batting_pos)) / 3,
-        'StatsSB': ((prev_year_standings[0]['StatsSB'] / batting_pos) + (prev_year_standings[1]['StatsSB'] / batting_pos) + (prev_year_standings[2]['StatsSB'] / batting_pos)) / 3,
-        'StatsOPS': (prev_year_standings[0]['StatsOPS'] + prev_year_standings[1]['StatsOPS'] + prev_year_standings[2]['StatsOPS']) / 3,
-        'StatsIP': ((prev_year_standings[0]['StatsIP'] / pitching_pos) + (prev_year_standings[1]['StatsIP'] / pitching_pos) + (prev_year_standings[2]['StatsIP'] / pitching_pos)) / 3,
-        'StatsW': ((prev_year_standings[0]['StatsW'] / pitching_pos) + (prev_year_standings[1]['StatsW'] / pitching_pos) + (prev_year_standings[2]['StatsW'] / pitching_pos)) / 3,
-        'StatsSV': ((prev_year_standings[0]['StatsSV'] / pitching_pos) + (prev_year_standings[1]['StatsSV'] / pitching_pos) + (prev_year_standings[2]['StatsSV'] / pitching_pos)) / 3,
-        'StatsK': ((prev_year_standings[0]['StatsK'] / pitching_pos) + (prev_year_standings[1]['StatsK'] / pitching_pos) + (prev_year_standings[2]['StatsK'] / pitching_pos)) / 3,
-        'StatsERA': (prev_year_standings[0]['StatsERA'] + prev_year_standings[1]['StatsERA'] + prev_year_standings[2]['StatsERA']) / 3,
-        'StatsWHIP': (prev_year_standings[0]['StatsWHIP'] + prev_year_standings[1]['StatsWHIP'] + prev_year_standings[2]['StatsWHIP']) / 3
-    }
-
+    draft_values['top_three_avg'] = get_prev_year_top_three_finishers(prev_year_league, user, redirect)
     return draft_values
 
 
-def get_projected_keepers(league_key, user, redirect):
+def get_prev_year_top_three_finishers(league, user, redirect):
+    draft_status, prev_year_standings = get_league_standings(league.league_key, user, redirect)
+    prev_year_standings.sort(key=operator.itemgetter('PointsRank'))
+    top_three_avg = {
+        # 'PointsTotal': (prev_year_standings[0]['PointsTotal'] + prev_year_standings[1]['PointsTotal'] + prev_year_standings[2]['PointsTotal']) / 3,
+        'StatsTotalGP': (prev_year_standings[0]['StatsTotalGP'] + prev_year_standings[1]['StatsTotalGP'] + prev_year_standings[2]['StatsTotalGP']) / 3,
+        'StatsR': (prev_year_standings[0]['StatsR'] + prev_year_standings[1]['StatsR'] + prev_year_standings[2]['StatsR']) / 3,
+        'StatsHR': (prev_year_standings[0]['StatsHR'] + prev_year_standings[1]['StatsHR'] + prev_year_standings[2]['StatsHR']) / 3,
+        'StatsRBI': (prev_year_standings[0]['StatsRBI'] + prev_year_standings[1]['StatsRBI'] + prev_year_standings[2]['StatsRBI']) / 3,
+        'StatsSB': (prev_year_standings[0]['StatsSB'] + prev_year_standings[1]['StatsSB'] + prev_year_standings[2]['StatsSB']) / 3,
+        'StatsOPS': (prev_year_standings[0]['StatsOPS'] + prev_year_standings[1]['StatsOPS'] + prev_year_standings[2]['StatsOPS']) / 3,
+        'StatsIP': (prev_year_standings[0]['StatsIP'] + prev_year_standings[1]['StatsIP'] + prev_year_standings[2]['StatsIP']) / 3,
+        'StatsW': (prev_year_standings[0]['StatsW'] + prev_year_standings[1]['StatsW'] + prev_year_standings[2]['StatsW']) / 3,
+        'StatsSV': (prev_year_standings[0]['StatsSV'] + prev_year_standings[1]['StatsSV'] + prev_year_standings[2]['StatsSV']) / 3,
+        'StatsK': (prev_year_standings[0]['StatsK'] + prev_year_standings[1]['StatsK'] + prev_year_standings[2]['StatsK']) / 3,
+        'StatsERA': (prev_year_standings[0]['StatsERA'] + prev_year_standings[1]['StatsERA'] + prev_year_standings[2]['StatsERA']) / 3,
+        'StatsWHIP': (prev_year_standings[0]['StatsWHIP'] + prev_year_standings[1]['StatsWHIP'] + prev_year_standings[2]['StatsWHIP']) / 3
+    }
+    return top_three_avg
+
+
+def get_projected_keepers(league, user, redirect):
     """Returns current keepers\n
     Args:\n
         league_no: Yahoo! fantasy baseball league number.\n
@@ -231,7 +222,6 @@ def get_projected_keepers(league_key, user, redirect):
     start = time.time()
     ros_proj_b_list = BatterProjection.objects.all()
     ros_proj_p_list = PitcherProjection.objects.all()
-    league = League.objects.get(league_key=league_key)
     potential_keepers = get_keepers(league, user, redirect)
     projected_keepers = project_keepers(ros_proj_b_list, ros_proj_p_list, potential_keepers, league)
     keeper_team_stats = analyze_keeper_team_stats(league, user, redirect, projected_keepers, ros_proj_b_list, ros_proj_p_list)
@@ -243,6 +233,9 @@ def get_projected_keepers(league_key, user, redirect):
                 value['keeper_stats_avg'] = stats
                 value['dollar_spent_per_point'] = value['total_cost'] / stats['PointsTotal']
 
+    prev_year_league = league.prev_year_league or league
+    projected_keepers['top_three_avg'] = get_prev_year_top_three_finishers(prev_year_league, user, redirect)
+
     end = time.time()
     elapsed = end - start
     print("***************************** %s seconds *****************************" % elapsed)
@@ -250,16 +243,78 @@ def get_projected_keepers(league_key, user, redirect):
 
 
 # TODO: not ready, this needs direction and thought, currently getting an average of batter/pitcher stats kept, but what good is that?
-def analyze_keeper_team_stats(league, user, redirect, projected_keepers, ros_proj_b_list, ros_proj_p_list):
+def analyze_keeper_team_stats(league, user, redirect, keepers, ros_proj_b_list, ros_proj_p_list):
     try:
         new_league = League.objects.get(prev_year_league=league)
     except League.DoesNotExist:
         new_league = league
-    standings = keeper_standing_projection(new_league, user, redirect, projected_keepers, ros_proj_b_list,
+    team_count = league.team_count
+    starting_batter_count = len(league.batting_pos)
+    starting_pitcher_count = len(league.pitcher_pos)
+    total_starting_batters = team_count * starting_batter_count
+    total_starting_pitchers = team_count * starting_pitcher_count
+
+    batter = BatterProjection.objects.order_by('dollarValue')[total_starting_batters]
+    replacement_batter = {
+        'category': 'batter',
+        'first_name': batter.normalized_first_name,
+        'full_name': batter.name,
+        'keeper_cost': 0,
+        'keeper_found': True,
+        'last_name': batter.last_name,
+        'player_key': 0,
+        'positions': ['C', '1B', '2B', 'SS', '3B', 'OF'],
+        'postseason_trade': False,
+        'preseason_trade': False,
+        'status': 'REPLACEMENT_LEVEL',
+        'team': batter.team,
+        'value': batter.dollarValue,
+        'worth_keeping': True
+    }
+
+    pitcher = PitcherProjection.objects.order_by('dollarValue')[total_starting_pitchers]
+    replacement_pitcher = {
+        'category': 'pitcher',
+        'first_name': pitcher.normalized_first_name,
+        'full_name': pitcher.name,
+        'keeper_cost': 0,
+        'keeper_found': True,
+        'last_name': pitcher.last_name,
+        'player_key': 0,
+        'positions': ['SP', 'RP', 'P', 'CL1', 'CL2', 'CL3', 'CLC'],
+        'postseason_trade': False,
+        'preseason_trade': False,
+        'status': 'REPLACEMENT_LEVEL',
+        'team': pitcher.team,
+        'value': pitcher.dollarValue,
+        'worth_keeping': True
+    }
+
+    for keeper_team_name, keeper_team_data in keepers['projected_keepers'].items():
+        team_batters = 0
+        team_pitchers = 0
+        replacement_batter['fantasy_team'] = keeper_team_name
+        replacement_batter['manager_guids'] = keeper_team_data['manager_guids']
+        replacement_pitcher['fantasy_team'] = keeper_team_name
+        replacement_pitcher['manager_guids'] = keeper_team_data['manager_guids']
+
+        for player in keeper_team_data['players']:
+            if player['category'] == 'batter':
+                team_batters += 1
+            elif player['category'] == 'pitcher':
+                team_pitchers += 1
+        while team_batters < starting_batter_count:
+            keeper_team_data['players'].append(replacement_batter)
+            team_batters += 1
+        while team_pitchers < starting_pitcher_count:
+            keeper_team_data['players'].append(replacement_pitcher)
+            team_pitchers += 1
+
+    standings = keeper_standing_projection(new_league, user, redirect, keepers, ros_proj_b_list,
                                            ros_proj_p_list)
     league_needs = []
     for std_team in standings:
-        for keeper_team_name, keeper_team_values in projected_keepers['projected_keepers'].items():
+        for keeper_team_name, keeper_team_values in keepers['projected_keepers'].items():
             if [mg for mg in std_team['manager_guids'] if mg in keeper_team_values['manager_guids']]:
                 batters = 0
                 pitchers = 0
@@ -269,14 +324,14 @@ def analyze_keeper_team_stats(league, user, redirect, projected_keepers, ros_pro
                     elif player['category'] == 'pitcher':
                         pitchers += 1
 
-                needs = {'team_name': keeper_team_name, 'manager_guids': keeper_team_values['manager_guids'],
-                         'StatsERA': std_team['StatsERA'], 'StatsHR': std_team['StatsHR'] / batters,
-                         'StatsIP': std_team['StatsIP'], 'StatsK': std_team['StatsK'] / pitchers,
-                         'StatsOPS': std_team['StatsOPS'], 'StatsR': std_team['StatsR'] / batters,
-                         'StatsRBI': std_team['StatsRBI'] / batters, 'StatsSB': std_team['StatsSB'] / batters,
-                         'StatsSV': std_team['StatsSV'] / pitchers, 'StatsTotalGP': std_team['StatsTotalGP'],
-                         'StatsW': std_team['StatsW'] / pitchers, 'StatsWHIP': std_team['StatsWHIP']}
-                league_needs.append(needs)
+                stats = {'team_name': keeper_team_name, 'manager_guids': keeper_team_values['manager_guids'],
+                         'StatsERA': std_team['StatsERA'], 'StatsHR': std_team['StatsHR'],
+                         'StatsIP': std_team['StatsIP'], 'StatsK': std_team['StatsK'],
+                         'StatsOPS': std_team['StatsOPS'], 'StatsR': std_team['StatsR'],
+                         'StatsRBI': std_team['StatsRBI'], 'StatsSB': std_team['StatsSB'],
+                         'StatsSV': std_team['StatsSV'], 'StatsTotalGP': std_team['StatsTotalGP'],
+                         'StatsW': std_team['StatsW'], 'StatsWHIP': std_team['StatsWHIP']}
+                league_needs.append(stats)
 
     return league_needs
 
