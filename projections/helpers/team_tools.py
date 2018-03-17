@@ -15,7 +15,7 @@ from ..models import BatterProjection, BatterValue, PitcherProjection, PitcherVa
     save_pitcher, save_pitcher_values
 from leagues.helpers.yql_queries import get_league_settings, get_league_standings, get_all_team_rosters, get_keepers, \
     get_players, get_single_team_roster, get_keeper_query
-from .keepers import project_keepers, get_draft_values
+from .keepers import project_keepers, get_auction_values
 from leagues.models import League, update_league, dummy_league
 
 # static variables
@@ -165,27 +165,27 @@ def get_keeper_costs(league_key, user, redirect):
 #     return eval_keepers
 
 
-def get_draft_values_(league, user, redirect):
+def get_auction_values_(league, user, redirect):
     ros_proj_b_list = BatterProjection.objects.all()
     ros_proj_p_list = PitcherProjection.objects.all()
 
     actual_keepers = get_keeper_query(league, user, redirect)
     potential_keepers = get_keepers(league, user, redirect)
 
-    draft_values = get_draft_values(league, ros_proj_b_list, ros_proj_p_list, potential_keepers, actual_keepers)
+    auction_values = get_auction_values(league, ros_proj_b_list, ros_proj_p_list, potential_keepers, actual_keepers)
 
-    keeper_team_stats = analyze_keeper_team_stats(league, user, redirect, draft_values, ros_proj_b_list, ros_proj_p_list)
+    keeper_team_stats = analyze_keeper_team_stats(league, user, redirect, auction_values, ros_proj_b_list, ros_proj_p_list)
     ranked_stats = rank_list(keeper_team_stats)
 
-    for key, value in draft_values['keepers'].items():
+    for key, value in auction_values['keepers'].items():
         for stats in ranked_stats:
             if [mg for mg in value['manager_guids'] if mg in stats['manager_guids']]:
                 value['keeper_stats_avg'] = stats
                 value['dollar_spent_per_point'] = value['total_cost'] / stats['PointsTotal']
 
     prev_year_league = league.prev_year_league or league
-    draft_values['top_three_avg'] = get_prev_year_top_three_finishers(prev_year_league, user, redirect)
-    return draft_values
+    auction_values['top_three_avg'] = get_prev_year_top_three_finishers(prev_year_league, user, redirect)
+    return auction_values
 
 
 def get_prev_year_top_three_finishers(league, user, redirect):

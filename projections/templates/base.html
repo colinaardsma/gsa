@@ -132,7 +132,7 @@
     function objectFilterByTeamName(filterId) {
       var input, filter, filterDiv, parentDiv;
       input = document.getElementById(filterId);
-      parentDiv = document.getElementById('all_keepers');
+      parentDiv = document.getElementById('potential_keepers');
 
       for (var i = 0; i < parentDiv.children.length; i++) {
         parentDiv.children[i].style.display = "none";
@@ -229,8 +229,8 @@ function openProjections(evt, projectionCategory) {
   });
 })(jQuery);
 
+// TODO: the url call fails but spinner works, fix
 function getSpinner() {
-
   $.ajax({
     url: 'http://baconipsum.com/api/?type=all-meat',
     dataType: 'json',

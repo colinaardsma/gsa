@@ -200,7 +200,7 @@ def run_keeper_passes(batter_pool, pitcher_pool, potential_keepers, total_dollar
     while passes > 0:
         passes -= 1
         if passes == 0:
-            result = {'projected_keepers': keeper_dict_by_team(all_projected_keepers), 'batter_pool': batter_pool_,
+            result = {'keepers': keeper_dict_by_team(all_projected_keepers), 'batter_pool': batter_pool_,
                       'pitcher_pool': pitcher_pool_, 'dollars_spent_on_keepers': total_dollars_spent_on_keepers}
             return result
         else:
@@ -210,7 +210,7 @@ def run_keeper_passes(batter_pool, pitcher_pool, potential_keepers, total_dollar
                                      all_projected_keepers, passes)
 
 
-def get_draft_values(league, batter_pool, pitcher_pool, potential_keepers, actual_keepers):
+def get_auction_values(league, batter_pool, pitcher_pool, potential_keepers, actual_keepers):
     b_over_zero = league.batters_over_zero_dollars_avg or league.batters_over_zero_dollars or league.prev_year_league.batters_over_zero_dollars_avg
     p_over_zero = league.pitchers_over_zero_dollars_avg or league.pitchers_over_zero_dollars or league.prev_year_league.pitchers_over_zero_dollars_avg
     b_one_dollar = league.one_dollar_batters_avg or league.one_dollar_batters or league.prev_year_league.one_dollar_batters_avg

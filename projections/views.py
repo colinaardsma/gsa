@@ -15,7 +15,8 @@ from leagues.models import League, dummy_league, update_profile, max_year_league
 from leagues.helpers.yql_queries import get_current_leagues, get_all_team_rosters, get_keeper_query
 from leagues.helpers.html_parser import get_single_yahoo_team
 from .helpers.team_tools import pull_batters, pull_pitchers, fa_finder, final_standing_projection, \
-    single_player_rater, get_keeper_costs, get_projected_keepers, trade_analyzer_, pull_players_html, get_draft_values_
+    single_player_rater, get_keeper_costs, get_projected_keepers, trade_analyzer_, pull_players_html, \
+    get_auction_values_
 from .helpers.html_parser import razzball_get_update_datetime, scrape_razzball
 from .helpers.keepers import project_keepers
 from .models import BatterProjection, PitcherProjection
@@ -148,13 +149,14 @@ def projected_standings(request):
         return redirect(TEAM_TOOLS_REDIRECT)
 
 
-def all_keepers(request):
+def potential_keepers(request):
     if request.method == 'POST':
         user = request.user
-        all_keepers_key = request.POST["all_keepers_key"]
-        all_keepers_ = get_keeper_costs(all_keepers_key, user, TEAM_TOOLS_REDIRECT)
+        potential_keepers_key = request.POST["potential_keepers_key"]
+        potential_keepers_ = get_keeper_costs(potential_keepers_key, user, TEAM_TOOLS_REDIRECT)
         import pprint
-        return render(request, 'all_keepers.html', {'all_keepers': all_keepers_, 'redirect': TEAM_TOOLS_REDIRECT})
+        return render(request, 'potential_keepers.html', {'potential_keepers': potential_keepers_,
+                                                          'redirect': TEAM_TOOLS_REDIRECT})
     else:
         return redirect(TEAM_TOOLS_REDIRECT)
 
@@ -164,25 +166,20 @@ def projected_keepers(request):
         proj_keepers_key = request.POST["proj_keepers_key"]
         league = request.user.profile.leagues.get(league_key=proj_keepers_key)
         proj_keepers = get_projected_keepers(league, request.user, TEAM_TOOLS_REDIRECT)
-        return render(request, 'keepers.html', {'all_players': proj_keepers, 'league_settings': league,
-                                                'redirect': TEAM_TOOLS_REDIRECT})
+        return render(request, 'projected_keepers.html', {'all_players': proj_keepers, 'league_settings': league,
+                                                          'redirect': TEAM_TOOLS_REDIRECT})
     else:
         return redirect(TEAM_TOOLS_REDIRECT)
 
 
-# TODO: finish this
-def draft_values(request):
+def auction_values(request):
     if request.method == 'POST':
-        draft_values_key = request.POST["draft_values_key"]
+        auction_values_key = request.POST["auction_values_key"]
         main_league = request.user.profile.leagues.get(league_key=request.user.profile.main_league)
-        league_settings = request.user.profile.leagues.get(league_key=draft_values_key)
-        draft_values_ = get_draft_values_(main_league, request.user, TEAM_TOOLS_REDIRECT)
-        # TODO: html needs to be broken out, fixed, or both
-        # return render(request, 'draft_values.html', {'draft_values': draft_values_, 'league_settings': league_settings,
-        #                                              'redirect': TEAM_TOOLS_REDIRECT})
-        return render(request, 'keepers.html', {'all_players': draft_values_, 'league_settings': league_settings,
-                                                'redirect': TEAM_TOOLS_REDIRECT})
-
+        league_settings = request.user.profile.leagues.get(league_key=auction_values_key)
+        auction_values_ = get_auction_values_(main_league, request.user, TEAM_TOOLS_REDIRECT)
+        return render(request, 'auction_values.html', {'all_players': auction_values_, 'league_settings': league_settings,
+                                                       'redirect': TEAM_TOOLS_REDIRECT})
     else:
         return redirect(TEAM_TOOLS_REDIRECT)
 
@@ -262,6 +259,6 @@ def user_(request):
 
 def test(request):
     main_league = request.user.profile.leagues.get(league_key=request.user.profile.main_league)
-    draft_values_ = get_keeper_query(main_league, request.user, USER_REDIRECT)
+    auction_values_ = get_keeper_query(main_league, request.user, USER_REDIRECT)
     import pprint
-    pprint.pprint(draft_values_)
+    pprint.pprint(auction_values_)

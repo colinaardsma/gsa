@@ -1,0 +1,128 @@
+{% load projection_filters %}
+{% block content %}
+<h2>Projected Player Pool Values</h2>
+<div class="tab">
+    <button class="tablinks btn btn-primary btn-sm" onclick="openProjections(event, 'batters')">batters</button>
+    <button class="tablinks btn btn-primary btn-sm" onclick="openProjections(event, 'pitchers')">pitchers</button>
+    <button class="tablinks btn btn-primary btn-sm active" onclick="openProjections(event, 1)">both</button>
+</div>
+<br/>
+
+<div id="playerProjections">
+    <div id="batters" class="tabcontent">
+        <h3>Batters</h3>
+        {% with tableId='proj_batter_pool_table' %}
+        {% include 'includes/batter_pos_filter.html' %}
+        {% endwith %}
+        <table id="proj_batter_pool_table" class="sortable display table table-hover">
+            <thead>
+            <tr>
+                <th>Value</th>
+                <th>Original Value</th>
+                <th>Player Name</th>
+                <th>Team</th>
+                <th>Position</th>
+                <th>Status</th>
+                <th>R</th>
+                <th>HR</th>
+                <th>RBI</th>
+                <th>SB</th>
+                <th>OPS</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for batter in all_players.batter_pool %}
+            {% if batter.dollarValue > 0 %}
+            <tr>
+                {% with 'style=""' as style %}
+                {% if batter.dollarValue < batter.original_value %}
+                {% update_variable 'style="color:red;"' as style %}
+                {% elif batter.dollarValue|greater_than_eq_10_pct:batter.original_value %}
+                {% update_variable 'style="color:green;"' as style %}
+                {% endif %}
+                <td><p {{style}}>${{batter.dollarValue|floatformat:2}}</p></td>
+                {% endwith %}
+                <td>${{batter.original_value|floatformat:2}}</td>
+                <td><a href="https://baseball.fantasysports.yahoo.com/b1/{{request.user.profile.main_league|get_league_no}}/playersearch?&search={{batter.name|url_safe_spaces}}" target="_blank">{{batter.name}}</a></td>
+                <td>{{batter.team}}</td>
+                <td>{{batter.pos}}</td>
+                {% if 'DL' in batter.status %}
+                <td style="color:red">{{batter.status}}</td>
+                {% elif 'MiLB' in batter.status %}
+                <td style="color:blue">{{batter.status}}</td>
+                {% else %}
+                <td></td>
+                {% endif %}
+                <td>{{batter.r|floatformat}}</td>
+                <td>{{batter.hr|floatformat}}</td>
+                <td>{{batter.rbi|floatformat}}</td>
+                <td>{{batter.sb|floatformat}}</td>
+                <td>{{batter.ops|floatformat:3}}</td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div id="pitchers" class="tabcontent">
+        <h3>Pitchers</h3>
+        {% with tableId='proj_pitcher_pool_table' %}
+        {% include 'includes/pitcher_pos_filter.html' %}
+        {% endwith %}
+        <table id="proj_pitcher_pool_table" class="sortable display table table-hover">
+            <thead>
+            <tr>
+                <th>Value</th>
+                <th>Original Value</th>
+                <th>Player Name</th>
+                <th>Team</th>
+                <th>Position</th>
+                <th>Status</th>
+                <th>W</th>
+                <th>SV</th>
+                <th>K</th>
+                <th>ERA</th>
+                <th>WHIP</th>
+                <th>IP</th>
+                <th>K/IP</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for pitcher in all_players.pitcher_pool %}
+            {% if pitcher.dollarValue > 0 %}
+            <tr>
+                {% with 'style=""' as style %}
+                {% if pitcher.dollarValue < pitcher.original_value %}
+                {% update_variable 'style="color:red;"' as style %}
+                {% elif pitcher.dollarValue|greater_than_eq_10_pct:pitcher.original_value %}
+                {% update_variable 'style="color:green;"' as style %}
+                {% endif %}
+                <td><p {{style}}>${{pitcher.dollarValue|floatformat:2}}</p></td>
+                {% endwith %}
+                <td>${{pitcher.original_value|floatformat:2}}</td>
+                <td><a href="https://baseball.fantasysports.yahoo.com/b1/{{request.user.profile.main_league|get_league_no}}/playersearch?&search={{pitcher.name|url_safe_spaces}}" target="_blank">{{pitcher.name}}</a></td>
+                <td>{{pitcher.team}}</td>
+                <td>{{pitcher.pos}}</td>
+                {% if 'DL' in pitcher.status %}
+                <td style="color:red">{{pitcher.status}}</td>
+                {% elif 'MiLB' in pitcher.status %}
+                <td style="color:blue">{{pitcher.status}}</td>
+                {% else %}
+                <td></td>
+                {% endif %}
+                <td>{{pitcher.w|floatformat:2}}</td>
+                <td>{{pitcher.sv|floatformat:2}}</td>
+                <td>{{pitcher.k|floatformat:2}}</td>
+                <td>{{pitcher.era|floatformat:2}}</td>
+                <td>{{pitcher.whip|floatformat:2}}</td>
+                <td>{{pitcher.ip|floatformat}}</td>
+                <td>{{pitcher.kip|floatformat:2}}</td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

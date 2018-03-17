@@ -90,20 +90,20 @@
     </div>
     <hr/>
     <div class="row" id="keeperProjections">
-        <div class="col" id="allKeepers">
-            <h4>All Keepers</h4>
-            <form class="form-inline" method="post" action="../../projections/all_keepers/">
+        <div class="col" id="poentialKeepers">
+            <h4>Potential Keepers</h4>
+            <form class="form-inline" method="post" action="../../projections/potential_keepers/">
                 {% csrf_token %}
                 {% if request.user and not request.user.is_anonymous %}
                 <!--&lt;!&ndash;<label class="my-1 mr-2" for="finalStandingsProjection">Current Leagues:</label>&ndash;&gt;-->
-                <!--<select class="custom-select my-1 mr-sm-2" id="allKeepersLeagueNo" name="all_keepers_key">-->
+                <!--<select class="custom-select my-1 mr-sm-2" id="allKeepersLeagueNo" name="potential_keepers_key">-->
                 <!--{% include 'includes/league_picker.html' %}-->
                 <!--</select>-->
-                <input type="hidden" value="{{league.league_key}}" name="all_keepers_key">
+                <input type="hidden" value="{{league.league_key}}" name="potential_keepers_key">
                 <!--TODO: this doesnt work-->
                 {% else %}
                 <!--<label class="my-1 mr-2" for="allKeepersLeagueNo">League Number:</label>-->
-                <input type="text" class="form-control my-1 mr-sm-2" id="allKeepersLeagueNo" name="all_keepers_key" value="{{all_keepers_key}}" placeholder="League Number" />
+                <input type="text" class="form-control my-1 mr-sm-2" id="potentialKeepersLeagueNo" name="potential_keepers_key" value="{{potential_keepers_key}}" placeholder="League Number" />
                 {% endif %}
                 <button type="submit" class="btn btn-primary mb-2 btn-sm" onclick="getSpinner()">display</button>
             </form>
@@ -130,19 +130,19 @@
     <br/>
     <div class="row" id="draftPrep">
         <div class="col" id="draftValues">
-            <h4>Draft Values</h4>
-            <form class="form-inline" method="post" action="../../projections/draft_values/">
+            <h4>Auction Values</h4>
+            <form class="form-inline" method="post" action="../../projections/auction_values/">
                 {% csrf_token %}
                 {% if request.user and not request.user.is_anonymous %}
                 <!--&lt;!&ndash;<label class="my-1 mr-2" for="draftValuesLeagueNo">Current Leagues:</label>&ndash;&gt;-->
-                <!--<select class="custom-select my-1 mr-sm-2" id="draftValuesLeagueNo" name="draft_values_key">-->
+                <!--<select class="custom-select my-1 mr-sm-2" id="draftValuesLeagueNo" name="auction_values_key">-->
                 <!--{% include 'includes/league_picker.html' %}-->
                 <!--</select>-->
-                <input type="hidden" value="{{league.league_key}}" name="draft_values_key">
+                <input type="hidden" value="{{league.league_key}}" name="auction_values_key">
                 <!--TODO: this doesnt work-->
                 {% else %}
                 <!--<label class="my-1 mr-2" for="projKeepersLeagueNo">League Number:</label>-->
-                <input type="text" class="form-control my-1 mr-sm-2" id="draftValuesLeagueNo" name="draft_values_key" value="{{draft_values_key}}" placeholder="League Number" />
+                <input type="text" class="form-control my-1 mr-sm-2" id="draftValuesLeagueNo" name="auction_values_key" value="{{auction_values_key}}" placeholder="League Number" />
                 {% endif %}
                 <button type="submit" class="btn btn-primary mb-2 btn-sm" onclick="getSpinner()">project</button>
             </form>

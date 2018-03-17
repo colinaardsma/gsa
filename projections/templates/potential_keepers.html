@@ -2,14 +2,14 @@
 {% block content %}
 {% load projection_filters %}
 <label class="my-1 mr-2" for="teamFilterChoice">Filter By Team:</label>
-<select class="custom-select my-1 mr-sm-2" id="teamFilterChoice" onchange="tableFilter('all_keepers_table', this.id, 5)">
-    {% for team in all_keepers %}
+<select class="custom-select my-1 mr-sm-2" id="teamFilterChoice" onchange="tableFilter('potential_keepers_table', this.id, 5)">
+    {% for team in potential_keepers %}
     <option value="{{team.team_name}}">{{team.team_name}}</option>
     {% endfor %}
 </select>
 <br/>
 <h2>All Keepers</h2>
-<table id="all_keepers_table" class="sortable display table table-hover">
+<table id="potential_keepers_table" class="sortable display table table-hover">
     <thead>
     <tr>
         <th>Cost</th>
@@ -20,7 +20,7 @@
         <th>Fantasy Team</th>
     </tr>
     </thead>
-    {% for team in all_keepers %}
+    {% for team in potential_keepers %}
     {% for player in team.roster %}
     <tr>
         <td>${{player.keeper_cost|floatformat}}</td>

@@ -1,0 +1,42 @@
+{% block content%}
+<div id="top_three_avg">
+    <h3>Average final stats from top 3 finishers of previous year</h3>
+    <table id="top_three_avg_table" class="sortable display table table-hover">
+        <thead>
+        <tr>
+            <th>TOTAL POINTS</th>
+            <th>TOTAL GP</th>
+            <th>R</th>
+            <th>HR</th>
+            <th>RBI</th>
+            <th>SB</th>
+            <th>OPS</th>
+            <th>TOTAL IP</th>
+            <th>W</th>
+            <th>SV</th>
+            <th>K</th>
+            <th>ERA</th>
+            <th>WHIP</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <!--<td>{{all_players.top_three_avg.PointsTotal|floatformat}}</td>-->
+            <td></td>
+            <td>{{all_players.top_three_avg.StatsTotalGP|floatformat:2}}</td>
+            <td>{{all_players.top_three_avg.StatsR|floatformat}}</td>
+            <td>{{all_players.top_three_avg.StatsHR|floatformat}}</td>
+            <td>{{all_players.top_three_avg.StatsRBI|floatformat}}</td>
+            <td>{{all_players.top_three_avg.StatsSB|floatformat}}</td>
+            <td>{{all_players.top_three_avg.StatsOPS|floatformat:3}}</td>
+            <td>{{all_players.top_three_avg.StatsIP|floatformat:2}}</td>
+            <td>{{all_players.top_three_avg.StatsW|floatformat}}</td>
+            <td>{{all_players.top_three_avg.StatsSV|floatformat}}</td>
+            <td>{{all_players.top_three_avg.StatsK|floatformat}}</td>
+            <td>{{all_players.top_three_avg.StatsERA|floatformat:2}}</td>
+            <td>{{all_players.top_three_avg.StatsWHIP|floatformat:2}}</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+{% endblock %}
