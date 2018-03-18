@@ -45,8 +45,8 @@ def fa_finder(league_key, user, redirect):
     ros_proj_p_list = PitcherProjection.objects.all()
 
     player_comp = {}
-    pitching_fa_list = get_players(league_key, user, redirect, 300, "P", "FA")
-    batting_fa_list = get_players(league_key, user, redirect, 300, "B", "FA")
+    pitching_fa_list = get_players(league_key, user, redirect, 300, "P", "A")
+    batting_fa_list = get_players(league_key, user, redirect, 300, "B", "A")
     avail_pitching_fas = rate_fa(pitching_fa_list, ros_proj_p_list)
     yahoo_team = get_single_team_roster(league_key, user, redirect)
     # yahoo_team = get_single_yahoo_team(league_no, team_name)

@@ -81,7 +81,9 @@ def top_fa(request):
     if request.method == 'POST':
         fa_league_key = request.POST["fa_league_key"]
         top_fa_ = fa_finder(fa_league_key, request.user, TEAM_TOOLS_REDIRECT)
-        return render(request, 'top_fa.html', {'top_fa': top_fa_, 'redirect': TEAM_TOOLS_REDIRECT})
+        team_name = top_fa_['TeamName']
+        return render(request, 'top_fa.html', {'top_fa': top_fa_, 'team_name': team_name,
+                                               'redirect': TEAM_TOOLS_REDIRECT})
     else:
         return redirect(TEAM_TOOLS_REDIRECT)
 

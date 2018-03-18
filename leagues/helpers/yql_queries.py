@@ -178,7 +178,7 @@ def format_league_standings_dict(league_standings_base_dict):
         team_stats_dict = team_standing_dict[1]['team_stats']['stats']
         for stat in team_stats_dict:
             stat_name = STAT_ID_DICT['{}'.format(stat['stat']['stat_id'])]
-            stat_value = float(stat['stat']['value']) if stat['stat']['value'] != "" else stat['stat']['value']
+            stat_value = float(stat['stat']['value'] or 0)
             standing['Stats{}'.format(stat_name)] = stat_value
             if stat_name == '':
                 continue
@@ -188,7 +188,7 @@ def format_league_standings_dict(league_standings_base_dict):
         team_points_dict = team_standing_dict[1]['team_points']['stats']
         for point in team_points_dict:
             stat_name = STAT_ID_DICT['{}'.format(point['stat']['stat_id'])]
-            point_value = float(point['stat']['value']) if point['stat']['value'] != "" else point['stat']['value']
+            point_value = float(point['stat']['value'] or 0)
             standing['Points{}'.format(stat_name)] = point_value
             if stat_name == '':
                 continue
@@ -208,7 +208,7 @@ def format_league_standings_dict(league_standings_base_dict):
                 elif 'Points' in key or 'Stats' in key:
                     standing[key] = 0
         else:
-            standing['PointsRank'] = int(team_standing_dict[2]['team_standings']['rank'])
+            standing['PointsRank'] = float(team_standing_dict[2]['team_standings']['rank'] or 0)
             standing['StatsRank'] = standing['PointsRank']
 
         formatted_standings.append(standing)
