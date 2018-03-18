@@ -4,11 +4,11 @@
 <p>Last Update: {{players.0.last_modified|date:'n.j.Y' }}</p>
 <br/>
 {% if cat == "batter" %}
-{% with tableId='stat_table' %}
+{% with tableId='stat_table' column_no=3 %}
 {% include 'includes/batter_pos_filter.html' %}
 {% endwith %}
 {% elif cat == "pitcher" %}
-{% with tableId='stat_table' %}
+{% with tableId='stat_table' column_no=3 %}
 {% include 'includes/pitcher_pos_filter.html' %}
 {% endwith %}
 {% endif %}

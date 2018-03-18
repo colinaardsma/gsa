@@ -11,7 +11,7 @@
 <div id="playerProjections">
     <div id="batters" class="tabcontent">
         <h3>Batters</h3>
-        {% with tableId='proj_batter_pool_table' %}
+        {% with tableId='proj_batter_pool_table' column_no=4 %}
         {% include 'includes/batter_pos_filter.html' %}
         {% endwith %}
         <table id="proj_batter_pool_table" class="sortable display table table-hover">
@@ -67,7 +67,7 @@
 
     <div id="pitchers" class="tabcontent">
         <h3>Pitchers</h3>
-        {% with tableId='proj_pitcher_pool_table' %}
+        {% with tableId='proj_pitcher_pool_table' column_no=4 %}
         {% include 'includes/pitcher_pos_filter.html' %}
         {% endwith %}
         <table id="proj_pitcher_pool_table" class="sortable display table table-hover">

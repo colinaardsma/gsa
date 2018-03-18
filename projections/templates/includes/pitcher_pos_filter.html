@@ -1,6 +1,6 @@
 {% block content %}
 <label class="my-1 mr-2" for="pitchersPosFilter">Filter By Position:</label>
-<select class="custom-select my-1 mr-sm-2" id="pitchersPosFilter" onchange="tableFilter('{{tableId}}', this.id, 3)">
+<select class="custom-select my-1 mr-sm-2" id="pitchersPosFilter" onchange="tableFilter('{{tableId}}', this.id, {{column_no}})">
     <option value=1>all pos</option>
     <option value="SP">SP</option>
     <option value="RP">RP</option>

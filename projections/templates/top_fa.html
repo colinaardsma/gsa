@@ -3,7 +3,7 @@
 {% load projection_filters %}
 <h2>FA/Team Valuation for {{team_name}}</h2>
 <h4>Top FA Pitchers</h4>
-{% with tableId='top_fa_pitchers_table' %}
+{% with tableId='top_fa_pitchers_table' column_no=3 %}
 {% include 'includes/pitcher_pos_filter.html' %}
 {% endwith %}
 <br/>
@@ -50,7 +50,7 @@
     </tbody>
 </table>
 <h4>Team Pitchers</h4>
-{% with tableId='team_pitchers_table' %}
+{% with tableId='team_pitchers_table' column_no=3 %}
 {% include 'includes/pitcher_pos_filter.html' %}
 {% endwith %}
 <br/>
@@ -97,7 +97,7 @@
     </tbody>
 </table>
 <h4>Top FA Batters</h4>
-{% with tableId='top_fa_batters_table' %}
+{% with tableId='top_fa_batters_table' column_no=3%}
 {% include 'includes/batter_pos_filter.html' %}
 {% endwith %}
 </select>
@@ -141,7 +141,7 @@
     </tbody>
 </table>
 <h4>Team Batters</h4>
-{% with tableId='team_batters_table' %}
+{% with tableId='team_batters_table' column_no=3 %}
 {% include 'includes/batter_pos_filter.html' %}
 {% endwith %}
 <br/>
