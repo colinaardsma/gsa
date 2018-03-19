@@ -70,7 +70,7 @@ def team_tools(request):
             league_key = request.POST['league_key']
             league = request.user.profile.leagues.get(league_key=league_key)
         else:
-            league = request.user.profile.main_league
+            league = request.user.profile.leagues.get(league_key=request.user.profile.main_league)
         return render(request, 'team_tools.html', {'league': league, 'redirect': TEAM_TOOLS_REDIRECT})
     else:
         return render(request, 'team_tools.html', {'redirect': TEAM_TOOLS_REDIRECT})
