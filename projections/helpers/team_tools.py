@@ -338,8 +338,6 @@ def analyze_keeper_team_stats(league, user, redirect, keepers, ros_proj_b_list, 
 def trade_analyzer_(league_key, user, redirect, team_a, team_a_players, team_b, team_b_players, team_list):
     ros_proj_b_list = BatterProjection.objects.all()
     ros_proj_p_list = PitcherProjection.objects.all()
-    # TODO: change to db call
-    league_settings = get_league_settings(league_key, user, redirect)
     league_status, current_standings = get_league_standings(league_key, user, redirect)
     league = user.profile.leagues.get(league_key=league_key)
     update_league(league, draft_status=league_status)
@@ -347,7 +345,7 @@ def trade_analyzer_(league_key, user, redirect, team_a, team_a_players, team_b, 
     sgp_dict = create_sgp_dict(league)
 
     new_standings = trade_analyzer(team_a, team_a_players, team_b, team_b_players, team_list, ros_proj_b_list,
-                                   ros_proj_p_list, current_standings, league_settings, sgp_dict)
+                                   ros_proj_p_list, current_standings, league, sgp_dict)
     return new_standings
 
 

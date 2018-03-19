@@ -636,7 +636,7 @@ def calc_volatility(sgp_dict, final_stats, stat, factor, reverse=True):
 
 
 def trade_analyzer(team_a, team_a_players, team_b, team_b_players, team_list, ros_proj_b_list, ros_proj_p_list,
-                   current_standings, league_settings, sgp_dict):
+                   current_standings, league, sgp_dict):
     """Analyzes value of trade for 2 teams\n
     Args:\n
         projected_volatility: projected volatility for league\n
@@ -655,7 +655,6 @@ def trade_analyzer(team_a, team_a_players, team_b, team_b_players, team_list, ro
     Raises:\n
         None.
     """
-    print(team_a_players)
     team_list = ast.literal_eval(team_list)
     team_a = ast.literal_eval(team_a)
     team_b = ast.literal_eval(team_b)
@@ -684,9 +683,7 @@ def trade_analyzer(team_a, team_a_players, team_b, team_b_players, team_list, ro
         if team['TEAM_NUMBER'] == team_b['TEAM_NUMBER']:
             team_list.remove(team)
             team_list.append(team_b)
-    final_stats = final_stats_projection(team_list, ros_proj_b_list,
-                                         ros_proj_p_list,
-                                         current_standings, league_settings)
+    final_stats = final_stats_projection(team_list, ros_proj_b_list, ros_proj_p_list, current_standings, league)
     volatility_standings = league_volatility(sgp_dict, final_stats)
     ranked_standings = rank_list(volatility_standings)
     return ranked_standings
