@@ -6,8 +6,8 @@ import urllib
 import pprint
 import operator
 
-from .data_analysis import rate_fa, rate_team, single_player_rater_db, single_player_rater_html, \
-    final_stats_projection, league_volatility, rank_list, evaluate_keepers, trade_analyzer
+from .data_analysis import rate_avail_players, rate_team, single_player_rater_db, single_player_rater_html, \
+    final_stats_projection, league_volatility, rank_list, evaluate_keepers, roster_change_analyzer
 from .player_creator import calc_batter_z_score, calc_pitcher_z_score, create_full_batter_html, \
     create_full_pitcher_html, create_full_batter_csv, create_full_pitcher_csv
 from .html_parser import scrape_razzball_batters, scrape_razzball_pitchers
@@ -31,7 +31,7 @@ B_PLAYER_POOL_MULT = 2.375
 P_PLAYER_POOL_MULT = 4.45
 
 
-def fa_finder(league_key, user, redirect):
+def avail_player_finder(league_key, user, redirect):
     """Compare team player values with available FA player values\n
     Args:\n
         league_key: Yahoo! fantasy baseball league number.\n
@@ -41,24 +41,24 @@ def fa_finder(league_key, user, redirect):
     Raises:\n
         None.
     """
-    ros_proj_b_list = BatterProjection.objects.all()
-    ros_proj_p_list = PitcherProjection.objects.all()
+    ros_proj_b_list = BatterProjection.objects.order_by('-fvaaz')
+    ros_proj_p_list = PitcherProjection.objects.order_by('-fvaaz')
 
     player_comp = {}
-    pitching_fa_list = get_players(league_key, user, redirect, 300, "P", "A")
-    batting_fa_list = get_players(league_key, user, redirect, 300, "B", "A")
-    avail_pitching_fas = rate_fa(pitching_fa_list, ros_proj_p_list)
+    pitcher_list = get_players(league_key, user, redirect, 300, "P", "A")
+    batter_list = get_players(league_key, user, redirect, 300, "B", "A")
+    avail_pitchers = rate_avail_players(pitcher_list, ros_proj_p_list)
     yahoo_team = get_single_team_roster(league_key, user, redirect)
     # yahoo_team = get_single_yahoo_team(league_no, team_name)
     team_pitching_values = rate_team(yahoo_team, ros_proj_p_list)
-    avail_batting_fas = rate_fa(batting_fa_list, ros_proj_b_list)
+    avail_batters = rate_avail_players(batter_list, ros_proj_b_list)
     team_batting_values = rate_team(yahoo_team, ros_proj_b_list)
 
     player_comp['TeamName'] = yahoo_team['TEAM_NAME']
-    player_comp['PitchingFAs'] = avail_pitching_fas
-    player_comp['PitchingTeam'] = team_pitching_values
-    player_comp['BattingFAs'] = avail_batting_fas
-    player_comp['BattingTeam'] = team_batting_values
+    player_comp['AvailPitchers'] = avail_pitchers
+    player_comp['TeamPitchers'] = team_pitching_values
+    player_comp['AvailBatters'] = avail_batters
+    player_comp['TeamBatters'] = team_batting_values
 
     return player_comp
 
@@ -241,7 +241,6 @@ def get_projected_keepers(league, user, redirect):
     return projected_keepers
 
 
-# TODO: not ready, this needs direction and thought, currently getting an average of batter/pitcher stats kept, but what good is that?
 def analyze_keeper_team_stats(league, user, redirect, keepers, ros_proj_b_list, ros_proj_p_list):
     try:
         new_league = League.objects.get(prev_year_league=league)
@@ -335,7 +334,7 @@ def analyze_keeper_team_stats(league, user, redirect, keepers, ros_proj_b_list, 
     return league_needs
 
 
-def trade_analyzer_(league_key, user, redirect, team_a, team_a_players, team_b, team_b_players, team_list):
+def roster_change_analyzer_(league_key, user, redirect, team_a, team_a_players, team_b, team_b_players, team_list):
     ros_proj_b_list = BatterProjection.objects.all()
     ros_proj_p_list = PitcherProjection.objects.all()
     league_status, current_standings = get_league_standings(league_key, user, redirect)
@@ -344,8 +343,8 @@ def trade_analyzer_(league_key, user, redirect, team_a, team_a_players, team_b, 
 
     sgp_dict = create_sgp_dict(league)
 
-    new_standings = trade_analyzer(team_a, team_a_players, team_b, team_b_players, team_list, ros_proj_b_list,
-                                   ros_proj_p_list, current_standings, league, sgp_dict)
+    new_standings = roster_change_analyzer(team_a, team_a_players, team_b, team_b_players, team_list, ros_proj_b_list,
+                                           ros_proj_p_list, current_standings, league, sgp_dict)
     return new_standings
 
 

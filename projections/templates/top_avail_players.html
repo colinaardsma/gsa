@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 {% load projection_filters %}
-<h2>FA/Team Valuation for {{team_name}}</h2>
+<h2>Available Players and Team Valuation for {{team_name}}</h2>
 <div class="tab">
     <button class="tablinks btn btn-primary btn-sm" onclick="openProjections(event, 'batters')">batters</button>
     <button class="tablinks btn btn-primary btn-sm" onclick="openProjections(event, 'pitchers')">pitchers</button>
@@ -11,11 +11,11 @@
 
 <div id="pitchers" class="tabcontent">
     <h4>Top FA Pitchers</h4>
-    {% with tableId='top_fa_pitchers_table' column_no=3 %}
+    {% with tableId='top_avail_pitchers_table' column_no=3 %}
     {% include 'includes/pitcher_pos_filter.html' %}
     {% endwith %}
     <br/>
-    <table id="top_fa_pitchers_table" class="sortable display table table-hover">
+    <table id="top_avail_pitchers_table" class="sortable display table table-hover">
         <thead>
         <tr>
             <th>Value</th>
@@ -33,7 +33,7 @@
         </tr>
         </thead>
         <tbody>
-        {% for pitcher in top_fa.PitchingFAs %}
+        {% for pitcher in top_avail_players.AvailPitchers %}
         <tr>
             <td>${{pitcher.dollarValue|floatformat:2}}</td>
             <td><a href="https://baseball.fantasysports.yahoo.com/b1/{{request.user.profile.main_league|get_league_no}}/playersearch?&search={{pitcher.name|url_safe_spaces}}" target="_blank">{{pitcher.name}}</a></td>
@@ -80,7 +80,7 @@
         </tr>
         </thead>
         <tbody>
-        {% for pitcher in top_fa.PitchingTeam %}
+        {% for pitcher in top_avail_players.TeamPitchers %}
         <tr>
             <td>${{pitcher.dollarValue|floatformat:2}}</td>
             <td>{{pitcher.name}}</td>
@@ -108,12 +108,12 @@
 
 <div id="batters" class="tabcontent">
     <h4>Top FA Batters</h4>
-    {% with tableId='top_fa_batters_table' column_no=3%}
+    {% with tableId='top_avail_batters_table' column_no=3%}
     {% include 'includes/batter_pos_filter.html' %}
     {% endwith %}
     </select>
     <br/>
-    <table id="top_fa_batters_table" class="sortable display table table-hover">
+    <table id="top_avail_batters_table" class="sortable display table table-hover">
         <thead>
         <tr>
             <th>Value</th>
@@ -129,7 +129,7 @@
         </tr>
         </thead>
         <tbody>
-        {% for batter in top_fa.BattingFAs %}
+        {% for batter in top_avail_players.AvailBatters %}
         <tr>
             <td>${{batter.dollarValue|floatformat:2}}</td>
             <td><a href="https://baseball.fantasysports.yahoo.com/b1/{{request.user.profile.main_league|get_league_no}}/playersearch?&search={{batter.name|url_safe_spaces}}" target="_blank">{{batter.name}}</a></td>
@@ -172,7 +172,7 @@
         </tr>
         </thead>
         <tbody>
-        {% for batter in top_fa.BattingTeam %}
+        {% for batter in top_avail_players.TeamBatters %}
         <tr>
             <td>${{batter.dollarValue|floatformat:2}}</td>
             <td>{{batter.name}}</td>

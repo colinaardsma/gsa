@@ -14,8 +14,8 @@ from leagues.helpers.api_connector import request_auth, get_token
 from leagues.models import League, dummy_league, update_profile, max_year_leagues
 from leagues.helpers.yql_queries import get_current_leagues, get_all_team_rosters, get_keeper_query
 from leagues.helpers.html_parser import get_single_yahoo_team
-from .helpers.team_tools import pull_batters, pull_pitchers, fa_finder, final_standing_projection, \
-    single_player_rater, get_keeper_costs, get_projected_keepers, trade_analyzer_, pull_players_html, \
+from .helpers.team_tools import pull_batters, pull_pitchers, avail_player_finder, final_standing_projection, \
+    single_player_rater, get_keeper_costs, get_projected_keepers, roster_change_analyzer_, pull_players_html, \
     get_auction_values_
 from .helpers.html_parser import razzball_get_update_datetime, scrape_razzball
 from .helpers.keepers import project_keepers
@@ -77,13 +77,13 @@ def team_tools(request):
         # return redirect(TEAM_TOOLS_REDIRECT)
 
 
-def top_fa(request):
+def top_avail_players(request):
     if request.method == 'POST':
-        fa_league_key = request.POST["fa_league_key"]
-        top_fa_ = fa_finder(fa_league_key, request.user, TEAM_TOOLS_REDIRECT)
-        team_name = top_fa_['TeamName']
-        return render(request, 'top_fa.html', {'top_fa': top_fa_, 'team_name': team_name,
-                                               'redirect': TEAM_TOOLS_REDIRECT})
+        avail_player_league_key = request.POST["avail_player_league_key"]
+        top_avail_players_ = avail_player_finder(avail_player_league_key, request.user, TEAM_TOOLS_REDIRECT)
+        team_name = top_avail_players_['TeamName']
+        return render(request, 'top_avail_players.html', {'top_avail_players': top_avail_players_,
+                                                          'team_name': team_name, 'redirect': TEAM_TOOLS_REDIRECT})
     else:
         return redirect(TEAM_TOOLS_REDIRECT)
 
@@ -131,8 +131,8 @@ def trade_projection(request):
                                                              'league_key': league_key, 'team_list': team_list,
                                                              'league_no': league_no, 'redirect': TEAM_TOOLS_REDIRECT})
         else:
-            trade_result = trade_analyzer_(league_key, request.user, TEAM_TOOLS_REDIRECT, team_a, team_a_players,
-                                           team_b, team_b_players, team_list)
+            trade_result = roster_change_analyzer_(league_key, request.user, TEAM_TOOLS_REDIRECT, team_a, team_a_players,
+                                                   team_b, team_b_players, team_list)
             return render(request, 'trade_projection.html',
                           {'team_a': team_a, 'team_b': team_b, 'league_key': league_key, 'league_no': league_no,
                            'trade_result': trade_result, 'redirect': TEAM_TOOLS_REDIRECT})

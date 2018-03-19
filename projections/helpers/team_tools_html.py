@@ -5,7 +5,7 @@ import urllib
 
 from leagues.helpers.html_parser import get_league_settings, get_standings, split_league_pos_types, yahoo_teams, yahoo_players, get_single_yahoo_team
 from ..models import BatterProjection, BatterValue, PitcherProjection, PitcherValue, save_batter, save_batter_values, save_pitcher, save_pitcher_values
-from .data_analysis import rate_fa, rate_team, single_player_rater_db, single_player_rater_html, final_stats_projection, league_volatility, rank_list, evaluate_keepers, trade_analyzer
+from .data_analysis import rate_avail_players, rate_team, single_player_rater_db, single_player_rater_html, final_stats_projection, league_volatility, rank_list, evaluate_keepers, roster_change_analyzer
 
 # https://developer.yahoo.com/fantasysports/guide/players-collection.html
 # https://www.mysportsfeeds.com
@@ -69,10 +69,10 @@ def fa_finder(league_no, team_name):
     player_comp = {}
     pitching_fa_list = yahoo_players(league_no, "P")
     batting_fa_list = yahoo_players(LEAGUE_NO, "B")
-    avail_pitching_fas = rate_fa(pitching_fa_list, ros_proj_p_list)
+    avail_pitching_fas = rate_avail_players(pitching_fa_list, ros_proj_p_list)
     yahoo_team = get_single_yahoo_team(league_no, team_name)
     team_pitching_values = rate_team(yahoo_team, ros_proj_p_list)
-    avail_batting_fas = rate_fa(batting_fa_list, ros_proj_b_list)
+    avail_batting_fas = rate_avail_players(batting_fa_list, ros_proj_b_list)
     team_batting_values = rate_team(yahoo_team, ros_proj_b_list)
 
     player_comp['Team Name'] = yahoo_team['TEAM_NAME']
@@ -155,8 +155,8 @@ def trade_analyzer_(league_no, team_a, team_a_players, team_b, team_b_players):
     league_settings = get_league_settings(league_no)
     current_standings = get_standings(league_no, int(league_settings['Max Teams:']))
     team_list = yahoo_teams(league_no)
-    new_standings = trade_analyzer(team_a, team_a_players, team_b, team_b_players, team_list, ros_proj_b_list,
-                                   ros_proj_p_list, current_standings, league_settings, SGP_DICT)
+    new_standings = roster_change_analyzer(team_a, team_a_players, team_b, team_b_players, team_list, ros_proj_b_list,
+                                           ros_proj_p_list, current_standings, league_settings, SGP_DICT)
     return new_standings
 
 
@@ -174,7 +174,7 @@ def get_keepers(league_key, user, user_id, redirect):
     return keepers
 
 # start = time.time()
-# print fa_finder(5091, "MachadoAboutNothing") #42sec #29sec
+# print avail_player_finder(5091, "MachadoAboutNothing") #42sec #29sec
 # # print final_standing_projection(5091) #21sec #5sec
 # end = time.time()
 # elapsed = end - start

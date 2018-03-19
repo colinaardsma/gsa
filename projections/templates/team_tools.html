@@ -3,24 +3,24 @@
 {% load projection_filters %}
 <div class="container">
     <div class="row" id="inSeasonTools1">
-        <div class="col" id="faRater">
-            <h4>FA Rater by Team/League</h4>
-            <form class="form-inline" method="post" action="../../projections/top_fa/">
+        <div class="col" id="topAvailPlayerRater">
+            <h4>Find Available Players</h4>
+            <form class="form-inline" method="post" action="../../projections/top_avail_players/">
                 {% csrf_token %}
                 {% if request.user and not request.user.is_anonymous %}
-                <!--&lt;!&ndash;<label class="my-1 mr-2" for="faLeagueNumber">Current Leagues:</label>&ndash;&gt;-->
-                <!--<select class="custom-select my-1 mr-sm-2" id="faLeagueNumber" name="fa_league_key">-->
+                <!--&lt;!&ndash;<label class="my-1 mr-2" for="availPlayerLeagueNumber">Current Leagues:</label>&ndash;&gt;-->
+                <!--<select class="custom-select my-1 mr-sm-2" id="availPlayerLeagueNumber" name="avail_player_league_key">-->
                 <!--{% include 'includes/league_picker.html' %}-->
                 <!--</select>-->
-                <input type="hidden" value="{{league.league_key}}" name="fa_league_key">
+                <input type="hidden" value="{{league.league_key}}" name="avail_player_league_key">
                 <!--TODO: this doesnt work-->
                 {% else %}
-                <!--<label class="my-1 mr-2" for="faLeagueNumber">League Number</label>-->
-                <input type="text" class="form-control my-1 mr-sm-2" id="faLeagueNumber" name="league_no" value="{{league_no}}" placeholder="League Number" />
-                <!--<label class="my-1 mr-2" for="faTeamName">Team Name</label>-->
-                <input type="text" class="form-control my-1 mr-sm-2" id="faTeamName" name="team_name" value="{{team_name}}" placeholder="Team Name" />
+                <!--<label class="my-1 mr-2" for="availPlayerLeagueNumber">League Number</label>-->
+                <input type="text" class="form-control my-1 mr-sm-2" id="availPlayerLeagueNumber" name="league_no" value="{{league_no}}" placeholder="League Number" />
+                <!--<label class="my-1 mr-2" for="availPlayerTeamName">Team Name</label>-->
+                <input type="text" class="form-control my-1 mr-sm-2" id="availPlayerTeamName" name="team_name" value="{{team_name}}" placeholder="Team Name" />
                 {% endif %}
-                <button type="submit" class="btn btn-primary btn-sm" onclick="getSpinner()">find FAs</button>
+                <button type="submit" class="btn btn-primary btn-sm" onclick="getSpinner()">find avail players</button>
             </form>
         </div>
         <div class="col" id="singlePlayerSearch">
