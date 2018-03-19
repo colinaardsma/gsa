@@ -491,7 +491,19 @@ def pull_players_(user, league, pitcher_list, batter_list):
 
     start = time.time()
     lg = league
-    if league.draft_status == 'predraft':
+
+    batters_over_zero_dollars = lg.batters_over_zero_dollars_avg or lg.batters_over_zero_dollars
+    one_dollar_batters = lg.one_dollar_batters_avg or lg.one_dollar_batters
+    b_dollar_per_fvaaz = lg.b_dollar_per_fvaaz_avg or lg.b_dollar_per_fvaaz
+    b_player_pool_mult = lg.b_player_pool_mult_avg or lg.b_player_pool_mult
+    pitchers_over_zero_dollars = lg.pitchers_over_zero_dollars_avg or lg.pitchers_over_zero_dollars
+    one_dollar_pitchers = lg.one_dollar_pitchers_avg or lg.one_dollar_pitchers
+    p_dollar_per_fvaaz = lg.p_dollar_per_fvaaz_avg or lg.p_dollar_per_fvaaz
+    p_player_pool_mult = lg.p_player_pool_mult_avg or lg.p_player_pool_mult
+
+    if league.draft_status == 'predraft' or batters_over_zero_dollars == 0 or one_dollar_batters == 0\
+            or b_dollar_per_fvaaz == 0 or b_player_pool_mult == 0 or pitchers_over_zero_dollars == 0\
+            or one_dollar_pitchers == 0 or p_dollar_per_fvaaz == 0 or p_player_pool_mult == 0:
         if league.prev_year_league:
             lg = league.prev_year_league
         else:
