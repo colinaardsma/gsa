@@ -136,6 +136,7 @@ def get_league_dict(league, get_prev_league=False, user=None, redirect=None):
     league_dict['league_key'] = league_key
     league_dict['name'] = league['name']
     league_dict['season'] = league['season']
+    league_dict['draft_status'] = league['draft_status']
     if league['renew'] == '':
         league_dict['prev_year'] = None
         return league_dict
