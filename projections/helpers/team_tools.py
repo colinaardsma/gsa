@@ -18,18 +18,6 @@ from leagues.helpers.yql_queries import get_league_settings, get_league_standing
 from .keepers import project_keepers, get_auction_values
 from leagues.models import League, update_league, dummy_league
 
-# static variables
-
-# TODO: replace these with db calls
-BATTERS_OVER_ZERO_DOLLARS = 176
-PITCHERS_OVER_ZERO_DOLLARS = 124
-ONE_DOLLAR_BATTERS = 30
-ONE_DOLLAR_PITCHERS = 22
-B_DOLLAR_PER_FVAAZ = 3.0
-P_DOLLAR_PER_FVAAZ = 2.17
-B_PLAYER_POOL_MULT = 2.375
-P_PLAYER_POOL_MULT = 4.45
-
 
 def avail_player_finder(league_key, user, redirect):
     """Compare team player values with available FA player values\n
@@ -49,12 +37,12 @@ def avail_player_finder(league_key, user, redirect):
     batter_list = get_players(league_key, user, redirect, 300, "B", "A")
     avail_pitchers = rate_avail_players(pitcher_list, ros_proj_p_list)
     yahoo_team = get_single_team_roster(league_key, user, redirect)
-    # yahoo_team = get_single_yahoo_team(league_no, team_name)
     team_pitching_values = rate_team(yahoo_team, ros_proj_p_list)
     avail_batters = rate_avail_players(batter_list, ros_proj_b_list)
     team_batting_values = rate_team(yahoo_team, ros_proj_b_list)
 
     player_comp['TeamName'] = yahoo_team['TEAM_NAME']
+    player_comp['TeamNumber'] = yahoo_team['TEAM_NUMBER']
     player_comp['AvailPitchers'] = avail_pitchers
     player_comp['TeamPitchers'] = team_pitching_values
     player_comp['AvailBatters'] = avail_batters
@@ -75,7 +63,6 @@ def single_player_rater(player_name):
     ros_proj_b_list = BatterProjection.objects.all()
     ros_proj_p_list = PitcherProjection.objects.all()
     player = single_player_rater_html(player_name, ros_proj_b_list, ros_proj_p_list)
-
     return player
 
 
@@ -334,17 +321,17 @@ def analyze_keeper_team_stats(league, user, redirect, keepers, ros_proj_b_list, 
     return league_needs
 
 
-def roster_change_analyzer_(league_key, user, redirect, team_a, team_a_players, team_b, team_b_players, team_list):
-    ros_proj_b_list = BatterProjection.objects.all()
-    ros_proj_p_list = PitcherProjection.objects.all()
+def roster_change_analyzer_(league_key, user, redirect, team_list, team_a, team_a_drops_trade, team_a_add_team_b_trade,
+                            team_b=[]):
+    ros_proj_b_list = BatterProjection.objects.order_by('-fvaaz')
+    ros_proj_p_list = PitcherProjection.objects.order_by('-fvaaz')
     league_status, current_standings = get_league_standings(league_key, user, redirect)
     league = user.profile.leagues.get(league_key=league_key)
     update_league(league, draft_status=league_status)
-
     sgp_dict = create_sgp_dict(league)
 
-    new_standings = roster_change_analyzer(team_a, team_a_players, team_b, team_b_players, team_list, ros_proj_b_list,
-                                           ros_proj_p_list, current_standings, league, sgp_dict)
+    new_standings = roster_change_analyzer(team_list, ros_proj_b_list, ros_proj_p_list, current_standings, league,
+                                           sgp_dict, team_a, team_a_drops_trade, team_a_add_team_b_trade, team_b)
     return new_standings
 
 

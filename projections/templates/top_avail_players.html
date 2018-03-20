@@ -9,190 +9,206 @@
 </div>
 <br/>
 
-<div id="pitchers" class="tabcontent">
-    <h4>Top FA Pitchers</h4>
-    {% with tableId='top_avail_pitchers_table' column_no=3 %}
-    {% include 'includes/pitcher_pos_filter.html' %}
-    {% endwith %}
-    <br/>
-    <table id="top_avail_pitchers_table" class="sortable display table table-hover">
-        <thead>
-        <tr>
-            <th>Value</th>
-            <th>Player Name</th>
-            <th>Team</th>
-            <th>Position</th>
-            <th>Status</th>
-            <th>W</th>
-            <th>SV</th>
-            <th>K</th>
-            <th>ERA</th>
-            <th>WHIP</th>
-            <th>IP</th>
-            <th>K/IP</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for pitcher in top_avail_players.AvailPitchers %}
-        <tr>
-            <td>${{pitcher.dollarValue|floatformat:2}}</td>
-            <td><a href="https://baseball.fantasysports.yahoo.com/b1/{{request.user.profile.main_league|get_league_no}}/playersearch?&search={{pitcher.name|url_safe_spaces}}" target="_blank">{{pitcher.name}}</a></td>
-            <td>{{pitcher.team}}</td>
-            <td>{{pitcher.pos}}</td>
-            {% if 'DL' in pitcher.status %}
-            <td style="color:red">{{pitcher.status}}</td>
-            {% elif 'MiLB' in pitcher.status %}
-            <td style="color:blue">{{pitcher.status}}</td>
-            {% else %}
-            <td></td>
-            {% endif %}
-            <td>{{pitcher.w|floatformat:2}}</td>
-            <td>{{pitcher.sv|floatformat:2}}</td>
-            <td>{{pitcher.k|floatformat:2}}</td>
-            <td>{{pitcher.era|floatformat:2}}</td>
-            <td>{{pitcher.whip|floatformat:2}}</td>
-            <td>{{pitcher.ip|floatformat}}</td>
-            <td>{{pitcher.kip|floatformat:2}}</td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    <h4>Team Pitchers</h4>
-    {% with tableId='team_pitchers_table' column_no=3 %}
-    {% include 'includes/pitcher_pos_filter.html' %}
-    {% endwith %}
-    <br/>
-    <table id="team_pitchers_table" class="sortable display table table-hover">
-        <thead>
-        <tr>
-            <th>Value</th>
-            <th>Player Name</th>
-            <th>Team</th>
-            <th>Position</th>
-            <th>Status</th>
-            <th>W</th>
-            <th>SV</th>
-            <th>K</th>
-            <th>ERA</th>
-            <th>WHIP</th>
-            <th>IP</th>
-            <th>K/IP</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for pitcher in top_avail_players.TeamPitchers %}
-        <tr>
-            <td>${{pitcher.dollarValue|floatformat:2}}</td>
-            <td>{{pitcher.name}}</td>
-            <td>{{pitcher.team}}</td>
-            <td>{{pitcher.pos}}</td>
-            {% if 'DL' in pitcher.status %}
-            <td style="color:red">{{pitcher.status}}</td>
-            {% elif 'MiLB' in pitcher.status %}
-            <td style="color:blue">{{pitcher.status}}</td>
-            {% else %}
-            <td></td>
-            {% endif %}
-            <td>{{pitcher.w|floatformat:2}}</td>
-            <td>{{pitcher.sv|floatformat:2}}</td>
-            <td>{{pitcher.k|floatformat:2}}</td>
-            <td>{{pitcher.era|floatformat:2}}</td>
-            <td>{{pitcher.whip|floatformat:2}}</td>
-            <td>{{pitcher.ip|floatformat:2}}</td>
-            <td>{{pitcher.kip|floatformat:2}}</td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-</div>
+<form method="post" action="../../projections/player_pickup_analyzer/">
+    {% csrf_token %}
+    <div id="pitchers" class="tabcontent">
+        <h4>Top FA Pitchers</h4>
+        {% with tableId='top_avail_pitchers_table' column_no=3 %}
+        {% include 'includes/pitcher_pos_filter.html' %}
+        {% endwith %}
+        <br/>
+        <table id="top_avail_pitchers_table" class="sortable display table table-hover">
+            <thead>
+            <tr>
+                <th>Add</th>
+                <th>Value</th>
+                <th>Player Name</th>
+                <th>Team</th>
+                <th>Position</th>
+                <th>Status</th>
+                <th>W</th>
+                <th>SV</th>
+                <th>K</th>
+                <th>ERA</th>
+                <th>WHIP</th>
+                <th>IP</th>
+                <th>K/IP</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for pitcher in top_avail_players.AvailPitchers %}
+            <tr>
+                <td><input type="checkbox" value="{{pitcher.name|create_player_dict:pitcher.team}}" id="pitcher_add" name="pitcher_add[]" /></td>
+                <td>${{pitcher.dollarValue|floatformat:2}}</td>
+                <td><a href="https://baseball.fantasysports.yahoo.com/b1/{{request.user.profile.main_league|get_league_no}}/playersearch?&search={{pitcher.name|url_safe_spaces}}" target="_blank">{{pitcher.name}}</a></td>
+                <td>{{pitcher.team}}</td>
+                <td>{{pitcher.pos}}</td>
+                {% if 'DL' in pitcher.status %}
+                <td style="color:red">{{pitcher.status}}</td>
+                {% elif 'MiLB' in pitcher.status %}
+                <td style="color:blue">{{pitcher.status}}</td>
+                {% else %}
+                <td></td>
+                {% endif %}
+                <td>{{pitcher.w|floatformat:2}}</td>
+                <td>{{pitcher.sv|floatformat:2}}</td>
+                <td>{{pitcher.k|floatformat:2}}</td>
+                <td>{{pitcher.era|floatformat:2}}</td>
+                <td>{{pitcher.whip|floatformat:2}}</td>
+                <td>{{pitcher.ip|floatformat}}</td>
+                <td>{{pitcher.kip|floatformat:2}}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <h4>Team Pitchers</h4>
+        {% with tableId='team_pitchers_table' column_no=3 %}
+        {% include 'includes/pitcher_pos_filter.html' %}
+        {% endwith %}
+        <br/>
+        <table id="team_pitchers_table" class="sortable display table table-hover">
+            <thead>
+            <tr>
+                <th>Drop</th>
+                <th>Value</th>
+                <th>Player Name</th>
+                <th>Team</th>
+                <th>Position</th>
+                <th>Status</th>
+                <th>W</th>
+                <th>SV</th>
+                <th>K</th>
+                <th>ERA</th>
+                <th>WHIP</th>
+                <th>IP</th>
+                <th>K/IP</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for pitcher in top_avail_players.TeamPitchers %}
+            <tr>
+                <td><input type="checkbox" value="{{pitcher.name|create_player_dict:pitcher.team}}" id="pitcher_drop" name="pitcher_drop[]" /></td>
+                <td>${{pitcher.dollarValue|floatformat:2}}</td>
+                <td>{{pitcher.name}}</td>
+                <td>{{pitcher.team}}</td>
+                <td>{{pitcher.pos}}</td>
+                {% if 'DL' in pitcher.status %}
+                <td style="color:red">{{pitcher.status}}</td>
+                {% elif 'MiLB' in pitcher.status %}
+                <td style="color:blue">{{pitcher.status}}</td>
+                {% else %}
+                <td></td>
+                {% endif %}
+                <td>{{pitcher.w|floatformat:2}}</td>
+                <td>{{pitcher.sv|floatformat:2}}</td>
+                <td>{{pitcher.k|floatformat:2}}</td>
+                <td>{{pitcher.era|floatformat:2}}</td>
+                <td>{{pitcher.whip|floatformat:2}}</td>
+                <td>{{pitcher.ip|floatformat:2}}</td>
+                <td>{{pitcher.kip|floatformat:2}}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
-<div id="batters" class="tabcontent">
-    <h4>Top FA Batters</h4>
-    {% with tableId='top_avail_batters_table' column_no=3%}
-    {% include 'includes/batter_pos_filter.html' %}
-    {% endwith %}
-    </select>
-    <br/>
-    <table id="top_avail_batters_table" class="sortable display table table-hover">
-        <thead>
-        <tr>
-            <th>Value</th>
-            <th>Player Name</th>
-            <th>Team</th>
-            <th>Position</th>
-            <th>Status</th>
-            <th>R</th>
-            <th>HR</th>
-            <th>RBI</th>
-            <th>SB</th>
-            <th>OPS</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for batter in top_avail_players.AvailBatters %}
-        <tr>
-            <td>${{batter.dollarValue|floatformat:2}}</td>
-            <td><a href="https://baseball.fantasysports.yahoo.com/b1/{{request.user.profile.main_league|get_league_no}}/playersearch?&search={{batter.name|url_safe_spaces}}" target="_blank">{{batter.name}}</a></td>
-            <td>{{batter.team}}</td>
-            <td>{{batter.pos}}</td>
-            {% if 'DL' in batter.status %}
-            <td style="color:red">{{batter.status}}</td>
-            {% elif 'MiLB' in batter.status %}
-            <td style="color:blue">{{batter.status}}</td>
-            {% else %}
-            <td></td>
-            {% endif %}
-            <td>{{batter.r|floatformat}}</td>
-            <td>{{batter.hr|floatformat}}</td>
-            <td>{{batter.rbi|floatformat}}</td>
-            <td>{{batter.sb|floatformat}}</td>
-            <td>{{batter.ops|floatformat:3}}</td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    <h4>Team Batters</h4>
-    {% with tableId='team_batters_table' column_no=3 %}
-    {% include 'includes/batter_pos_filter.html' %}
-    {% endwith %}
-    <br/>
-    <table id="team_batters_table" class="sortable display table table-hover">
-        <thead>
-        <tr>
-            <th>Value</th>
-            <th>Player Name</th>
-            <th>Team</th>
-            <th>Position</th>
-            <th>Status</th>
-            <th>R</th>
-            <th>HR</th>
-            <th>RBI</th>
-            <th>SB</th>
-            <th>OPS</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for batter in top_avail_players.TeamBatters %}
-        <tr>
-            <td>${{batter.dollarValue|floatformat:2}}</td>
-            <td>{{batter.name}}</td>
-            <td>{{batter.team}}</td>
-            <td>{{batter.pos}}</td>
-            {% if 'DL' in batter.status %}
-            <td style="color:red">{{batter.status}}</td>
-            {% elif 'MiLB' in batter.status %}
-            <td style="color:blue">{{batter.status}}</td>
-            {% else %}
-            <td></td>
-            {% endif %}
-            <td>{{batter.r|floatformat}}</td>
-            <td>{{batter.hr|floatformat}}</td>
-            <td>{{batter.rbi|floatformat}}</td>
-            <td>{{batter.sb|floatformat}}</td>
-            <td>{{batter.ops|floatformat:3}}</td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-</div>
+    <div id="batters" class="tabcontent">
+        <h4>Top FA Batters</h4>
+        {% with tableId='top_avail_batters_table' column_no=3%}
+        {% include 'includes/batter_pos_filter.html' %}
+        {% endwith %}
+        <br/>
+        <table id="top_avail_batters_table" class="sortable display table table-hover">
+            <thead>
+            <tr>
+                <th>Add</th>
+                <th>Value</th>
+                <th>Player Name</th>
+                <th>Team</th>
+                <th>Position</th>
+                <th>Status</th>
+                <th>R</th>
+                <th>HR</th>
+                <th>RBI</th>
+                <th>SB</th>
+                <th>OPS</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for batter in top_avail_players.AvailBatters %}
+            <tr>
+                <td><input type="checkbox" value="{{batter.name|create_player_dict:batter.team}}" id="batter_add" name="batter_add[]" /></td>
+                <td>${{batter.dollarValue|floatformat:2}}</td>
+                <td><a href="https://baseball.fantasysports.yahoo.com/b1/{{request.user.profile.main_league|get_league_no}}/playersearch?&search={{batter.name|url_safe_spaces}}" target="_blank">{{batter.name}}</a></td>
+                <td>{{batter.team}}</td>
+                <td>{{batter.pos}}</td>
+                {% if 'DL' in batter.status %}
+                <td style="color:red">{{batter.status}}</td>
+                {% elif 'MiLB' in batter.status %}
+                <td style="color:blue">{{batter.status}}</td>
+                {% else %}
+                <td></td>
+                {% endif %}
+                <td>{{batter.r|floatformat}}</td>
+                <td>{{batter.hr|floatformat}}</td>
+                <td>{{batter.rbi|floatformat}}</td>
+                <td>{{batter.sb|floatformat}}</td>
+                <td>{{batter.ops|floatformat:3}}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <h4>Team Batters</h4>
+        {% with tableId='team_batters_table' column_no=3 %}
+        {% include 'includes/batter_pos_filter.html' %}
+        {% endwith %}
+        <br/>
+        <table id="team_batters_table" class="sortable display table table-hover">
+            <thead>
+            <tr>
+                <th>Drop</th>
+                <th>Value</th>
+                <th>Player Name</th>
+                <th>Team</th>
+                <th>Position</th>
+                <th>Status</th>
+                <th>R</th>
+                <th>HR</th>
+                <th>RBI</th>
+                <th>SB</th>
+                <th>OPS</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for batter in top_avail_players.TeamBatters %}
+            <tr>
+                <td><input type="checkbox" value="{{batter.name|create_player_dict:batter.team}}" id="batter_drop" name="batter_drop[]" /></td>
+                <td>${{batter.dollarValue|floatformat:2}}</td>
+                <td>{{batter.name}}</td>
+                <td>{{batter.team}}</td>
+                <td>{{batter.pos}}</td>
+                {% if 'DL' in batter.status %}
+                <td style="color:red">{{batter.status}}</td>
+                {% elif 'MiLB' in batter.status %}
+                <td style="color:blue">{{batter.status}}</td>
+                {% else %}
+                <td></td>
+                {% endif %}
+                <td>{{batter.r|floatformat}}</td>
+                <td>{{batter.hr|floatformat}}</td>
+                <td>{{batter.rbi|floatformat}}</td>
+                <td>{{batter.sb|floatformat}}</td>
+                <td>{{batter.ops|floatformat:3}}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <input type="hidden" name="league_no" value="{{league_no}}" />
+    <input type="hidden" name="league_key" value="{{avail_player_league_key}}" />
+    <input type="hidden" name="team_name" value="{{team_name}}" />
+    <input type="hidden" name="team_number" value="{{team_number}}" />
+    <button class="btn btn-lg btn-primary btn-block" type="submit">add/drop</button>
+</form>
+<br/>
 {% endblock %}

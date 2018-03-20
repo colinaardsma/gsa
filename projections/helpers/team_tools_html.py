@@ -149,14 +149,15 @@ def pitcher_projections():
     return sorted_proj
 
 
-def trade_analyzer_(league_no, team_a, team_a_players, team_b, team_b_players):
+def trade_analyzer_(league_no, team_a, team_a_drops_trade, team_a_add_team_b_trade, team_b=[]):
     ros_proj_b_list = BatterProjection.objects.all()
     ros_proj_p_list = PitcherProjection.objects.all()
     league_settings = get_league_settings(league_no)
     current_standings = get_standings(league_no, int(league_settings['Max Teams:']))
     team_list = yahoo_teams(league_no)
-    new_standings = roster_change_analyzer(team_a, team_a_players, team_b, team_b_players, team_list, ros_proj_b_list,
-                                           ros_proj_p_list, current_standings, league_settings, SGP_DICT)
+    new_standings = roster_change_analyzer(team_list, ros_proj_b_list, ros_proj_p_list, current_standings,
+                                           league_settings, SGP_DICT, team_a, team_a_drops_trade,
+                                           team_a_add_team_b_trade, team_b)
     return new_standings
 
 

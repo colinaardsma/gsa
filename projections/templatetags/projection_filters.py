@@ -2,6 +2,8 @@ from django import template
 from django.template.defaultfilters import stringfilter
 from django.forms.widgets import CheckboxInput
 
+from ..helpers.normalizer import name_normalizer
+
 register = template.Library()
 
 
@@ -61,3 +63,10 @@ def less_than_eq_10_pct(value, arg):
 @register.filter
 def get_league_no(value):
     return value.split('.l.')[1]
+
+@register.filter
+def create_player_dict(value, team):
+    norm_name = name_normalizer(value)
+    player_dict = {'NAME': value, 'NORMALIZED_FIRST_NAME': norm_name['First'], 'LAST_NAME': norm_name['Last'],
+                   'TEAM': team}
+    return player_dict

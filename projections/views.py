@@ -19,6 +19,7 @@ from .helpers.team_tools import pull_batters, pull_pitchers, avail_player_finder
     get_auction_values_
 from .helpers.html_parser import razzball_get_update_datetime, scrape_razzball
 from .helpers.keepers import project_keepers
+from .helpers.normalizer import name_normalizer
 from .models import BatterProjection, PitcherProjection
 
 
@@ -82,10 +83,43 @@ def top_avail_players(request):
         avail_player_league_key = request.POST["avail_player_league_key"]
         top_avail_players_ = avail_player_finder(avail_player_league_key, request.user, TEAM_TOOLS_REDIRECT)
         team_name = top_avail_players_['TeamName']
+        team_number = top_avail_players_['TeamNumber']
         return render(request, 'top_avail_players.html', {'top_avail_players': top_avail_players_,
-                                                          'team_name': team_name, 'redirect': TEAM_TOOLS_REDIRECT})
+                                                          'team_name': team_name, 'team_number': team_number,
+                                                          'avail_player_league_key': avail_player_league_key,
+                                                          'redirect': TEAM_TOOLS_REDIRECT})
     else:
         return redirect(TEAM_TOOLS_REDIRECT)
+
+
+def player_pickup_analyzer(request):
+    if request.method == 'POST':
+        pitcher_adds = request.POST.getlist('pitcher_add[]')
+        pitcher_drops = request.POST.getlist('pitcher_drop[]')
+        batter_adds = request.POST.getlist('batter_add[]')
+        batter_drops = request.POST.getlist('batter_drop[]')
+        team_number = request.POST["team_number"]
+        try:
+            league_key = request.POST["league_key"]
+            league_no = None
+        except MultiValueDictKeyError:
+            league_no = request.POST["league_no"]
+            league_key = None
+
+        team_list = get_all_team_rosters(league_key, request.user, TEAM_TOOLS_REDIRECT)
+        team = [team for team in team_list if team['TEAM_NUMBER'] == team_number][0]
+
+        adds = []
+        adds.extend(pitcher_adds)
+        adds.extend(batter_adds)
+        drops = []
+        drops.extend(pitcher_drops)
+        drops.extend(batter_drops)
+        add_drop_result = roster_change_analyzer_(league_key, request.user, TEAM_TOOLS_REDIRECT, team_list, team, drops,
+                                                  adds)
+        return render(request, 'trade_projection.html', {'league_key': league_key, 'league_no': league_no,
+                                                         'trade_result': add_drop_result,
+                                                         'redirect': TEAM_TOOLS_REDIRECT})
 
 
 def single_player(request):
@@ -131,11 +165,12 @@ def trade_projection(request):
                                                              'league_key': league_key, 'team_list': team_list,
                                                              'league_no': league_no, 'redirect': TEAM_TOOLS_REDIRECT})
         else:
-            trade_result = roster_change_analyzer_(league_key, request.user, TEAM_TOOLS_REDIRECT, team_a, team_a_players,
-                                                   team_b, team_b_players, team_list)
-            return render(request, 'trade_projection.html',
-                          {'team_a': team_a, 'team_b': team_b, 'league_key': league_key, 'league_no': league_no,
-                           'trade_result': trade_result, 'redirect': TEAM_TOOLS_REDIRECT})
+            trade_result = roster_change_analyzer_(league_key, request.user, TEAM_TOOLS_REDIRECT, team_list, team_a,
+                                                   team_a_players, team_b_players, team_b)
+            return render(request, 'trade_projection.html', {'team_a': team_a, 'team_b': team_b,
+                                                             'league_key': league_key, 'league_no': league_no,
+                                                             'trade_result': trade_result,
+                                                             'redirect': TEAM_TOOLS_REDIRECT})
     else:
         return redirect(TEAM_TOOLS_REDIRECT)
 

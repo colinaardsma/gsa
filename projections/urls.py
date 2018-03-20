@@ -18,6 +18,7 @@ urlpatterns = [
     path('scrape_proj/', views.scrape_proj, name='scrape_proj'),
     path('set_main_league/', views.set_main_league, name='set_main_league'),
     path('auction_values/', views.auction_values, name='auction_values'),
+    path('player_pickup_analyzer/', views.player_pickup_analyzer, name='player_pickup_analyzer'),
 
     path('test/', views.test, name='test'),
 ]

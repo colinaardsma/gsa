@@ -182,7 +182,7 @@ def batting_roster_optimizer(team_dict, ros_projection_list, league_pos_dict):
                                                                          or "CF" in player.pos)):
                 if multi_pos is True or batting_pos_scarc_elig.count(pos) > 1:
                     multi_pos = True
-                    if (pos in starting_batters and len(starting_batters[pos]) < batting_pos_scarc_elig.count(pos)):
+                    if pos in starting_batters and len(starting_batters[pos]) < batting_pos_scarc_elig.count(pos):
                         starting_batters[pos].append(player)
                         del team_player_list[i]
                     elif pos not in starting_batters:
@@ -428,7 +428,6 @@ def single_player_rater_html(player_name, ros_batter_projection_list, ros_pitche
     """
     player = None
     norm_player_name = name_normalizer(player_name)
-    player_name = player_name.lower()
     for player_proj in ros_pitcher_projection_list:
         if (norm_player_name['First'] == player_proj.normalized_first_name and
                 norm_player_name['Last'] == player_proj.last_name):
@@ -450,16 +449,12 @@ def single_player_rater_db(player_name):
     Raises:\n
         None.
     """
-    player = None
     norm_player_name = name_normalizer(player_name)
-    player_name = player_name.lower()
     player = BatterProjection.objects.filter(normalized_first_name=norm_player_name['First'],
                                              last_name=norm_player_name['Last'])
-    #    player = queries.get_single_batter(norm_player_name)
     if not player:
         player = PitcherProjection.objects.filter(normalized_first_name=norm_player_name['First'],
                                                   last_name=norm_player_name['Last'])
-        # player = queries.get_single_pitcher(norm_player_name)
     return player
 
 
@@ -635,8 +630,8 @@ def calc_volatility(sgp_dict, final_stats, stat, factor, reverse=True):
         final_stats[i][down_vol_title] = down_counter
 
 
-def roster_change_analyzer(team_a, team_a_players, team_b, team_b_players, team_list, ros_proj_b_list, ros_proj_p_list,
-                           current_standings, league, sgp_dict):
+def roster_change_analyzer(team_list, ros_proj_b_list, ros_proj_p_list, current_standings, league, sgp_dict, team_a,
+                           team_a_drops_trade, team_a_add_team_b_trade=[], team_b=[]):
     """Analyzes value of trade for 2 teams\n
     Args:\n
         projected_volatility: projected volatility for league\n
@@ -655,10 +650,13 @@ def roster_change_analyzer(team_a, team_a_players, team_b, team_b_players, team_
     Raises:\n
         None.
     """
-    team_list = ast.literal_eval(team_list)
-    team_a = ast.literal_eval(team_a)
-    team_b = ast.literal_eval(team_b)
-    for player in team_a_players:
+    if isinstance(team_list, str):
+        team_list = ast.literal_eval(team_list)
+    if isinstance(team_a, str):
+        team_a = ast.literal_eval(team_a)
+    if team_b and isinstance(team_b, str):
+            team_b = ast.literal_eval(team_b)
+    for player in team_a_drops_trade:
         player = ast.literal_eval(player)
         for roster_player in team_a['ROSTER']:
             if (roster_player['TEAM'] == player['TEAM'] and
@@ -666,23 +664,28 @@ def roster_change_analyzer(team_a, team_a_players, team_b, team_b_players, team_
                     roster_player['NORMALIZED_FIRST_NAME'] == player['NORMALIZED_FIRST_NAME']):
                 team_a['ROSTER'].remove(roster_player)
                 break
-        team_b['ROSTER'].append(copy.deepcopy(player))
-    for player in team_b_players:
-        player = ast.literal_eval(player)
-        team_a['ROSTER'].append(copy.deepcopy(player))
-        for roster_player in team_b['ROSTER']:
-            if (roster_player['TEAM'] == player['TEAM'] and
-                    roster_player['LAST_NAME'] == player['LAST_NAME'] and
-                    roster_player['NORMALIZED_FIRST_NAME'] == player['NORMALIZED_FIRST_NAME']):
-                team_b['ROSTER'].remove(roster_player)
-                break
+        if team_b:
+            team_b['ROSTER'].append(copy.deepcopy(player))
+    # TODO: rename/reorder all these variables to make sense for both trades and add/drop
+    if team_a_add_team_b_trade:
+        for player in team_a_add_team_b_trade:
+            player = ast.literal_eval(player)
+            if team_b:
+                for roster_player in team_b['ROSTER']:
+                    if (roster_player['TEAM'] == player['TEAM'] and
+                            roster_player['LAST_NAME'] == player['LAST_NAME'] and
+                            roster_player['NORMALIZED_FIRST_NAME'] == player['NORMALIZED_FIRST_NAME']):
+                        team_b['ROSTER'].remove(roster_player)
+                        break
+            team_a['ROSTER'].append(copy.deepcopy(player))
     for team in team_list:
         if team['TEAM_NUMBER'] == team_a['TEAM_NUMBER']:
             team_list.remove(team)
             team_list.append(team_a)
-        if team['TEAM_NUMBER'] == team_b['TEAM_NUMBER']:
-            team_list.remove(team)
-            team_list.append(team_b)
+        if team_b:
+            if team['TEAM_NUMBER'] == team_b['TEAM_NUMBER']:
+                team_list.remove(team)
+                team_list.append(team_b)
     final_stats = final_stats_projection(team_list, ros_proj_b_list, ros_proj_p_list, current_standings, league)
     volatility_standings = league_volatility(sgp_dict, final_stats)
     ranked_standings = rank_list(volatility_standings)
