@@ -1,11 +1,9 @@
 {% load projection_filters %}
 {% block content %}
 <h2>Projected Player Pool Values</h2>
-<div class="tab">
-    <button class="tablinks btn btn-primary btn-sm" onclick="openProjections(event, 'batters')">batters</button>
-    <button class="tablinks btn btn-primary btn-sm" onclick="openProjections(event, 'pitchers')">pitchers</button>
-    <button class="tablinks btn btn-primary btn-sm active" onclick="openProjections(event, 1)">both</button>
-</div>
+{% with batterDivId='batters' pitcherDivId='pitchers' parentDivId='playerProjections' %}
+{% include 'includes/batter_pitcher_tab_view.html' %}
+{% endwith %}
 <br/>
 
 <div id="playerProjections">

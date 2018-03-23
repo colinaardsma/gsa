@@ -120,7 +120,7 @@ def yahoo_team_creator(single_team_html):
         None.
     """
     team = {}
-    dict_key_list = ["TEAM_NAME", "TEAM_NUMBER", "ROSTER"]
+    dict_key_list = ["team_name", "team_number", "roster"]
     team[dict_key_list[0]] = str(single_team_html.xpath(".//p/a[@href]/text()")[0])
     team_number_a = single_team_html.xpath(".//p/a")[0]
     team[dict_key_list[1]] = team_number_a.attrib['href'].split("/")[3]
@@ -139,10 +139,10 @@ def yahoo_team_creator(single_team_html):
             string_loc = player_team[0].find(" - ")
             player_team = player_team[0][:string_loc]
             norm_name = name_normalizer(player_name[0])
-            player_dict['NAME'] = player_name[0]
-            player_dict["NORMALIZED_FIRST_NAME"] = norm_name['First']
-            player_dict["LAST_NAME"] = norm_name['Last']
-            player_dict['TEAM'] = team_normalizer(player_team.upper())
+            player_dict['name'] = player_name[0]
+            player_dict["normalized_first_name"] = norm_name['First']
+            player_dict["last_name"] = norm_name['Last']
+            player_dict['team'] = team_normalizer(player_team.upper())
             # player = player.replace('.', '')
             roster.append(player_dict)
         team[dict_key_list[2]] = roster
@@ -166,9 +166,9 @@ def get_single_yahoo_team(league_no, team_name=None, team_number=None):
     print(team_name)
     print(team_number)
     for team in team_list:
-        if team_number is not None and team['TEAM_NUMBER'] == str(team_number):
+        if team_number is not None and team['team_number'] == str(team_number):
             return team
-        elif team_name is not None and team['TEAM_NAME'].lower() == team_name.lower():
+        elif team_name is not None and team['team_name'].lower() == team_name.lower():
             return team
     print("Team Name or Team Number are invalid.")
 

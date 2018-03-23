@@ -255,18 +255,24 @@ def team_comparer(team_a, team_b):
     return False
 
 
-def player_comparer(player, proj_player):
-    if isinstance(proj_player, dict):
-        if (player['LAST_NAME'] == proj_player['LAST_NAME'] and
-                player['TEAM'] == proj_player['TEAM'] and
-                player['NORMALIZED_FIRST_NAME'] == proj_player['NORMALIZED_FIRST_NAME']):
-            return True
+def player_comparer(player_a, player_b):
+    if isinstance(player_a, dict):
+        player_a_first = player_a['normalized_first_name']
+        player_a_last = player_a['last_name']
+        player_a_team = player_a['team']
     else:
-        if (player['LAST_NAME'] == proj_player.last_name and
-                player['TEAM'] == proj_player.team and
-                player['NORMALIZED_FIRST_NAME'] == proj_player.normalized_first_name):
-            return True
-    return False
+        player_a_first = player_a.normalized_first_name
+        player_a_last = player_a.last_name
+        player_a_team = player_a.team
+    if isinstance(player_b, dict):
+        player_b_first = player_b['normalized_first_name']
+        player_b_last = player_b['last_name']
+        player_b_team = player_b['team']
+    else:
+        player_b_first = player_b.normalized_first_name
+        player_b_last = player_b.last_name
+        player_b_team = player_b.team
+    return player_a_last == player_b_last and player_a_team == player_b_team and player_a_first == player_b_first
 
 
 def regex_groups(full_name):

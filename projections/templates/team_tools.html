@@ -44,11 +44,19 @@
                 <!--<select class="custom-select my-1 mr-sm-2" id="tradeLeagueNo" name="trade_league_key">-->
                 <!--{% include 'includes/league_picker.html' %}-->
                 <!--</select>-->
-                <!--<label class="my-1 mr-2" for="tradeTeamA">Team A:</label>-->
+                <label class="my-1 mr-2" for="tradeTeamA">Team A:</label>
+                <select class="custom-select my-1 mr-sm-2 w-75" id="tradeTeamA" name="team_a_key" >
+                    {% for standing in league_standings %}
+                    <option value="{{standing.PointsTeamKey}}">{{standing.PointsTeam}}</option>
+                    {% endfor %}
+                </select>
+                <label class="my-1 mr-2" for="tradeTeamB">Team B:</label>
+                <select class="custom-select my-1 mr-sm-2 w-75" id="tradeTeamB" name="team_b_key" >
+                    {% for standing in league_standings %}
+                    <option value="{{standing.PointsTeamKey}}">{{standing.PointsTeam}}</option>
+                    {% endfor %}
+                </select>
                 <input type="hidden" value="{{league.league_key}}" name="trade_league_key">
-                <input type="text" class="form-control mb-2 mr-sm-2" id="tradeTeamA" name="team_a_name" value="{{team_a_name}}" placeholder="Team A Name" />
-                <!--<label class="my-1 mr-2" for="tradeTeamB">Team B:</label>-->
-                <input type="text" class="form-control mb-2 mr-sm-2" id="tradeTeamB" name="team_b_name" value="{{team_b_name}}" placeholder="Team B Name" />
                 <!--TODO: this doesnt work-->
                 {% else %}
                 <!--<label class="my-1 mr-2" for="tradeLeagueNo">League Number:</label>-->
@@ -88,6 +96,7 @@
         <div class="col">
         </div>
     </div>
+    {% if draft_status == 'predraft' or league.end_date|is_in_past %}
     <hr/>
     <div class="row" id="keeperProjections">
         <div class="col" id="poentialKeepers">
@@ -150,6 +159,7 @@
         <div class="col">
         </div>
     </div>
+    {% endif %}
 </div>
 <br/>
 {% endblock %}

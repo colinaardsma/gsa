@@ -41,8 +41,8 @@ def avail_player_finder(league_key, user, redirect):
     avail_batters = rate_avail_players(batter_list, ros_proj_b_list)
     team_batting_values = rate_team(yahoo_team, ros_proj_b_list)
 
-    player_comp['TeamName'] = yahoo_team['TEAM_NAME']
-    player_comp['TeamNumber'] = yahoo_team['TEAM_NUMBER']
+    player_comp['TeamName'] = yahoo_team['team_name']
+    player_comp['TeamNumber'] = yahoo_team['team_number']
     player_comp['AvailPitchers'] = avail_pitchers
     player_comp['TeamPitchers'] = team_pitching_values
     player_comp['AvailBatters'] = avail_batters
@@ -111,11 +111,11 @@ def create_sgp_dict(league):
 def keeper_to_roster_converter(keeper_dict):
     roster_list = []
     for key, val in keeper_dict.items():
-        roster_dict = {'TEAM_NAME': key, 'manager_guids': val['manager_guids'], 'ROSTER': []}
+        roster_dict = {'team_name': key, 'manager_guids': val['manager_guids'], 'roster': []}
         for roster_player in val['players']:
-            player = dict(LAST_NAME=roster_player['last_name'].lower(), NAME=roster_player['full_name'],
-                          NORMALIZED_FIRST_NAME=roster_player['first_name'].lower(), TEAM=roster_player['team'])
-            roster_dict['ROSTER'].append(player)
+            player = dict(last_name=roster_player['last_name'].lower(), name=roster_player['full_name'],
+                          normalized_first_name=roster_player['first_name'].lower(), team=roster_player['team'])
+            roster_dict['roster'].append(player)
         roster_list.append(roster_dict)
     return roster_list
 

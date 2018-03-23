@@ -1,0 +1,7 @@
+{% block content %}
+<div class="tab">
+    <a href="javascript:void(0)" class="tablinks btn btn-primary btn-sm" onclick="openProjections(event, '{{batterDivId}}', '{{parentDivId}}')">batters</a>
+    <a href="javascript:void(0)" class="tablinks btn btn-primary btn-sm" onclick="openProjections(event, '{{pitcherDivId}}', '{{parentDivId}}')">pitchers</a>
+    <a href="javascript:void(0)" class="tablinks btn btn-primary btn-sm active" onclick="openProjections(event, 1, '{{parentDivId}}')">both</a>
+</div>
+{% endblock %}

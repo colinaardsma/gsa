@@ -4,6 +4,8 @@ import logging
 from io import StringIO
 from datetime import datetime
 import pytz
+import pprint
+import operator
 
 from django.shortcuts import render, redirect
 from django.utils.datastructures import MultiValueDictKeyError
@@ -12,14 +14,15 @@ from django.views import generic
 from gsa.settings import TOKEN_REDIRECT_PATH, TEAM_TOOLS_REDIRECT, USER_REDIRECT
 from leagues.helpers.api_connector import request_auth, get_token
 from leagues.models import League, dummy_league, update_profile, max_year_leagues
-from leagues.helpers.yql_queries import get_current_leagues, get_all_team_rosters, get_keeper_query
+from leagues.helpers.yql_queries import get_current_leagues, get_all_team_rosters, get_keeper_query,\
+    get_league_standings
 from leagues.helpers.html_parser import get_single_yahoo_team
 from .helpers.team_tools import pull_batters, pull_pitchers, avail_player_finder, final_standing_projection, \
     single_player_rater, get_keeper_costs, get_projected_keepers, roster_change_analyzer_, pull_players_html, \
     get_auction_values_
 from .helpers.html_parser import razzball_get_update_datetime, scrape_razzball
 from .helpers.keepers import project_keepers
-from .helpers.normalizer import name_normalizer
+from .helpers.normalizer import name_normalizer, player_comparer
 from .models import BatterProjection, PitcherProjection
 
 
@@ -72,7 +75,9 @@ def team_tools(request):
             league = request.user.profile.leagues.get(league_key=league_key)
         else:
             league = request.user.profile.leagues.get(league_key=request.user.profile.main_league)
-        return render(request, 'team_tools.html', {'league': league, 'redirect': TEAM_TOOLS_REDIRECT})
+        league_status, standings = get_league_standings(league.league_key, request.user, TEAM_TOOLS_REDIRECT)
+        return render(request, 'team_tools.html', {'league': league, 'redirect': TEAM_TOOLS_REDIRECT,
+                                                   'league_standings': standings, 'draft_status': league_status})
     else:
         return render(request, 'team_tools.html', {'redirect': TEAM_TOOLS_REDIRECT})
         # return redirect(TEAM_TOOLS_REDIRECT)
@@ -107,7 +112,7 @@ def player_pickup_analyzer(request):
             league_key = None
 
         team_list = get_all_team_rosters(league_key, request.user, TEAM_TOOLS_REDIRECT)
-        team = [team for team in team_list if team['TEAM_NUMBER'] == team_number][0]
+        team = [team for team in team_list if team['team_number'] == team_number][0]
 
         adds = []
         adds.extend(pitcher_adds)
@@ -131,6 +136,7 @@ def single_player(request):
         return redirect(TEAM_TOOLS_REDIRECT)
 
 
+# TODO: move most of this logic into another method
 def trade_projection(request):
     if request.method == 'POST':
         try:
@@ -140,11 +146,11 @@ def trade_projection(request):
             league_no = request.POST["trade_league_no"]
             league_key = None
         try:
-            team_a_name = request.POST['team_a_name']
-            team_b_name = request.POST['team_b_name']
+            team_a_key = request.POST['team_a_key']
+            team_b_key = request.POST['team_b_key']
         except MultiValueDictKeyError:
-            team_a_name = ""
-            team_b_name = ""
+            team_a_key = ""
+            team_b_key = ""
         try:
             team_a = request.POST['team_a']
             team_b = request.POST['team_b']
@@ -156,11 +162,43 @@ def trade_projection(request):
         except MultiValueDictKeyError:
             pass
 
-        if league_key != "" and team_a_name != "" and team_b_name != "":
+        if league_key != "" and team_a_key != "" and team_b_key != "":
+            batter_projections = BatterProjection.objects.all().all().order_by('-fvaaz')
+            pitcher_projections = PitcherProjection.objects.all().all().order_by('-fvaaz')
             team_list = get_all_team_rosters(league_key, request.user, TEAM_TOOLS_REDIRECT)
-            team_a = [team for team in team_list if team['TEAM_NAME'].lower() == team_a_name.lower()][0]
-            team_b = [team for team in team_list if team['TEAM_NAME'].lower() == team_b_name.lower()][0]
-            import pprint
+            team_a = [team for team in team_list if team['team_key'] == team_a_key][0]
+            team_b = [team for team in team_list if team['team_key'] == team_b_key][0]
+            rosters = [team_a['roster'], team_b['roster']]
+            for roster in rosters:
+                for player in roster:
+                    if player['category'] == 'batter':
+                        for batter in batter_projections:
+                            if player_comparer(player, batter):
+                                player['dollarValue'] = batter.dollarValue
+                                player['pos'] = batter.pos
+                                player['status'] = batter.status
+                                player['ab'] = batter.ab
+                                player['r'] = batter.r
+                                player['hr'] = batter.hr
+                                player['rbi'] = batter.rbi
+                                player['sb'] = batter.sb
+                                player['ops'] = batter.ops
+                                player['avg'] = batter.avg
+                                break
+                    elif player['category'] == 'pitcher':
+                        for pitcher in pitcher_projections:
+                            if player_comparer(player, pitcher):
+                                player['dollarValue'] = pitcher.dollarValue
+                                player['pos'] = pitcher.pos
+                                player['status'] = pitcher.status
+                                player['ip'] = pitcher.ip
+                                player['w'] = pitcher.w
+                                player['sv'] = pitcher.sv
+                                player['k'] = pitcher.k
+                                player['era'] = pitcher.era
+                                player['whip'] = pitcher.whip
+                                player['kip'] = pitcher.kip
+                                break
             return render(request, 'trade_projection.html', {'team_a': team_a, 'team_b': team_b,
                                                              'league_key': league_key, 'team_list': team_list,
                                                              'league_no': league_no, 'redirect': TEAM_TOOLS_REDIRECT})

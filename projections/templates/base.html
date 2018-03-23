@@ -37,7 +37,7 @@
                 <li class="nav-item">
                     <a class="nav-link" href="/projections/pitching">pitching projections</a>
                 </li>
-                {% if request.user and not request.user.is_anonymous %}
+            {% if request.user and not request.user.is_anonymous %}
                 <!--TODO: improve this by only showing when the main_league is in the offseason-->
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="../team_tools" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -46,12 +46,16 @@
                     <div class="dropdown-menu bg-dark border border-light" aria-labelledby="navbarDropdown">
                         {% for league in request.user.profile.leagues.all|dictsortreversed:"season" %}
                         {% now "Y" as current_year %}
+                        {% if league.season|stringformat:'s' == current_year|stringformat:'s' and league.draft_status != 'predraft' %}
                         <form action="../team_tools/" method="POST">
                             {% csrf_token %}
                             <input type="hidden" name="league_key" value="{{league.league_key}}" />
                             <a class="dropdown-item" href="#" onclick="this.parentNode.submit()" style="color:rgba(255,255,255,.5)">{{league.league_name}} - {{league.season}}</a>
                         </form>
                         <!--<a class="dropdown-item" href="/team_tools?league={{league.league_key}}">{{league.league_name}} - {{league.season}}</a>-->
+                        {% else %}
+
+                        {% endif %}
                         {% endfor %}
                         <!--<a class="dropdown-item" href="#">Another action</a>-->
                         <!--<div class="dropdown-divider"></div>-->
@@ -132,7 +136,7 @@
     function objectFilterByTeamName(filterId) {
       var input, filter, filterDiv, parentDiv;
       input = document.getElementById(filterId);
-      parentDiv = document.getElementById('potential_keepers');
+      parentDiv = document.getElementById('all_keepers');
 
       for (var i = 0; i < parentDiv.children.length; i++) {
         parentDiv.children[i].style.display = "none";
@@ -155,9 +159,10 @@
 </script>
 <!--Projections in Tabs-->
 <script>
-function openProjections(evt, projectionCategory) {
+function openProjections(evt, projectionCategory, parentDivId) {
     var i, tabcontent, tablinks, playerProjections;
-    tabcontent = document.getElementsByClassName("tabcontent");
+    playerProjections = document.getElementById(parentDivId);
+    tabcontent = playerProjections.getElementsByClassName("tabcontent");
     for (i = 0; i < tabcontent.length; i++) {
         tabcontent[i].style.display = "none";
     }
@@ -166,7 +171,6 @@ function openProjections(evt, projectionCategory) {
         tablinks[i].className = tablinks[i].className.replace(" active", "");
     }
     if (projectionCategory === 1) {
-        playerProjections = document.getElementById("playerProjections");
         for (var i = 0; i < playerProjections.children.length; i++) {
             playerProjections.children[i].style.display = "";
         }
@@ -229,8 +233,8 @@ function openProjections(evt, projectionCategory) {
   });
 })(jQuery);
 
-// TODO: the url call fails but spinner works, fix
 function getSpinner() {
+
   $.ajax({
     url: 'http://baconipsum.com/api/?type=all-meat',
     dataType: 'json',

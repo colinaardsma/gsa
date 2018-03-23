@@ -80,21 +80,21 @@ def fant_pro_player_dict_creator(single_player_html, headings_list_html):
                 if name_team_pos[0] is None or name_team_pos[0] == " ()":
                     counter = len(single_player_html)
                     continue
-                single_player["NAME"] = name_team_pos[0]
+                single_player["name"] = name_team_pos[0]
                 if len(name_team_pos) >= 3:
-                    single_player["TEAM"] = name_team_pos[2].replace(u'\xa0', u' ').encode('utf-8')
+                    single_player["team"] = name_team_pos[2].replace(u'\xa0', u' ').encode('utf-8')
                 else:
-                    single_player["TEAM"] = "NONE"
+                    single_player["team"] = "NONE"
                 if len(name_team_pos) >= 4:
                     name_team_pos[3] = name_team_pos[3].strip(" - ")
                     name_team_pos[3] = name_team_pos[3].strip(")")
-                    single_player["POS"] = name_team_pos[3].replace(u'\xa0', u' ').encode('utf-8')
+                    single_player["pos"] = name_team_pos[3].replace(u'\xa0', u' ').encode('utf-8')
                 else:
-                    single_player["POS"] = "NONE"
+                    single_player["pos"] = "NONE"
                 if len(name_team_pos) >= 5:
-                    single_player["STATUS"] = name_team_pos[4].replace(u'\xa0', '').encode('utf-8')
+                    single_player["status"] = name_team_pos[4].replace(u'\xa0', '').encode('utf-8')
                 else:
-                    single_player["STATUS"] = "ACTIVE"
+                    single_player["status"] = "ACTIVE"
             else:
                 stat = single_player_html[counter].xpath("self::*/text()")
                 if len(stat) != 0:

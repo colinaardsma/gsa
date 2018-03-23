@@ -48,7 +48,7 @@ def rate_team(team_dict, ros_projection_list):
         None.
     """
     team_player_list = []
-    for player_proj, roster_player in itertools.product(ros_projection_list, team_dict['ROSTER']):
+    for player_proj, roster_player in itertools.product(ros_projection_list, team_dict['roster']):
         if player_comparer(roster_player, player_proj):
             team_player_list.append(player_proj)
     return team_player_list
@@ -122,7 +122,7 @@ def team_optimizer(team_dict, ros_proj_b_list, ros_proj_p_list, league_pos_dict,
                 weighted_pitcher_whip = pitcher.whip * pitcher.ip
                 team_stats['StatsWHIP'] = (weighted_team_whip + weighted_pitcher_whip) / current_ip
                 team_stats['StatsIP'] = current_ip
-            team_stats['TEAM_NAME'] = standing['PointsTeam']
+            team_stats['team_name'] = standing['PointsTeam']
             team_stats['manager_guids'] = standing['manager_guids']
     return team_stats
 
@@ -139,12 +139,12 @@ def batting_roster_optimizer(team_dict, ros_projection_list, league_pos_dict):
         None.
     """
     team_player_list = []
-    for player_proj, roster_player in itertools.product(ros_projection_list, team_dict['ROSTER']):
+    for player_proj, roster_player in itertools.product(ros_projection_list, team_dict['roster']):
         if player_comparer(roster_player, player_proj):
             # for player_proj in ros_projection_list:
-            #     if any(team_comparer(player_proj.team, roster_player['TEAM']) and
-            #            name_comparer(player_proj.name, roster_player['NAME'])
-            #            for roster_player in team_dict['ROSTER']):
+            #     if any(team_comparer(player_proj.team, roster_player['team']) and
+            #            name_comparer(player_proj.name, roster_player['name'])
+            #            for roster_player in team_dict['roster']):
             team_player_list.append(player_proj)
     sorted(team_player_list, key=operator.attrgetter('dollarValue'))
     starting_batters = {}
@@ -238,15 +238,15 @@ def pitching_roster_optimizer(team_dict, ros_projection_list, league_pos_dict, c
     current_ip = 0
     starter_ip = 0
     for standing in current_stangings:
-        # if standing['PointsTeam'] == team_dict['TEAM_NAME']:
+        # if standing['PointsTeam'] == team_dict['team_name']:
         if [mg for mg in standing['manager_guids'] if mg in team_dict['manager_guids']]:
             current_ip += int(math.ceil(float(standing['StatsIP'])))
-    for player_proj, roster_player in itertools.product(ros_projection_list, team_dict['ROSTER']):
+    for player_proj, roster_player in itertools.product(ros_projection_list, team_dict['roster']):
         if player_comparer(roster_player, player_proj):
             # for player_proj in ros_projection_list:
-            #     if any(team_comparer(player_proj.team, roster_player['TEAM']) and
-            #            name_comparer(player_proj.name, roster_player['NAME'])
-            #            for roster_player in team_dict['ROSTER']):
+            #     if any(team_comparer(player_proj.team, roster_player['team']) and
+            #            name_comparer(player_proj.name, roster_player['name'])
+            #            for roster_player in team_dict['roster']):
             team_player_list.append(player_proj)
     sorted(team_player_list, key=operator.attrgetter('dollarValue'))
     starting_pitchers = {}
@@ -325,7 +325,7 @@ def bench_roster_optimizer(team_dict, ros_batter_projection_list, ros_pitcher_pr
     starter_ip = optimized_pitchers.pop('Starter IP')
     opt_batters = list(sum(optimized_batters.values(), []))
     opt_pitchers = list(sum(optimized_pitchers.values(), []))
-    for player in team_dict['ROSTER']:
+    for player in team_dict['roster']:
         if (not any(player_comparer(player, batter)
                     for batter in opt_batters) and
                 not any(player_comparer(player, pitcher)
@@ -335,23 +335,23 @@ def bench_roster_optimizer(team_dict, ros_batter_projection_list, ros_pitcher_pr
                                                        bench_roster_list):
         if player_comparer(bench_player, player_proj):
             # for player in ros_pitcher_projection_list:
-            #     if any(team_comparer(player.team, bench_player['TEAM']) and
-            #            name_comparer(player.name, bench_player['NAME'])
+            #     if any(team_comparer(player.team, bench_player['team']) and
+            #            name_comparer(player.name, bench_player['name'])
             #            for bench_player in bench_roster_list):
             team_player_list.append(player_proj)
     for player_proj, bench_player in itertools.product(ros_batter_projection_list,
                                                        bench_roster_list):
         if player_comparer(bench_player, player_proj):
             # for player in ros_batter_projection_list:
-            #     if any(team_comparer(player.team, bench_player['TEAM']) and
-            #            name_comparer(player.name, bench_player['NAME'])
+            #     if any(team_comparer(player.team, bench_player['team']) and
+            #            name_comparer(player.name, bench_player['name'])
             #            for bench_player in bench_roster_list):
             team_player_list.append(player_proj)
     bench_players = {'pitchers': [], 'batters': []}
     current_ip = 0
     bench_ip = 0
     for standing in current_stangings:
-        # if standing['PointsTeam'] == team_dict['TEAM_NAME']:
+        # if standing['PointsTeam'] == team_dict['team_name']:
         if [mg for mg in standing['manager_guids'] if mg in team_dict['manager_guids']]:
                 current_ip += int(math.ceil(float(standing['StatsIP'])))
     current_ip += starter_ip
@@ -658,32 +658,32 @@ def roster_change_analyzer(team_list, ros_proj_b_list, ros_proj_p_list, current_
             team_b = ast.literal_eval(team_b)
     for player in team_a_drops_trade:
         player = ast.literal_eval(player)
-        for roster_player in team_a['ROSTER']:
-            if (roster_player['TEAM'] == player['TEAM'] and
-                    roster_player['LAST_NAME'] == player['LAST_NAME'] and
-                    roster_player['NORMALIZED_FIRST_NAME'] == player['NORMALIZED_FIRST_NAME']):
-                team_a['ROSTER'].remove(roster_player)
+        for roster_player in team_a['roster']:
+            if (roster_player['team'] == player['team'] and
+                    roster_player['last_name'] == player['last_name'] and
+                    roster_player['normalized_first_name'] == player['normalized_first_name']):
+                team_a['roster'].remove(roster_player)
                 break
         if team_b:
-            team_b['ROSTER'].append(copy.deepcopy(player))
+            team_b['roster'].append(copy.deepcopy(player))
     # TODO: rename/reorder all these variables to make sense for both trades and add/drop
     if team_a_add_team_b_trade:
         for player in team_a_add_team_b_trade:
             player = ast.literal_eval(player)
             if team_b:
-                for roster_player in team_b['ROSTER']:
-                    if (roster_player['TEAM'] == player['TEAM'] and
-                            roster_player['LAST_NAME'] == player['LAST_NAME'] and
-                            roster_player['NORMALIZED_FIRST_NAME'] == player['NORMALIZED_FIRST_NAME']):
-                        team_b['ROSTER'].remove(roster_player)
+                for roster_player in team_b['roster']:
+                    if (roster_player['team'] == player['team'] and
+                            roster_player['last_name'] == player['last_name'] and
+                            roster_player['normalized_first_name'] == player['normalized_first_name']):
+                        team_b['roster'].remove(roster_player)
                         break
-            team_a['ROSTER'].append(copy.deepcopy(player))
+            team_a['roster'].append(copy.deepcopy(player))
     for team in team_list:
-        if team['TEAM_NUMBER'] == team_a['TEAM_NUMBER']:
+        if team['team_number'] == team_a['team_number']:
             team_list.remove(team)
             team_list.append(team_a)
         if team_b:
-            if team['TEAM_NUMBER'] == team_b['TEAM_NUMBER']:
+            if team['team_number'] == team_b['team_number']:
                 team_list.remove(team)
                 team_list.append(team_b)
     final_stats = final_stats_projection(team_list, ros_proj_b_list, ros_proj_p_list, current_standings, league)

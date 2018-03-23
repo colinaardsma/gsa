@@ -75,7 +75,7 @@ def fa_finder(league_no, team_name):
     avail_batting_fas = rate_avail_players(batting_fa_list, ros_proj_b_list)
     team_batting_values = rate_team(yahoo_team, ros_proj_b_list)
 
-    player_comp['Team Name'] = yahoo_team['TEAM_NAME']
+    player_comp['Team Name'] = yahoo_team['team_name']
     player_comp['Pitching FAs'] = avail_pitching_fas
     player_comp['Pitching Team'] = team_pitching_values
     player_comp['Batting FAs'] = avail_batting_fas

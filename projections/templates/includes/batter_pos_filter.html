@@ -1,6 +1,6 @@
 {% block content %}
-<label class="my-1 mr-2" for="battersPosFilter">Filter By Position:</label>
-<select class="custom-select my-1 mr-sm-2" id="battersPosFilter" onchange="tableFilter('{{tableId}}', this.id, {{column_no}})">
+<label class="my-1 mr-2" for="{{filterId|default:'battersPosFilter'}}">Filter By Position:</label>
+<select class="custom-select my-1 mr-sm-2" id="{{filterId|default:'battersPosFilter'}}" onchange="tableFilter('{{tableId}}', this.id, {{column_no}})">
     <option value=1>all pos</option>
     <option value="C">C</option>
     <option value="1B">1B</option>

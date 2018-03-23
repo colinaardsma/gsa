@@ -3,152 +3,356 @@
 {% load projection_filters %}
 {% if trade_result %}
 <!-- TODO: how to combine this with projected_standings.html-->
-<h2>Projected Final Standings</h2>
-<table id="proj_final_standings" class="sortable display table table-hover">
-    <thead>
-    <tr>
-        <th>Total Points</th>
-        <th>Team Name</th>
-        <th>R</th>
-        <th>HR</th>
-        <th>RBI</th>
-        <th>SB</th>
-        <th>OPS</th>
-        <th>W</th>
-        <th>SV</th>
-        <th>K</th>
-        <th>ERA</th>
-        <th>WHIP</th>
-        <th>IP</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for team in trade_result %}
-    <tr>
-        <td>{{team.PointsTotal}}</td>
-        <td>{{team.TEAM_NAME}}</td>
-        <td>{{team.PointsR}}</td>
-        <td>{{team.PointsHR}}</td>
-        <td>{{team.PointsRBI}}</td>
-        <td>{{team.PointsSB}}</td>
-        <td>{{team.PointsOPS}}</td>
-        <td>{{team.PointsW}}</td>
-        <td>{{team.PointsSV}}</td>
-        <td>{{team.PointsK}}</td>
-        <td>{{team.PointsERA}}</td>
-        <td>{{team.PointsWHIP}}</td>
-        <td>{{team.StatsIP}}</td>
-    </tr>
-    {% endfor %}
-    </tbody>
-</table>
-<h2>Projected Final Stats</h2>
-<table id="proj_final_stats" class="sortable display table table-hover">
-    <thead>
-    <tr>
-        <th>Team Name</th>
-        <th>R</th>
-        <th>HR</th>
-        <th>RBI</th>
-        <th>SB</th>
-        <th>OPS</th>
-        <th>W</th>
-        <th>SV</th>
-        <th>K</th>
-        <th>ERA</th>
-        <th>WHIP</th>
-        <th>IP</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for team in trade_result %}
-    <tr>
-        <td>{{team.TEAM_NAME}}</td>
-        <td>{{team.StatsR}}</td>
-        <td>{{team.StatsHR}}</td>
-        <td>{{team.StatsRBI}}</td>
-        <td>{{team.StatsSB}}</td>
-        <td>{{team.StatsOPS|floatformat:3}}</td>
-        <td>{{team.StatsW}}</td>
-        <td>{{team.StatsSV}}</td>
-        <td>{{team.StatsK}}</td>
-        <td>{{team.StatsERA|floatformat:2}}</td>
-        <td>{{team.StatsWHIP|floatformat:2}}</td>
-        <td>{{team.StatsIP}}</td>
-    </tr>
-    {% endfor %}
-    </tbody>
-</table>
-<h2>Projected Final Volatility</h2>
-<table id="proj_final_volatility" class="sortable display table table-hover">
-    <thead>
-    <tr>
-        <th>Volatility(<small>Down</small> Up)</th>
-        <th>Team Name</th>
-        <th>R</th>
-        <th>HR</th>
-        <th>RBI</th>
-        <th>SB</th>
-        <th>OPS</th>
-        <th>W</th>
-        <th>SV</th>
-        <th>K</th>
-        <th>ERA</th>
-        <th>WHIP</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for team in trade_result %}
-    <tr>
-        <td><small>{{team.Total_Downward_Volatility}} </small>{{team.Total_Upward_Volatility}}</td>
-        <td>{{team.TEAM_NAME}}</td>
-        <td><small>{{team.DownVol_R}} </small>{{team.UpVol_R}}</td>
-        <td><small>{{team.DownVol_HR}} </small>{{team.UpVol_HR}}</td>
-        <td><small>{{team.DownVol_RBI}} </small>{{team.UpVol_RBI}}</td>
-        <td><small>{{team.DownVol_SB}} </small>{{team.UpVol_SB}}</td>
-        <td><small>{{team.DownVol_OPS}} </small>{{team.UpVol_OPS}}</td>
-        <td><small>{{team.DownVol_W}} </small>{{team.UpVol_W}}</td>
-        <td><small>{{team.DownVol_SV}} </small>{{team.UpVol_SV}}</td>
-        <td><small>{{team.DownVol_K}} </small>{{team.UpVol_K}}</td>
-        <td><small>{{team.DownVol_ERA}} </small>{{team.UpVol_ERA}}</td>
-        <td><small>{{team.DownVol_WHIP}} </small>{{team.UpVol_WHIP}}</td>
-    </tr>
-    {% endfor %}
-    </tbody>
-</table>
-{% else %}
-<h2>Trade Analyzer</h2>
-<div class="form-group">
-    <form method="post">
-        {% csrf_token %}
-        <p>League Key: {{league_key}}</p>
-        <div class="row">
-            <div class="col">
-                <label for="team_a_players"><strong>{{team_a.TEAM_NAME}}</strong></br>Players to Trade:</label>
-                <select name="team_a_players" id="team_a_players" class="form-control" multiple size="30">
-                    {% for player in team_a.ROSTER %}
-                    <option value="{{player}}" id="{{player_a}}" name="{{player}}">{{player.NAME}} - {{player.POS}} - {{player.TEAM}}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col">
-                <label for="team_b_players"><strong>{{team_b.TEAM_NAME}}</strong></br>Players to Trade:</label>
-                <select name="team_b_players" id="team_b_players" class="form-control" multiple size="30">
-                    {% for player in team_b.ROSTER %}
-                    <option value="{{player}}" id="{{player_b}}" name="{{player}}">{{player.NAME}} - {{player.POS}} - {{player.TEAM}}</option>
-                    {% endfor %}
-                </select>
-            </div>
-        </div>
-        <input type="hidden" name="team_a" value="{{team_a}}" />
-        <input type="hidden" name="team_b" value="{{team_b}}" />
-        <input type="hidden" name="trade_league_no" value="{{league_no}}" />
-        <input type="hidden" name="trade_league_key" value="{{league_key}}" />
-        <input type="hidden" name="team_list" value="{{team_list}}" />
-        <br/>
-        <button class="btn btn-lg btn-primary btn-block" type="submit">trade</button>
-    </form>
+<div id="results_view">
+    <h2>Projected Final Standings</h2>
+    <table id="proj_final_standings" class="sortable display table table-hover">
+        <thead>
+        <tr>
+            <th>Total Points</th>
+            <th>Team Name</th>
+            <th>R</th>
+            <th>HR</th>
+            <th>RBI</th>
+            <th>SB</th>
+            <th>OPS</th>
+            <th>W</th>
+            <th>SV</th>
+            <th>K</th>
+            <th>ERA</th>
+            <th>WHIP</th>
+            <th>IP</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for team in trade_result %}
+        <tr>
+            <td>{{team.PointsTotal}}</td>
+            <td>{{team.team_name}}</td>
+            <td>{{team.PointsR}}</td>
+            <td>{{team.PointsHR}}</td>
+            <td>{{team.PointsRBI}}</td>
+            <td>{{team.PointsSB}}</td>
+            <td>{{team.PointsOPS}}</td>
+            <td>{{team.PointsW}}</td>
+            <td>{{team.PointsSV}}</td>
+            <td>{{team.PointsK}}</td>
+            <td>{{team.PointsERA}}</td>
+            <td>{{team.PointsWHIP}}</td>
+            <td>{{team.StatsIP}}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <h2>Projected Final Stats</h2>
+    <table id="proj_final_stats" class="sortable display table table-hover">
+        <thead>
+        <tr>
+            <th>Team Name</th>
+            <th>R</th>
+            <th>HR</th>
+            <th>RBI</th>
+            <th>SB</th>
+            <th>OPS</th>
+            <th>W</th>
+            <th>SV</th>
+            <th>K</th>
+            <th>ERA</th>
+            <th>WHIP</th>
+            <th>IP</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for team in trade_result %}
+        <tr>
+            <td>{{team.team_name}}</td>
+            <td>{{team.StatsR}}</td>
+            <td>{{team.StatsHR}}</td>
+            <td>{{team.StatsRBI}}</td>
+            <td>{{team.StatsSB}}</td>
+            <td>{{team.StatsOPS|floatformat:3}}</td>
+            <td>{{team.StatsW}}</td>
+            <td>{{team.StatsSV}}</td>
+            <td>{{team.StatsK}}</td>
+            <td>{{team.StatsERA|floatformat:2}}</td>
+            <td>{{team.StatsWHIP|floatformat:2}}</td>
+            <td>{{team.StatsIP}}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <h2>Projected Final Volatility</h2>
+    <table id="proj_final_volatility" class="sortable display table table-hover">
+        <thead>
+        <tr>
+            <th>Volatility(<small>Down</small> Up)</th>
+            <th>Team Name</th>
+            <th>R</th>
+            <th>HR</th>
+            <th>RBI</th>
+            <th>SB</th>
+            <th>OPS</th>
+            <th>W</th>
+            <th>SV</th>
+            <th>K</th>
+            <th>ERA</th>
+            <th>WHIP</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for team in trade_result %}
+        <tr>
+            <td><small>{{team.Total_Downward_Volatility}} </small>{{team.Total_Upward_Volatility}}</td>
+            <td>{{team.team_name}}</td>
+            <td><small>{{team.DownVol_R}} </small>{{team.UpVol_R}}</td>
+            <td><small>{{team.DownVol_HR}} </small>{{team.UpVol_HR}}</td>
+            <td><small>{{team.DownVol_RBI}} </small>{{team.UpVol_RBI}}</td>
+            <td><small>{{team.DownVol_SB}} </small>{{team.UpVol_SB}}</td>
+            <td><small>{{team.DownVol_OPS}} </small>{{team.UpVol_OPS}}</td>
+            <td><small>{{team.DownVol_W}} </small>{{team.UpVol_W}}</td>
+            <td><small>{{team.DownVol_SV}} </small>{{team.UpVol_SV}}</td>
+            <td><small>{{team.DownVol_K}} </small>{{team.UpVol_K}}</td>
+            <td><small>{{team.DownVol_ERA}} </small>{{team.UpVol_ERA}}</td>
+            <td><small>{{team.DownVol_WHIP}} </small>{{team.UpVol_WHIP}}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 </div>
-<p>Hold down the Ctrl (windows) / Command (Mac) button to select multiple options.</p>
+{% else %}
+<div id="player_selection">
+    <h2>Trade Analyzer</h2>
+    <div class="form-group">
+        <form method="post">
+            {% csrf_token %}
+            <div id="team_a">
+                {% with batterDivId='team_a_batters' pitcherDivId='team_a_pitchers' parentDivId='team_a_projections' %}
+                {% include 'includes/batter_pitcher_tab_view.html' %}
+                {% endwith %}
+                <br/>
+                <div id="team_a_projections">
+                    <div id="team_a_batters" class="tabcontent">
+                        <h4>{{team_a.team_name}} Batters</h4>
+                        {% with tableId='team_a_batters_table' column_no=4 filterId='team_a_battersPosFilter' %}
+                        {% include 'includes/batter_pos_filter.html' %}
+                        {% endwith %}
+                        <br/>
+                        <table id="team_a_batters_table" class="sortable display table table-hover">
+                            <thead>
+                            <tr>
+                                <th>Trade</th>
+                                <th>Value</th>
+                                <th>Player Name</th>
+                                <th>Team</th>
+                                <th>Position</th>
+                                <th>Status</th>
+                                <th>R</th>
+                                <th>HR</th>
+                                <th>RBI</th>
+                                <th>SB</th>
+                                <th>OPS</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for batter in team_a.roster %}
+                            {% if batter.category == 'batter' %}
+                            <tr>
+                                <td><input type="checkbox" value="{{batter.name|create_player_dict:batter.team}}" id="team_a_batters" name="team_a_players[]" /></td>
+                                <td>${{batter.dollarValue|floatformat:2}}</td>
+                                <td><a href="https://baseball.fantasysports.yahoo.com/b1/{{request.user.profile.main_league|get_league_no}}/playersearch?&search={{batter.name|url_safe_spaces}}" target="_blank">{{batter.name}}</a></td>
+                                <td>{{batter.team}}</td>
+                                <td>{{batter.pos}}</td>
+                                {% if 'DL' in batter.status %}
+                                <td style="color:red">{{batter.status}}</td>
+                                {% elif 'MiLB' in batter.status %}
+                                <td style="color:blue">{{batter.status}}</td>
+                                {% else %}
+                                <td></td>
+                                {% endif %}
+                                <td>{{batter.r|floatformat}}</td>
+                                <td>{{batter.hr|floatformat}}</td>
+                                <td>{{batter.rbi|floatformat}}</td>
+                                <td>{{batter.sb|floatformat}}</td>
+                                <td>{{batter.ops|floatformat:3}}</td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="team_a_pitchers" class="tabcontent">
+                        <h4>{{team_a.team_name}} Pitchers</h4>
+                        {% with tableId='team_a_pitchers_table' column_no=4 filterId='team_a_pitchersPosFilter' %}
+                        {% include 'includes/pitcher_pos_filter.html' %}
+                        {% endwith %}
+                        <br/>
+                        <table id="team_a_pitchers_table" class="sortable display table table-hover">
+                            <thead>
+                            <tr>
+                                <th>Trade</th>
+                                <th>Value</th>
+                                <th>Player Name</th>
+                                <th>Team</th>
+                                <th>Position</th>
+                                <th>Status</th>
+                                <th>W</th>
+                                <th>SV</th>
+                                <th>K</th>
+                                <th>ERA</th>
+                                <th>WHIP</th>
+                                <th>IP</th>
+                                <th>K/IP</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for pitcher in team_a.roster %}
+                            {% if pitcher.category == 'pitcher' %}
+                            <tr>
+                                <td><input type="checkbox" value="{{pitcher.name|create_player_dict:pitcher.team}}" id="team_a_pitchers" name="team_a_players[]" /></td>
+                                <td>${{pitcher.dollarValue|floatformat:2}}</td>
+                                <td><a href="https://baseball.fantasysports.yahoo.com/b1/{{request.user.profile.main_league|get_league_no}}/playersearch?&search={{pitcher.name|url_safe_spaces}}" target="_blank">{{pitcher.name}}</a></td>
+                                <td>{{pitcher.team}}</td>
+                                <td>{{pitcher.pos}}</td>
+                                {% if 'DL' in pitcher.status %}
+                                <td style="color:red">{{pitcher.status}}</td>
+                                {% elif 'MiLB' in pitcher.status %}
+                                <td style="color:blue">{{pitcher.status}}</td>
+                                {% else %}
+                                <td></td>
+                                {% endif %}
+                                <td>{{pitcher.w|floatformat:2}}</td>
+                                <td>{{pitcher.sv|floatformat:2}}</td>
+                                <td>{{pitcher.k|floatformat:2}}</td>
+                                <td>{{pitcher.era|floatformat:2}}</td>
+                                <td>{{pitcher.whip|floatformat:2}}</td>
+                                <td>{{pitcher.ip|floatformat}}</td>
+                                <td>{{pitcher.kip|floatformat:2}}</td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div id="team_b">
+                {% with batterDivId='team_b_batters' pitcherDivId='team_b_pitchers' parentDivId='team_b_projections' anchor='team_b' %}
+                {% include 'includes/batter_pitcher_tab_view.html' %}
+                {% endwith %}
+                <br/>
+                <div id="team_b_projections">
+                    <div id="team_b_batters" class="tabcontent">
+                        <h4>{{team_b.team_name}} Batters</h4>
+                        {% with tableId='team_b_batters_table' column_no=4 filterId='team_b_battersPosFilter' %}
+                        {% include 'includes/batter_pos_filter.html' %}
+                        {% endwith %}
+                        <br/>
+                        <table id="team_b_batters_table" class="sortable display table table-hover">
+                            <thead>
+                            <tr>
+                                <th>Trade</th>
+                                <th>Value</th>
+                                <th>Player Name</th>
+                                <th>Team</th>
+                                <th>Position</th>
+                                <th>Status</th>
+                                <th>R</th>
+                                <th>HR</th>
+                                <th>RBI</th>
+                                <th>SB</th>
+                                <th>OPS</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for batter in team_b.roster %}
+                            {% if batter.category == 'batter' %}
+                            <tr>
+                                <td><input type="checkbox" value="{{batter.name|create_player_dict:batter.team}}" id="team_b_batters" name="team_b_players[]" /></td>
+                                <td>${{batter.dollarValue|floatformat:2}}</td>
+                                <td><a href="https://baseball.fantasysports.yahoo.com/b1/{{request.user.profile.main_league|get_league_no}}/playersearch?&search={{batter.name|url_safe_spaces}}" target="_blank">{{batter.name}}</a></td>
+                                <td>{{batter.team}}</td>
+                                <td>{{batter.pos}}</td>
+                                {% if 'DL' in batter.status %}
+                                <td style="color:red">{{batter.status}}</td>
+                                {% elif 'MiLB' in batter.status %}
+                                <td style="color:blue">{{batter.status}}</td>
+                                {% else %}
+                                <td></td>
+                                {% endif %}
+                                <td>{{batter.r|floatformat}}</td>
+                                <td>{{batter.hr|floatformat}}</td>
+                                <td>{{batter.rbi|floatformat}}</td>
+                                <td>{{batter.sb|floatformat}}</td>
+                                <td>{{batter.ops|floatformat:3}}</td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="team_b_pitchers" class="tabcontent">
+                        <h4>{{team_b.team_name}} Pitchers</h4>
+                        {% with tableId='team_b_pitchers_table' column_no=4 filterId='team_b_pitchersPosFilter' %}
+                        {% include 'includes/pitcher_pos_filter.html' %}
+                        {% endwith %}
+                        <br/>
+                        <table id="team_b_pitchers_table" class="sortable display table table-hover">
+                            <thead>
+                            <tr>
+                                <th>Trade</th>
+                                <th>Value</th>
+                                <th>Player Name</th>
+                                <th>Team</th>
+                                <th>Position</th>
+                                <th>Status</th>
+                                <th>W</th>
+                                <th>SV</th>
+                                <th>K</th>
+                                <th>ERA</th>
+                                <th>WHIP</th>
+                                <th>IP</th>
+                                <th>K/IP</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for pitcher in team_b.roster %}
+                            {% if pitcher.category == 'pitcher' %}
+                            <tr>
+                                <td><input type="checkbox" value="{{pitcher.name|create_player_dict:pitcher.team}}" id="team_b_pitchers" name="team_b_players[]" /></td>
+                                <td>${{pitcher.dollarValue|floatformat:2}}</td>
+                                <td><a href="https://baseball.fantasysports.yahoo.com/b1/{{request.user.profile.main_league|get_league_no}}/playersearch?&search={{pitcher.name|url_safe_spaces}}" target="_blank">{{pitcher.name}}</a></td>
+                                <td>{{pitcher.team}}</td>
+                                <td>{{pitcher.pos}}</td>
+                                {% if 'DL' in pitcher.status %}
+                                <td style="color:red">{{pitcher.status}}</td>
+                                {% elif 'MiLB' in pitcher.status %}
+                                <td style="color:blue">{{pitcher.status}}</td>
+                                {% else %}
+                                <td></td>
+                                {% endif %}
+                                <td>{{pitcher.w|floatformat:2}}</td>
+                                <td>{{pitcher.sv|floatformat:2}}</td>
+                                <td>{{pitcher.k|floatformat:2}}</td>
+                                <td>{{pitcher.era|floatformat:2}}</td>
+                                <td>{{pitcher.whip|floatformat:2}}</td>
+                                <td>{{pitcher.ip|floatformat}}</td>
+                                <td>{{pitcher.kip|floatformat:2}}</td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <input type="hidden" name="team_a" value="{{team_a}}" />
+            <input type="hidden" name="team_b" value="{{team_b}}" />
+            <input type="hidden" name="trade_league_no" value="{{league_no}}" />
+            <input type="hidden" name="trade_league_key" value="{{league_key}}" />
+            <input type="hidden" name="team_list" value="{{team_list}}" />
+            <br/>
+            <button class="btn btn-lg btn-primary btn-block" type="submit">trade</button>
+        </form>
+    </div>
+</div>
 {% endif %}
 {% endblock %}

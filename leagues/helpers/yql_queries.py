@@ -172,7 +172,9 @@ def format_league_standings_dict(league_standings_base_dict):
         standing['manager_guids'] = manager_guid_list
 
         standing['PointsTeam'] = team_info_dict['name']
-        standing['StatsTeam'] = standing['PointsTeam']
+        standing['StatsTeam'] = team_info_dict['name']
+        standing['PointsTeamKey'] = team_info_dict['team_key']
+        standing['StatsTeamKey'] = team_info_dict['team_key']
         standing['Stats'] = {}
         stats = {}
 
@@ -282,7 +284,7 @@ def get_single_team_roster(league_key, user, redirect):
     rosters_dict = (query_dict['fantasy_content']['users']['0']['user'][1]['games']['0']['game'][1]['teams'])
     user_team_list = format_single_team_rosters_dict(rosters_dict)
     for team in user_team_list:
-        if league_key in team['TEAM_KEY']:
+        if league_key in team['team_key']:
             return team
 
 
@@ -304,9 +306,9 @@ def format_team_rosters_dict(team_count, rosters):
         team_dict = {}
         team_rosters_dict = rosters['{}'.format(i)]['team']
         team_dict_info = dict([(key, dct[key]) for dct in team_rosters_dict[0] for key in dct])
-        team_dict['TEAM_KEY'] = team_dict_info['team_key']
-        team_dict['TEAM_NAME'] = team_dict_info['name']
-        team_dict['TEAM_NUMBER'] = team_dict_info['team_id']
+        team_dict['team_key'] = team_dict_info['team_key']
+        team_dict['team_name'] = team_dict_info['name']
+        team_dict['team_number'] = team_dict_info['team_id']
 
         managers = team_dict_info['managers']
         manager_guid_list = []
@@ -330,14 +332,18 @@ def format_team_rosters_dict(team_count, rosters):
             last_name = player_data_dict['name']['ascii_last']
             player_name = str(first_name) + " " + str(last_name)
             norm_name = name_normalizer(player_name)
-            player_dict['NAME'] = player_name
-            player_dict["NORMALIZED_FIRST_NAME"] = norm_name['First']
-            player_dict["LAST_NAME"] = norm_name['Last']
+            player_dict['name'] = player_name
+            player_dict["normalized_first_name"] = norm_name['First']
+            player_dict["last_name"] = norm_name['Last']
             team = player_data_dict['editorial_team_abbr']
             player_dict['POS'] = player_data_dict['display_position'].split(',')
-            player_dict['TEAM'] = team_normalizer(team)
+            if 'P' in player_data_dict['display_position'].upper():
+                player_dict['category'] = 'pitcher'
+            else:
+                player_dict['category'] = 'batter'
+            player_dict['team'] = team_normalizer(team)
             roster.append(player_dict)
-        team_dict['ROSTER'] = roster
+        team_dict['roster'] = roster
         formatted_rosters.append(team_dict)
     return formatted_rosters
 
@@ -366,19 +372,19 @@ def get_players(league_key, user, redirect, total_players, pOrB, player_list_typ
             player_name = player_data_dict['name']['ascii_first'] + " " + player_data_dict['name']['ascii_last']
             player_dict = {}
             norm_name = name_normalizer(player_name)
-            player_dict['NAME'] = player_name
-            player_dict["NORMALIZED_FIRST_NAME"] = norm_name['First']
-            player_dict["LAST_NAME"] = norm_name['Last']
+            player_dict['name'] = player_name
+            player_dict["normalized_first_name"] = norm_name['First']
+            player_dict["last_name"] = norm_name['Last']
             if 'status_full' in player_data_dict:
-                player_dict['STATUS'] = player_data_dict['status_full']
+                player_dict['status'] = player_data_dict['status_full']
             else:
-                player_dict['STATUS'] = ''
+                player_dict['status'] = ''
             positions = []
             for pos in player_data_dict['eligible_positions']:
                 positions.append(pos['position'])
-            player_dict["POS"] = positions
+            player_dict["pos"] = positions
             team = player_data_dict['editorial_team_abbr']
-            player_dict['TEAM'] = team_normalizer(team)
+            player_dict['team'] = team_normalizer(team)
             formatted_fas.append(player_dict)
     return formatted_fas
 

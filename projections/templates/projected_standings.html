@@ -24,7 +24,7 @@
     {% for team in projected_standings %}
     <tr>
         <td>{{team.PointsTotal}}</td>
-        <td>{{team.TEAM_NAME}}</td>
+        <td>{{team.team_name}}</td>
         <td>{{team.PointsR}}</td>
         <td>{{team.PointsHR}}</td>
         <td>{{team.PointsRBI}}</td>
@@ -61,7 +61,7 @@
     <tbody>
     {% for team in projected_standings %}
     <tr>
-        <td>{{team.TEAM_NAME}}</td>
+        <td>{{team.team_name}}</td>
         <td>{{team.StatsR}}</td>
         <td>{{team.StatsHR}}</td>
         <td>{{team.StatsRBI}}</td>
@@ -99,7 +99,7 @@
     {% for team in projected_standings %}
     <tr>
         <td><small>{{team.Total_Downward_Volatility}} </small>{{team.Total_Upward_Volatility}}</td>
-        <td>{{team.TEAM_NAME}}</td>
+        <td>{{team.team_name}}</td>
         <td><small>{{team.DownVol_R}} </small>{{team.UpVol_R}}</td>
         <td><small>{{team.DownVol_HR}} </small>{{team.UpVol_HR}}</td>
         <td><small>{{team.DownVol_RBI}} </small>{{team.UpVol_RBI}}</td>
