@@ -159,6 +159,7 @@ def calc_batter_z_score(batter_list, players_over_zero_dollars, one_dollar_playe
     fvaaz_list_over_one = heapq.nlargest(players_over_one_dollar, fvaaz_list)
     for batter in batter_dict_list:
         if batter['fvaaz'] >= fvaaz_list_over_one[players_over_one_dollar - 1]:
+            # TODO: dollar_per_fvaaz seems to be a circular reference, how to resolve this?
             batter['dollarValue'] = batter['fvaaz'] * dollar_per_fvaaz
         elif batter['fvaaz'] >= fvaaz_list_over_zero[players_over_zero_dollars - 1]:
             batter['dollarValue'] = 1.0
