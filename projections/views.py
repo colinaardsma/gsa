@@ -154,8 +154,8 @@ def trade_projection(request):
         try:
             team_a = request.POST['team_a']
             team_b = request.POST['team_b']
-            team_a_players = request.POST.getlist('team_a_players')
-            team_b_players = request.POST.getlist('team_b_players')
+            team_a_players = request.POST.getlist('team_a_players[]')
+            team_b_players = request.POST.getlist('team_b_players[]')
             team_list = request.POST['team_list']
             league_key = request.POST['league_key']
             league_no = request.POST['league_no']
