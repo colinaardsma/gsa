@@ -631,7 +631,7 @@ def calc_volatility(sgp_dict, final_stats, stat, factor, reverse=True):
 
 
 def roster_change_analyzer(team_list, ros_proj_b_list, ros_proj_p_list, current_standings, league, sgp_dict, team_a,
-                           team_a_drops_trade, team_a_add_team_b_trade=[], team_b=[]):
+                           team_a_drops_trade, team_a_add_team_b_trade, team_b):
     """Analyzes value of trade for 2 teams\n
     Args:\n
         projected_volatility: projected volatility for league\n
@@ -666,7 +666,6 @@ def roster_change_analyzer(team_list, ros_proj_b_list, ros_proj_p_list, current_
                 break
         if team_b:
             team_b['roster'].append(copy.deepcopy(player))
-    # TODO: rename/reorder all these variables to make sense for both trades and add/drop
     if team_a_add_team_b_trade:
         for player in team_a_add_team_b_trade:
             player = ast.literal_eval(player)
@@ -678,15 +677,15 @@ def roster_change_analyzer(team_list, ros_proj_b_list, ros_proj_p_list, current_
                         team_b['roster'].remove(roster_player)
                         break
             team_a['roster'].append(copy.deepcopy(player))
+    new_team_list = []
     for team in team_list:
-        if team['team_number'] == team_a['team_number']:
-            team_list.remove(team)
-            team_list.append(team_a)
-        if team_b:
-            if team['team_number'] == team_b['team_number']:
-                team_list.remove(team)
-                team_list.append(team_b)
-    final_stats = final_stats_projection(team_list, ros_proj_b_list, ros_proj_p_list, current_standings, league)
+        if team['team_key'] == team_a['team_key']:
+            new_team_list.append(team_a)
+        elif team_b and team['team_key'] == team_b['team_key']:
+            new_team_list.append(team_b)
+        else:
+            new_team_list.append(team)
+    final_stats = final_stats_projection(new_team_list, ros_proj_b_list, ros_proj_p_list, current_standings, league)
     volatility_standings = league_volatility(sgp_dict, final_stats)
     ranked_standings = rank_list(volatility_standings)
     return ranked_standings

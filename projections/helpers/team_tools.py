@@ -322,12 +322,12 @@ def analyze_keeper_team_stats(league, user, redirect, keepers, ros_proj_b_list, 
 
 
 def roster_change_analyzer_(league_key, user, redirect, team_list, team_a, team_a_drops_trade, team_a_add_team_b_trade,
-                            team_b=[]):
+                            team_b=None):
     ros_proj_b_list = BatterProjection.objects.order_by('-fvaaz')
     ros_proj_p_list = PitcherProjection.objects.order_by('-fvaaz')
     league_status, current_standings = get_league_standings(league_key, user, redirect)
     league = user.profile.leagues.get(league_key=league_key)
-    update_league(league, draft_status=league_status)
+    # update_league(league, draft_status=league_status)
     sgp_dict = create_sgp_dict(league)
 
     new_standings = roster_change_analyzer(team_list, ros_proj_b_list, ros_proj_p_list, current_standings, league,
