@@ -638,15 +638,15 @@ def get_keepers(league, user, redirect):
     auction_results = get_auction_results(prev_league, user, redirect)
     league_transactions = get_league_transactions(prev_league, user, redirect)
     list_of_managers = []
-    try:
-        if not new_league:
+    if not new_league:
+        try:
             new_league = user.profile.leagues.get(prev_year_key=league.league_key)
-        new_current_rosters = get_current_rosters(new_league.league_key, user, redirect)
-        for team in new_current_rosters:
-            list_of_managers.extend(team['manager_guids'])
-    except ModuleNotFoundError:
-        for team in current_rosters:
-            list_of_managers.extend(team['manager_guids'])
+            new_current_rosters = get_current_rosters(new_league.league_key, user, redirect)
+            for team in new_current_rosters:
+                list_of_managers.extend(team['manager_guids'])
+        except (ModuleNotFoundError, League.DoesNotExist):
+            for team in current_rosters:
+                list_of_managers.extend(team['manager_guids'])
     teams_to_remove = []
     for team in current_rosters:
         if not [mg for mg in team['manager_guids'] if mg in list_of_managers]:
@@ -659,7 +659,8 @@ def get_keepers(league, user, redirect):
             player['postseason_trade'] = False
             pickup_found = False
             for transaction in league_transactions:
-                if transaction['transaction_datetime'] > prev_league.start_date.replace(tzinfo=None):
+                if prev_league.draft_status == 'postdraft':
+                # if transaction['transaction_datetime'] > prev_league.start_date.replace(tzinfo=None):
                     for plyr in transaction['players']:
                         if plyr['player_key'] == player['player_key'] and not pickup_found:
                             # FA pickup
@@ -668,7 +669,7 @@ def get_keepers(league, user, redirect):
                                 player['keeper_found'] = True
                                 continue
                             # Waiver Claim
-                            if plyr['source_type'] == 'waivers':
+                            elif plyr['source_type'] == 'waivers':
                                 if 'faab_bid' in transaction:
                                     player['keeper_cost'] += int(transaction['faab_bid'])
                                 pickup_found = True

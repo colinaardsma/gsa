@@ -10,6 +10,7 @@ import pprint
 
 from .normalizer import team_normalizer, name_normalizer, player_comparer
 from ..models import BatterProjection, BatterValue, PitcherProjection, PitcherValue
+from leagues.helpers.yql_queries import get_keepers
 
 
 def rate_avail_players(fa_list, ros_projection_list):
@@ -630,8 +631,8 @@ def calc_volatility(sgp_dict, final_stats, stat, factor, reverse=True):
         final_stats[i][down_vol_title] = down_counter
 
 
-def roster_change_analyzer(team_list, ros_proj_b_list, ros_proj_p_list, current_standings, league, sgp_dict, team_a,
-                           team_a_drops_trade, team_a_add_team_b_trade, team_b):
+def roster_change_analyzer(user, redirect, team_list, ros_proj_b_list, ros_proj_p_list, current_standings, league,
+                           sgp_dict, team_a, team_a_drops_trade, team_a_add_team_b_trade, team_b):
     """Analyzes value of trade for 2 teams\n
     Args:\n
         projected_volatility: projected volatility for league\n

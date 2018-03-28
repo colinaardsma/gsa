@@ -38,7 +38,7 @@
             <td>{{team.PointsK}}</td>
             <td>{{team.PointsERA}}</td>
             <td>{{team.PointsWHIP}}</td>
-            <td>{{team.StatsIP}}</td>
+            <td>{{team.StatsIP|floatformat}}</td>
         </tr>
         {% endfor %}
         </tbody>
@@ -75,7 +75,7 @@
             <td>{{team.StatsK}}</td>
             <td>{{team.StatsERA|floatformat:2}}</td>
             <td>{{team.StatsWHIP|floatformat:2}}</td>
-            <td>{{team.StatsIP}}</td>
+            <td>{{team.StatsIP|floatformat}}</td>
         </tr>
         {% endfor %}
         </tbody>
@@ -140,6 +140,7 @@
                             <thead>
                             <tr>
                                 <th>Trade</th>
+                                <th>{{league.season|add:"1"}} Cost</th>
                                 <th>Value</th>
                                 <th>Player Name</th>
                                 <th>Team</th>
@@ -157,6 +158,7 @@
                             {% if batter.category == 'batter' %}
                             <tr>
                                 <td><input type="checkbox" value="{{batter.name|create_player_dict:batter.team}}" id="team_a_batters" name="team_a_players[]" /></td>
+                                <td>${{batter.keeper_cost}}</td>
                                 <td>${{batter.dollarValue|floatformat:2}}</td>
                                 <td><a href="https://baseball.fantasysports.yahoo.com/b1/{{request.user.profile.main_league|get_league_no}}/playersearch?&search={{batter.name|url_safe_spaces}}" target="_blank">{{batter.name}}</a></td>
                                 <td>{{batter.team}}</td>
@@ -189,6 +191,7 @@
                             <thead>
                             <tr>
                                 <th>Trade</th>
+                                <th>{{league.season|add:"1"}} Cost</th>
                                 <th>Value</th>
                                 <th>Player Name</th>
                                 <th>Team</th>
@@ -208,6 +211,7 @@
                             {% if pitcher.category == 'pitcher' %}
                             <tr>
                                 <td><input type="checkbox" value="{{pitcher.name|create_player_dict:pitcher.team}}" id="team_a_pitchers" name="team_a_players[]" /></td>
+                                <td>${{pitcher.keeper_cost}}</td>
                                 <td>${{pitcher.dollarValue|floatformat:2}}</td>
                                 <td><a href="https://baseball.fantasysports.yahoo.com/b1/{{request.user.profile.main_league|get_league_no}}/playersearch?&search={{pitcher.name|url_safe_spaces}}" target="_blank">{{pitcher.name}}</a></td>
                                 <td>{{pitcher.team}}</td>
@@ -250,6 +254,7 @@
                             <thead>
                             <tr>
                                 <th>Trade</th>
+                                <th>{{league.season|add:"1"}} Cost</th>
                                 <th>Value</th>
                                 <th>Player Name</th>
                                 <th>Team</th>
@@ -267,6 +272,7 @@
                             {% if batter.category == 'batter' %}
                             <tr>
                                 <td><input type="checkbox" value="{{batter.name|create_player_dict:batter.team}}" id="team_b_batters" name="team_b_players[]" /></td>
+                                <td>${{batter.keeper_cost}}</td>
                                 <td>${{batter.dollarValue|floatformat:2}}</td>
                                 <td><a href="https://baseball.fantasysports.yahoo.com/b1/{{request.user.profile.main_league|get_league_no}}/playersearch?&search={{batter.name|url_safe_spaces}}" target="_blank">{{batter.name}}</a></td>
                                 <td>{{batter.team}}</td>
@@ -299,6 +305,7 @@
                             <thead>
                             <tr>
                                 <th>Trade</th>
+                                <th>{{league.season|add:"1"}} Cost</th>
                                 <th>Value</th>
                                 <th>Player Name</th>
                                 <th>Team</th>
@@ -318,6 +325,7 @@
                             {% if pitcher.category == 'pitcher' %}
                             <tr>
                                 <td><input type="checkbox" value="{{pitcher.name|create_player_dict:pitcher.team}}" id="team_b_pitchers" name="team_b_players[]" /></td>
+                                <td>${{pitcher.keeper_cost}}</td>
                                 <td>${{pitcher.dollarValue|floatformat:2}}</td>
                                 <td><a href="https://baseball.fantasysports.yahoo.com/b1/{{request.user.profile.main_league|get_league_no}}/playersearch?&search={{pitcher.name|url_safe_spaces}}" target="_blank">{{pitcher.name}}</a></td>
                                 <td>{{pitcher.team}}</td>

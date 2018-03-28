@@ -257,22 +257,30 @@ def team_comparer(team_a, team_b):
 
 def player_comparer(player_a, player_b):
     if isinstance(player_a, dict):
-        player_a_first = player_a['normalized_first_name']
+        player_a_key = player_a.get('player_key')
+        player_a_first = player_a.get('normalized_first_name') or player_a.get('first_name')
         player_a_last = player_a['last_name']
         player_a_team = player_a['team']
     else:
+        # TODO: need to add player_key to model
+        player_a_key = None
         player_a_first = player_a.normalized_first_name
         player_a_last = player_a.last_name
         player_a_team = player_a.team
     if isinstance(player_b, dict):
-        player_b_first = player_b['normalized_first_name']
+        player_b_key = player_b.get('player_key')
+        player_b_first = player_b.get('normalized_first_name') or player_b.get('first_name')
         player_b_last = player_b['last_name']
         player_b_team = player_b['team']
     else:
+        player_b_key = None
         player_b_first = player_b.normalized_first_name
         player_b_last = player_b.last_name
         player_b_team = player_b.team
-    return player_a_last == player_b_last and player_a_team == player_b_team and player_a_first == player_b_first
+    if player_a_key and player_b_key:
+        return player_a_key == player_b_key
+    else:
+        return player_a_last == player_b_last and player_a_team == player_b_team and player_a_first == player_b_first
 
 
 def regex_groups(full_name):

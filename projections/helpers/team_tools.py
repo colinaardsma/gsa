@@ -330,8 +330,9 @@ def roster_change_analyzer_(league_key, user, redirect, team_list, team_a, team_
     # update_league(league, draft_status=league_status)
     sgp_dict = create_sgp_dict(league)
 
-    new_standings = roster_change_analyzer(team_list, ros_proj_b_list, ros_proj_p_list, current_standings, league,
-                                           sgp_dict, team_a, team_a_drops_trade, team_a_add_team_b_trade, team_b)
+    new_standings = roster_change_analyzer(user, redirect, team_list, ros_proj_b_list, ros_proj_p_list,
+                                           current_standings, league, sgp_dict, team_a, team_a_drops_trade,
+                                           team_a_add_team_b_trade, team_b)
     return new_standings
 
 

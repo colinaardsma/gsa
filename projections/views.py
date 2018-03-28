@@ -15,7 +15,7 @@ from gsa.settings import TOKEN_REDIRECT_PATH, TEAM_TOOLS_REDIRECT, USER_REDIRECT
 from leagues.helpers.api_connector import request_auth, get_token
 from leagues.models import League, dummy_league, update_profile, max_year_leagues
 from leagues.helpers.yql_queries import get_current_leagues, get_all_team_rosters, get_keeper_query,\
-    get_league_standings
+    get_league_standings, get_keepers
 from leagues.helpers.html_parser import get_single_yahoo_team
 from .helpers.team_tools import pull_batters, pull_pitchers, avail_player_finder, final_standing_projection, \
     single_player_rater, get_keeper_costs, get_projected_keepers, roster_change_analyzer_, pull_players_html, \
@@ -161,16 +161,25 @@ def trade_projection(request):
             league_no = request.POST['league_no']
         except MultiValueDictKeyError:
             pass
-
+        league = request.user.profile.leagues.get(league_key=league_key)
         if league_key != "" and team_a_key != "" and team_b_key != "":
             batter_projections = BatterProjection.objects.all().all().order_by('-fvaaz')
             pitcher_projections = PitcherProjection.objects.all().all().order_by('-fvaaz')
             team_list = get_all_team_rosters(league_key, request.user, TEAM_TOOLS_REDIRECT)
+
+            all_keepers = get_keepers(league, request.user, TEAM_TOOLS_REDIRECT)
+            # pprint.pprint(all_keepers)
+
             team_a = [team for team in team_list if team['team_key'] == team_a_key][0]
             team_b = [team for team in team_list if team['team_key'] == team_b_key][0]
             rosters = [team_a['roster'], team_b['roster']]
             for roster in rosters:
                 for player in roster:
+                    for team in all_keepers:
+                        for keeper in team['roster']:
+                            if player_comparer(player, keeper):
+                                player['keeper_cost'] = keeper['keeper_cost']
+                                break
                     if player['category'] == 'batter':
                         for batter in batter_projections:
                             if player_comparer(player, batter):
@@ -199,13 +208,14 @@ def trade_projection(request):
                                 player['whip'] = pitcher.whip
                                 player['kip'] = pitcher.kip
                                 break
-            return render(request, 'trade_projection.html', {'team_a': team_a, 'team_b': team_b,
+            pprint.pprint(rosters)
+            return render(request, 'trade_projection.html', {'team_a': team_a, 'team_b': team_b, 'league': league,
                                                              'league_key': league_key, 'team_list': team_list,
                                                              'league_no': league_no, 'redirect': TEAM_TOOLS_REDIRECT})
         else:
             trade_result = roster_change_analyzer_(league_key, request.user, TEAM_TOOLS_REDIRECT, team_list, team_a,
                                                    team_a_players, team_b_players, team_b)
-            return render(request, 'trade_projection.html', {'team_a': team_a, 'team_b': team_b,
+            return render(request, 'trade_projection.html', {'team_a': team_a, 'team_b': team_b, 'league': league,
                                                              'league_key': league_key, 'league_no': league_no,
                                                              'trade_result': trade_result,
                                                              'redirect': TEAM_TOOLS_REDIRECT})
