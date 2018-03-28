@@ -208,7 +208,6 @@ def trade_projection(request):
                                 player['whip'] = pitcher.whip
                                 player['kip'] = pitcher.kip
                                 break
-            pprint.pprint(rosters)
             return render(request, 'trade_projection.html', {'team_a': team_a, 'team_b': team_b, 'league': league,
                                                              'league_key': league_key, 'team_list': team_list,
                                                              'league_no': league_no, 'redirect': TEAM_TOOLS_REDIRECT})
