@@ -120,11 +120,9 @@ def player_pickup_analyzer(request):
         drops = []
         drops.extend(pitcher_drops)
         drops.extend(batter_drops)
-        add_drop_result = roster_change_analyzer_(league_key, request.user, TEAM_TOOLS_REDIRECT, team_list, team, drops,
-                                                  adds)
-        return render(request, 'trade_projection.html', {'league_key': league_key, 'league_no': league_no,
-                                                         'trade_result': add_drop_result,
-                                                         'redirect': TEAM_TOOLS_REDIRECT})
+        standings = roster_change_analyzer_(league_key, request.user, TEAM_TOOLS_REDIRECT, team_list, team, drops, adds)
+        return render(request, 'projected_standings.html', {'league_key': league_key, 'league_no': league_no,
+                                                            'standings': standings, 'redirect': TEAM_TOOLS_REDIRECT})
 
 
 def single_player(request):
@@ -212,11 +210,11 @@ def trade_projection(request):
                                                              'league_key': league_key, 'team_list': team_list,
                                                              'league_no': league_no, 'redirect': TEAM_TOOLS_REDIRECT})
         else:
-            trade_result = roster_change_analyzer_(league_key, request.user, TEAM_TOOLS_REDIRECT, team_list, team_a,
+            standings = roster_change_analyzer_(league_key, request.user, TEAM_TOOLS_REDIRECT, team_list, team_a,
                                                    team_a_players, team_b_players, team_b)
             return render(request, 'trade_projection.html', {'team_a': team_a, 'team_b': team_b, 'league': league,
                                                              'league_key': league_key, 'league_no': league_no,
-                                                             'trade_result': trade_result,
+                                                             'standings': standings,
                                                              'redirect': TEAM_TOOLS_REDIRECT})
     else:
         return redirect(TEAM_TOOLS_REDIRECT)
@@ -226,9 +224,8 @@ def projected_standings(request):
     if request.method == 'POST':
         proj_league_key = request.POST["proj_league_key"]
         league = request.user.profile.leagues.get(league_key=proj_league_key)
-        projected_standings_ = final_standing_projection(league, request.user, TEAM_TOOLS_REDIRECT)
-        return render(request, 'projected_standings.html', {'projected_standings': projected_standings_,
-                                                            'redirect': TEAM_TOOLS_REDIRECT})
+        standings = final_standing_projection(league, request.user, TEAM_TOOLS_REDIRECT)
+        return render(request, 'projected_standings.html', {'standings': standings, 'redirect': TEAM_TOOLS_REDIRECT})
     else:
         return redirect(TEAM_TOOLS_REDIRECT)
 

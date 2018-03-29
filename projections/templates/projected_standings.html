@@ -21,21 +21,21 @@
     </tr>
     </thead>
     <tbody>
-    {% for team in projected_standings %}
+    {% for team in standings %}
     <tr>
-        <td>{{team.PointsTotal}}</td>
+        <td>{{team.PointsTotal|floatformat}}</td>
         <td>{{team.team_name}}</td>
-        <td>{{team.PointsR}}</td>
-        <td>{{team.PointsHR}}</td>
-        <td>{{team.PointsRBI}}</td>
-        <td>{{team.PointsSB}}</td>
-        <td>{{team.PointsOPS}}</td>
-        <td>{{team.PointsW}}</td>
-        <td>{{team.PointsSV}}</td>
-        <td>{{team.PointsK}}</td>
-        <td>{{team.PointsERA}}</td>
-        <td>{{team.PointsWHIP}}</td>
-        <td>{{team.StatsIP}}</td>
+        <td>{{team.PointsR|floatformat}}</td>
+        <td>{{team.PointsHR|floatformat}}</td>
+        <td>{{team.PointsRBI|floatformat}}</td>
+        <td>{{team.PointsSB|floatformat}}</td>
+        <td>{{team.PointsOPS|floatformat}}</td>
+        <td>{{team.PointsW|floatformat}}</td>
+        <td>{{team.PointsSV|floatformat}}</td>
+        <td>{{team.PointsK|floatformat}}</td>
+        <td>{{team.PointsERA|floatformat}}</td>
+        <td>{{team.PointsWHIP|floatformat}}</td>
+        <td>{{team.StatsIP|floatformat:0}}</td>
     </tr>
     {% endfor %}
     </tbody>
@@ -56,23 +56,25 @@
         <th>ERA</th>
         <th>WHIP</th>
         <th>IP</th>
+        <th>K/IP</th>
     </tr>
     </thead>
     <tbody>
-    {% for team in projected_standings %}
+    {% for team in standings %}
     <tr>
         <td>{{team.team_name}}</td>
-        <td>{{team.StatsR}}</td>
-        <td>{{team.StatsHR}}</td>
-        <td>{{team.StatsRBI}}</td>
-        <td>{{team.StatsSB}}</td>
+        <td>{{team.StatsR|floatformat}}</td>
+        <td>{{team.StatsHR|floatformat}}</td>
+        <td>{{team.StatsRBI|floatformat}}</td>
+        <td>{{team.StatsSB|floatformat}}</td>
         <td>{{team.StatsOPS|floatformat:3}}</td>
-        <td>{{team.StatsW}}</td>
-        <td>{{team.StatsSV}}</td>
-        <td>{{team.StatsK}}</td>
+        <td>{{team.StatsW|floatformat}}</td>
+        <td>{{team.StatsSV|floatformat}}</td>
+        <td>{{team.StatsK|floatformat}}</td>
         <td>{{team.StatsERA|floatformat:2}}</td>
         <td>{{team.StatsWHIP|floatformat:2}}</td>
-        <td>{{team.StatsIP}}</td>
+        <td>{{team.StatsIP|floatformat:0}}</td>
+        <td>{{team.StatsIP|divide:team.StatsK|floatformat:2}}</td>
     </tr>
     {% endfor %}
     </tbody>
@@ -96,7 +98,7 @@
     </tr>
     </thead>
     <tbody>
-    {% for team in projected_standings %}
+    {% for team in standings %}
     <tr>
         <td><small>{{team.Total_Downward_Volatility}} </small>{{team.Total_Upward_Volatility}}</td>
         <td>{{team.team_name}}</td>
