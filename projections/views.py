@@ -11,7 +11,8 @@ from django.shortcuts import render, redirect
 from django.utils.datastructures import MultiValueDictKeyError
 from django.views import generic
 
-from gsa.settings import TOKEN_REDIRECT_PATH, TEAM_TOOLS_REDIRECT, USER_REDIRECT
+from gsa.settings import TOKEN_REDIRECT_PATH, TEAM_TOOLS_REDIRECT, USER_REDIRECT, BATTER_RAZZBALL_ROS_URL, \
+    PITCHER_RAZZBALL_ROS_URL, BATTER_RAZZBALL_OS_URL, PITCHER_RAZZBALL_OS_URL
 from leagues.helpers.api_connector import request_auth, get_token
 from leagues.models import League, dummy_league, update_profile, max_year_leagues
 from leagues.helpers.yql_queries import get_current_leagues, get_all_team_rosters, get_keeper_query,\
@@ -58,12 +59,12 @@ def scrape_proj(request):
     # if request.method == 'POST':
     main_league = request.user.profile.leagues.get(league_key=request.user.profile.main_league)
     now = datetime.now(pytz.utc)
-    if main_league.start_date > now:
-        batter_url = 'http://razzball.com/restofseason-hitterprojections/'
-        pitcher_url = 'http://razzball.com/restofseason-pitcherprojections/'
+    if main_league.end_date > now > main_league.start_date:
+        batter_url = BATTER_RAZZBALL_ROS_URL
+        pitcher_url = PITCHER_RAZZBALL_ROS_URL
     else:
-        batter_url = 'http://razzball.com/steamer-hitter-projections/'
-        pitcher_url = 'http://razzball.com/steamer-pitcher-projections/'
+        batter_url = BATTER_RAZZBALL_OS_URL
+        pitcher_url = PITCHER_RAZZBALL_OS_URL
     pull_players_html(request.user, main_league, batter_url, pitcher_url)
     return redirect(USER_REDIRECT)
 
@@ -317,22 +318,15 @@ def user_(request):
         oldest_last_mod_date = datetime(2000, 1, 1, tzinfo=pytz.utc)
 
     now = datetime.now(pytz.utc)
-    razzball_proj_update_datetime = None
-    if main_league and main_league.end_date > now:
-        batter_url = 'http://razzball.com/restofseason-hitterprojections/'
-        pitcher_url = 'http://razzball.com/restofseason-pitcherprojections/'
+    if main_league and main_league.end_date > now > main_league.start_date:
+        batter_url = BATTER_RAZZBALL_ROS_URL
+        pitcher_url = PITCHER_RAZZBALL_ROS_URL
     else:
-        batter_url = 'http://razzball.com/steamer-hitter-projections/'
-        pitcher_url = 'http://razzball.com/steamer-pitcher-projections/'
-        # TODO: old way of checking for updated razzball, can delete
-        # if oldest_last_mod_date.date() < now.date():
-        #     razzball_proj_update_datetime = razzball_get_update_datetime(batter_url)
-        #     if razzball_proj_update_datetime < oldest_last_mod_date:
-        #         razzball_proj_update_datetime = None
-
-    return render(request, 'user.html', {'yahoo_link': yahoo_link, 'elapsed': elapsed,
-                                         'leagues': max_year_leagues_,
-                                         # 'razzball_proj_update_datetime': razzball_proj_update_datetime,
+        batter_url = BATTER_RAZZBALL_OS_URL
+        pitcher_url = PITCHER_RAZZBALL_OS_URL
+    return render(request, 'user.html', {'yahoo_link': yahoo_link, 'elapsed': elapsed, 'leagues': max_year_leagues_,
+                                         'league_start_date': str(main_league.start_date),
+                                         'league_end_date': str(main_league.end_date),
                                          'proj_update_datetime': oldest_last_mod_date,
                                          'main_league': main_league, 'batter_url': batter_url,
                                          'pitcher_url': pitcher_url})

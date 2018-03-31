@@ -145,12 +145,17 @@ def scrape_razzball(url):
     headers = [h.lower() for h in headers]
     body_rows = [tr.xpath("descendant::a/text()|descendant::td/text()") for tr in table[0].xpath("descendant::tbody//tr")]
     projection_dict = [dict(zip(headers, player)) for player in body_rows]
+    if 'ip' in projection_dict[0]:
+        projection_dict = [p for p in projection_dict if float(p['ip']) > 0.0]
+    elif 'ab' in projection_dict[0]:
+        projection_dict = [p for p in projection_dict if float(p['ab']) > 0.0]
     return projection_dict
 
 
 def scrape_razzball_batters(url):
     batter_list = scrape_razzball(url)
     for batter in batter_list:
+        # if batter['']
         if 'yahoo' in batter:
             batter['pos'] = batter['yahoo']
         elif 'y!' in batter:

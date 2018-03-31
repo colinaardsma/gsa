@@ -36,8 +36,10 @@
 
 <div class="row" id="razzball">
     <div class="col" id="razzball_links">
-        <p><a href="{{batter_url}}" target="_blank" class="btn btn-outline-primary btn-sm">Razzball Hitter Projections</a>
-            <a href="{{pitcher_url}}" target="_blank" class="btn btn-outline-primary btn-sm">Razzball Pitcher Projections</a></p>
+        <p>
+            <a href="{{batter_url}}" target="_blank" class="btn btn-outline-primary btn-sm">Razzball Hitter Projections</a>
+            <a href="{{pitcher_url}}" target="_blank" class="btn btn-outline-primary btn-sm">Razzball Pitcher Projections</a>
+        </p>
     </div>
     <div class="col">
     </div>
@@ -84,7 +86,13 @@
         var dbUpdateDate = new Date(dbUpdateString);
         var updateText = '';
         var noNewProjectionString = 'Projections are up to date';
-        if (dbUpdateDate.getFullYear() === today.getFullYear() && dbUpdateDate.getMonth() === today.getMonth() && dbUpdateDate.getDate() === today.getDate()) {
+        var leagueStartDate = new Date("{{league_start_date}}");
+        var leagueEndDate = new Date("{{league_end_date}}");
+        if (today > leagueStartDate && today < leagueEndDate) {
+            var dailyUpdate = `<a href="/projections/scrape_proj" class="btn btn-outline-primary btn-sm" onclick="getSpinner()">Scrape Projections from Razzball</a>`;
+            document.getElementById("razzball_update_check").innerHTML = dailyUpdate;
+        }
+        else if (dbUpdateDate.getFullYear() === today.getFullYear() && dbUpdateDate.getMonth() === today.getMonth() && dbUpdateDate.getDate() === today.getDate()) {
             document.getElementById("razzball_update_check").innerHTML = noNewProjectionString;
         }
         else {

@@ -136,3 +136,7 @@ STATICFILES_FINDERS = (
 TEAM_TOOLS_REDIRECT = '/team_tools'
 USER_REDIRECT = '/user'
 LOGIN_REDIRECT_URL = '/user'
+BATTER_RAZZBALL_ROS_URL = 'http://razzball.com/restofseason-hitterprojections/'
+PITCHER_RAZZBALL_ROS_URL = 'http://razzball.com/restofseason-pitcherprojections/'
+BATTER_RAZZBALL_OS_URL = 'http://razzball.com/steamer-hitter-projections/'
+PITCHER_RAZZBALL_OS_URL = 'http://razzball.com/steamer-pitcher-projections/'
