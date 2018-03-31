@@ -321,12 +321,16 @@ def user_(request):
     if main_league and main_league.end_date > now > main_league.start_date:
         batter_url = BATTER_RAZZBALL_ROS_URL
         pitcher_url = PITCHER_RAZZBALL_ROS_URL
+        league_start_date = main_league.start_date.strftime("%c")
+        league_end_date = main_league.end_date.strftime("%c")
     else:
         batter_url = BATTER_RAZZBALL_OS_URL
         pitcher_url = PITCHER_RAZZBALL_OS_URL
+        league_start_date = ""
+        league_end_date = ""
     return render(request, 'user.html', {'yahoo_link': yahoo_link, 'elapsed': elapsed, 'leagues': max_year_leagues_,
-                                         'league_start_date': str(main_league.start_date),
-                                         'league_end_date': str(main_league.end_date),
+                                         'league_start_date': league_start_date,
+                                         'league_end_date': league_end_date,
                                          'proj_update_datetime': oldest_last_mod_date,
                                          'main_league': main_league, 'batter_url': batter_url,
                                          'pitcher_url': pitcher_url})
