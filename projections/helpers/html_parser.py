@@ -236,6 +236,8 @@ def scrape_closer_monkey():
     cl_list = []
     for tr in tr_list[1:len(tr_list) - 1]:
         td_list = tr.xpath("descendant::td/descendant-or-self::*/text()")
+        if not td_list[0] or td_list[0] == " ":
+            continue
         team_one = team_normalizer(td_list[0])
         team_one_cl_one = {'last_name': td_list[1], 'team': team_one, 'pos': 'CL1'}
         team_one_cl_two = {'last_name': td_list[2], 'team': team_one, 'pos': 'CL2'}
