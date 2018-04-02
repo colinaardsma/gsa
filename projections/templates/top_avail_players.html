@@ -12,7 +12,7 @@
     <div id="playerProjections">
         <div id="pitchers" class="tabcontent">
             <h4>Top FA Pitchers</h4>
-            {% with tableId='top_avail_pitchers_table' column_no=3 %}
+            {% with tableId='top_avail_pitchers_table' column_no=4 %}
             {% include 'includes/pitcher_pos_filter.html' %}
             {% endwith %}
             <br/>
@@ -61,7 +61,7 @@
                 </tbody>
             </table>
             <h4>Team Pitchers</h4>
-            {% with tableId='team_pitchers_table' column_no=3 %}
+            {% with tableId='team_pitchers_table' column_no=4 %}
             {% include 'includes/pitcher_pos_filter.html' %}
             {% endwith %}
             <br/>
@@ -112,7 +112,7 @@
         </div>
         <div id="batters" class="tabcontent">
             <h4>Top FA Batters</h4>
-            {% with tableId='top_avail_batters_table' column_no=3%}
+            {% with tableId='top_avail_batters_table' column_no=4 %}
             {% include 'includes/batter_pos_filter.html' %}
             {% endwith %}
             <br/>
@@ -157,7 +157,7 @@
                 </tbody>
             </table>
             <h4>Team Batters</h4>
-            {% with tableId='team_batters_table' column_no=3 %}
+            {% with tableId='team_batters_table' column_no=4 %}
             {% include 'includes/batter_pos_filter.html' %}
             {% endwith %}
             <br/>
