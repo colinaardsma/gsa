@@ -88,6 +88,7 @@
         var noNewProjectionString = 'Projections are up to date';
         var leagueStartDate = new Date("{{league_start_date}}");
         var leagueEndDate = new Date("{{league_end_date}}");
+        var testDate = new Date("2001/1/1");
         if (today > leagueStartDate && today < leagueEndDate) {
             var dailyUpdate = `<a href="/projections/scrape_proj" class="btn btn-outline-primary btn-sm" onclick="getSpinner()">Scrape Projections from Razzball</a>`;
             document.getElementById("razzball_update_check").innerHTML = dailyUpdate;
