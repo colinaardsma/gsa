@@ -110,7 +110,11 @@ def fant_pro_player_dict_creator(single_player_html, headings_list_html):
                 else:
                     single_player["pos"] = "NONE"
                 if len(name_team_pos) >= 5:
-                    single_player["status"] = name_team_pos[4].replace(u'\xa0', '')
+                    status = name_team_pos[4].replace(u'\xa0', '')
+                    if status == "NRI" or status == "DFA":
+                        single_player["status"] = "MiLB"
+                    else:
+                        single_player["status"] = name_team_pos[4].replace(u'\xa0', '')
                 else:
                     single_player["status"] = "ACTIVE"
             else:

@@ -11,8 +11,8 @@ from django.shortcuts import render, redirect
 from django.utils.datastructures import MultiValueDictKeyError
 from django.views import generic
 
-from gsa.settings import TOKEN_REDIRECT_PATH, TEAM_TOOLS_REDIRECT, USER_REDIRECT, BATTER_RAZZBALL_ROS_URL, \
-    PITCHER_RAZZBALL_ROS_URL, BATTER_RAZZBALL_OS_URL, PITCHER_RAZZBALL_OS_URL
+from gsa.settings import TOKEN_REDIRECT_PATH, TEAM_TOOLS_REDIRECT, USER_REDIRECT, BATTER_ROS_URL, PITCHER_ROS_URL,\
+    BATTER_OS_URL, PITCHER_OS_URL
 from leagues.helpers.api_connector import request_auth, get_token
 from leagues.models import League, dummy_league, update_profile, max_year_leagues
 from leagues.helpers.yql_queries import get_current_leagues, get_all_team_rosters, get_keeper_query,\
@@ -60,11 +60,11 @@ def scrape_proj(request):
     main_league = request.user.profile.leagues.get(league_key=request.user.profile.main_league)
     now = datetime.now(pytz.utc)
     if main_league.end_date > now > main_league.start_date:
-        batter_url = BATTER_RAZZBALL_ROS_URL
-        pitcher_url = PITCHER_RAZZBALL_ROS_URL
+        batter_url = BATTER_ROS_URL
+        pitcher_url = PITCHER_ROS_URL
     else:
-        batter_url = BATTER_RAZZBALL_OS_URL
-        pitcher_url = PITCHER_RAZZBALL_OS_URL
+        batter_url = BATTER_OS_URL
+        pitcher_url = PITCHER_OS_URL
     pull_players_html(request.user, main_league, batter_url, pitcher_url)
     return redirect(USER_REDIRECT)
 
@@ -319,13 +319,13 @@ def user_(request):
 
     now = datetime.now(pytz.utc)
     if main_league and main_league.end_date > now > main_league.start_date:
-        batter_url = BATTER_RAZZBALL_ROS_URL
-        pitcher_url = PITCHER_RAZZBALL_ROS_URL
+        batter_url = BATTER_ROS_URL
+        pitcher_url = PITCHER_ROS_URL
         league_start_date = main_league.start_date.strftime("%c")
         league_end_date = main_league.end_date.strftime("%c")
     else:
-        batter_url = BATTER_RAZZBALL_OS_URL
-        pitcher_url = PITCHER_RAZZBALL_OS_URL
+        batter_url = BATTER_OS_URL
+        pitcher_url = PITCHER_OS_URL
         league_start_date = ""
         league_end_date = ""
     return render(request, 'user.html', {'yahoo_link': yahoo_link, 'elapsed': elapsed, 'leagues': max_year_leagues_,

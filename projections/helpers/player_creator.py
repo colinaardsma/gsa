@@ -16,7 +16,7 @@ from .normalizer import name_normalizer
 def create_full_batter_html(url):
     """Create batters using html"""
     # raw_batter_list = scrape_razzball_batters(url)
-    raw_batter_list = fantasy_pro_players("https://www.fantasypros.com/mlb/projections/ros-hitters.php")
+    raw_batter_list = fantasy_pro_players(url)
     return create_full_batter(raw_batter_list)
 
 
@@ -173,7 +173,7 @@ def calc_batter_z_score(batter_list, players_over_zero_dollars, one_dollar_playe
 def create_full_pitcher_html(url):
     """Create pitchers using html"""
     # raw_pitcher_list = scrape_razzball_pitchers(url)
-    raw_pitcher_list = fantasy_pro_players("https://www.fantasypros.com/mlb/projections/ros-pitchers.php")
+    raw_pitcher_list = fantasy_pro_players(url)
     return create_full_pitcher(raw_pitcher_list)
 
 

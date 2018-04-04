@@ -136,7 +136,18 @@ STATICFILES_FINDERS = (
 TEAM_TOOLS_REDIRECT = '/team_tools'
 USER_REDIRECT = '/user'
 LOGIN_REDIRECT_URL = '/user'
+
 BATTER_RAZZBALL_ROS_URL = 'http://razzball.com/restofseason-hitterprojections/'
 PITCHER_RAZZBALL_ROS_URL = 'http://razzball.com/restofseason-pitcherprojections/'
 BATTER_RAZZBALL_OS_URL = 'http://razzball.com/steamer-hitter-projections/'
 PITCHER_RAZZBALL_OS_URL = 'http://razzball.com/steamer-pitcher-projections/'
+
+BATTER_FANTPRO_ROS_URL = "https://www.fantasypros.com/mlb/projections/ros-hitters.php"
+PITCHER_FANTPRO_ROS_URL = "https://www.fantasypros.com/mlb/projections/ros-pitchers.php"
+BATTER_FANTPRO_OS_URL = "https://www.fantasypros.com/mlb/projections/hitters.php"
+PITCHER_FANTPRO_OS_URL = "https://www.fantasypros.com/mlb/projections/pitchers.php"
+
+BATTER_ROS_URL = BATTER_FANTPRO_ROS_URL
+PITCHER_ROS_URL = PITCHER_FANTPRO_ROS_URL
+BATTER_OS_URL = BATTER_FANTPRO_OS_URL
+PITCHER_OS_URL = PITCHER_FANTPRO_OS_URL
