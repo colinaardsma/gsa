@@ -122,7 +122,15 @@
       for (i = 0; i < tr.length; i++) {
         td = tr[i].getElementsByTagName("td")[columnNumber];
         if (td) {
-          if (td.innerHTML.toUpperCase().indexOf(filter) > -1 || filter === '1') {
+          if (filter === "OF" && (td.innerHTML.toUpperCase().indexOf("LF") > -1 || td.innerHTML.toUpperCase().indexOf("CF") > -1 || td.innerHTML.toUpperCase().indexOf("RF") > -1 || td.innerHTML.toUpperCase().indexOf("OF") > -1)) {
+            tr[i].style.display = "";
+          } else if (filter === "C" && td.innerHTML.toUpperCase().indexOf("C") > -1) {
+            if (td.innerHTML.toUpperCase().indexOf("CF") > -1) {
+              tr[i].style.display = "none";
+            } else {
+              tr[i].style.display = "";
+            }
+          } else if (filter === "1" || td.innerHTML.toUpperCase().indexOf(filter) > -1) {
             tr[i].style.display = "";
           } else {
             tr[i].style.display = "none";
