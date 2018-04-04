@@ -47,16 +47,30 @@ def fantasy_pro_players(url):
     document = html_to_document(url)
     headings_list_html = document.xpath("//div[@class='mobile-table']" +
                                         "/table/thead/tr/descendant::*/text()")
-    headings_list_html[len(headings_list_html) - 1] = "AVG_OWN_PCT"
-    headings_list_html.append("YAHOO_OWN_PCT")
-    headings_list_html.append("ESPN_OWN_PCT")
+    headings_list_html[len(headings_list_html) - 1] = "avg_own_pct"
+    headings_list_html.append("yahoo_own_pct")
+    headings_list_html.append("espn_own_pct")
     body_html = document.xpath("//div[@class='mobile-table']/table/tbody/tr")
     player_list = []
     for player_html in body_html:
         single_player_html = player_html.xpath("descendant::td")
         player_stats = fant_pro_player_dict_creator(single_player_html, headings_list_html)
-        if player_stats:
-            player_list.append(player_stats)
+        if player_stats and "name" in player_stats:
+            player_stats['keeper'] = 0.0
+            player_stats['isFA'] = False
+            if [pos for pos in player_stats["pos"] if "p" in pos.lower()]:
+                player_stats["category"] = "pitcher"
+            else:
+                player_stats["category"] = "batter"
+            if player_stats["category"] == "batter":
+                player_list.append(player_stats)
+            elif player_stats["category"] == "pitcher" and (player_stats['w'] > 0 or player_stats['sv'] > 0
+                                                            or player_stats['k'] > 0 or player_stats['era'] > 0
+                                                            or player_stats['whip'] > 0):
+                player_stats['is_sp'] = True if 'SP' in player_stats['pos'] else False
+                player_stats['winsip'] = player_stats['w'] / player_stats['ip']
+                player_stats['kip'] = player_stats['k'] / player_stats['ip']
+                player_list.append(player_stats)
     return player_list
 
 
@@ -80,26 +94,33 @@ def fant_pro_player_dict_creator(single_player_html, headings_list_html):
                 if name_team_pos[0] is None or name_team_pos[0] == " ()":
                     counter = len(single_player_html)
                     continue
+                norm_name = name_normalizer(name_team_pos[0])
+                single_player['normalized_first_name'] = norm_name['First']
+                single_player['last_name'] = norm_name['Last']
                 single_player["name"] = name_team_pos[0]
                 if len(name_team_pos) >= 3:
-                    single_player["team"] = name_team_pos[2].replace(u'\xa0', u' ').encode('utf-8')
+                    single_player["team"] = team_normalizer(name_team_pos[2].replace(u'\xa0', u' '))
                 else:
-                    single_player["team"] = "NONE"
+                    single_player["team"] = "FA"
                 if len(name_team_pos) >= 4:
                     name_team_pos[3] = name_team_pos[3].strip(" - ")
                     name_team_pos[3] = name_team_pos[3].strip(")")
-                    single_player["pos"] = name_team_pos[3].replace(u'\xa0', u' ').encode('utf-8')
+                    pos = name_team_pos[3].replace(u'\xa0', u' ')
+                    single_player["pos"] = pos.split(",")
                 else:
                     single_player["pos"] = "NONE"
                 if len(name_team_pos) >= 5:
-                    single_player["status"] = name_team_pos[4].replace(u'\xa0', '').encode('utf-8')
+                    single_player["status"] = name_team_pos[4].replace(u'\xa0', '')
                 else:
                     single_player["status"] = "ACTIVE"
             else:
                 stat = single_player_html[counter].xpath("self::*/text()")
                 if len(stat) != 0:
-                    cat = stat[0].replace(u'\xa0', '').encode('utf-8')
-                    single_player[headings_list_html[counter]] = cat
+                    try:
+                        cat = float(stat[0].replace(u'\xa0', ''))
+                    except ValueError:
+                        cat = stat[0].replace(u'\xa0', '')
+                    single_player[headings_list_html[counter].lower()] = cat
             counter += 1
         return single_player
 

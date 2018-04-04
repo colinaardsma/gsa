@@ -15,7 +15,8 @@ from .normalizer import name_normalizer
 
 def create_full_batter_html(url):
     """Create batters using html"""
-    raw_batter_list = scrape_razzball_batters(url)
+    # raw_batter_list = scrape_razzball_batters(url)
+    raw_batter_list = fantasy_pro_players("https://www.fantasypros.com/mlb/projections/ros-hitters.php")
     return create_full_batter(raw_batter_list)
 
 
@@ -171,7 +172,8 @@ def calc_batter_z_score(batter_list, players_over_zero_dollars, one_dollar_playe
 
 def create_full_pitcher_html(url):
     """Create pitchers using html"""
-    raw_pitcher_list = scrape_razzball_pitchers(url)
+    # raw_pitcher_list = scrape_razzball_pitchers(url)
+    raw_pitcher_list = fantasy_pro_players("https://www.fantasypros.com/mlb/projections/ros-pitchers.php")
     return create_full_pitcher(raw_pitcher_list)
 
 
@@ -222,10 +224,8 @@ def calc_pitcher_z_score(pitcher_list, players_over_zero_dollars, one_dollar_pla
     for pitcher in pitcher_dict_list:
         if add_original_value:
             pitcher['original_value'] = pitcher['dollarValue']
-
-        if (pitcher['w'] < 0 or pitcher['sv'] < 0 or pitcher['k'] < 0 or
-                pitcher['era'] < 0 or pitcher['whip'] < 0):
-            continue
+        # if pitcher['w'] < 0 or pitcher['sv'] < 0 or pitcher['k'] < 0 or pitcher['era'] <= 0 or pitcher['whip'] <= 0:
+        #     continue
         win_list.append(pitcher['w'])
         sv_list.append(pitcher['sv'])
         k_list.append(pitcher['k'])
@@ -339,3 +339,8 @@ def calc_pitcher_z_score(pitcher_list, players_over_zero_dollars, one_dollar_pla
             pitcher['dollarValue'] = 0.0
     return sorted(pitcher_dict_list, key=operator.itemgetter('fvaaz'), reverse=True)
     # sorts by fvaaz (largest to smallest)
+
+
+def is_useless_pitcher(pitcher):
+    return pitcher['w'] < 0 or pitcher['sv'] < 0 or pitcher['k'] < 0 or pitcher['era'] <= 0 or pitcher['whip'] <= 0
+
