@@ -54,6 +54,8 @@ def fantasy_pro_players(url):
     player_list = []
     for player_html in body_html:
         single_player_html = player_html.xpath("descendant::td")
+        if len(single_player_html) < 2:
+            continue
         player_stats = fant_pro_player_dict_creator(single_player_html, headings_list_html)
         if player_stats and "name" in player_stats:
             player_stats['keeper'] = 0.0
