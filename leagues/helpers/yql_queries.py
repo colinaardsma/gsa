@@ -928,7 +928,7 @@ def get_keeper_query(league, user, redirect):
         user = updated_user
     keepers = []
     for i in range(league.team_count):
-        query_path = f'/team/{league.league_key}.t.{i + 1}/players;status=K'
+        query_path = f"/team/{league.league_key}.t.{i + 1}/players;status=K"
         team_base_json = yql_query(query_path, user.profile.access_token)
         team_base_dict = json.loads(team_base_json)
 
