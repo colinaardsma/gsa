@@ -9,7 +9,10 @@ SECRET_KEY = 'em0q#e0^ulf%d9%qy+32m9wyj&#_(fn884va^i%ve9(c3x6__#'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'localhost',
+    '198.199.122.80',
+]
 
 
 # Database
@@ -17,12 +20,12 @@ ALLOWED_HOSTS = []
 
 DATABASES = {
     'default': {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": "",
-        "USER": "",
-        "PASSWORD": "",
-        "HOST": "",
-        "PORT": "",
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': os.environ['RDS_DB_NAME'],
+        'USER': os.environ['RDS_USERNAME'],
+        'PASSWORD': os.environ['RDS_PASSWORD'],
+        'HOST': os.environ['RDS_HOSTNAME'],
+        'PORT': os.environ['RDS_PORT'],
     }
 }
 
@@ -30,7 +33,7 @@ DATABASES = {
 # Global Variables
 TOKEN_REDIRECT_PATH = "/get_token"
 # consumer key
-CLIENT_ID = ""
+CLIENT_ID = "dj0yJmk9c2VWeGVNc3BWcW5iJmQ9WVdrOVJWaHhja0o2TmpJbWNHbzlNQS0tJnM9Y29uc3VtZXJzZWNyZXQmeD04NA--"
 # consumer secret
-CLIENT_SECRET = ""
-REDIRECT_URI = ""
+CLIENT_SECRET = "06e294a5200ce05a8be8b7d4c03d0bfb8870c30d"
+REDIRECT_URI = "http://198.199.122.80"
