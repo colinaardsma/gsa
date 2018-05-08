@@ -11,7 +11,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     'localhost',
-    'gsa-dev.us-west-2.elasticbeanstalk.com',
+    '10.211.55.2',
+    'mbp',
 ]
 
 # Database
@@ -19,19 +20,19 @@ ALLOWED_HOSTS = [
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.environ['RDS_DB_NAME'],
-        'USER': os.environ['RDS_USERNAME'],
-        'PASSWORD': os.environ['RDS_PASSWORD'],
-        'HOST': os.environ['RDS_HOSTNAME'],
-        'PORT': os.environ['RDS_PORT'],
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": "gsa",
+        "USER": "gsa_admin",
+        "PASSWORD": "",
+        "HOST": "localhost",
+        "PORT": "",
     }
 }
 
 # Global Variables
-TOKEN_REDIRECT_PATH = "/get_token"
+TOKEN_REDIRECT_PATH = "/localhost_token"
 # consumer key
-CLIENT_ID = "dj0yJmk9WElwNkFUbG1MVmZJJmQ9WVdrOVduWldOalpKTXpBbWNHbzlNQS0tJnM9Y29uc3VtZXJzZWNyZXQmeD03Yw--"
+CLIENT_ID = "dj0yJmk9cEQyTkhmUUt5ekN5JmQ9WVdrOWFtRkdUSHB0Tm1zbWNHbzlNQS0tJnM9Y29uc3VtZXJzZWNyZXQmeD0yYQ--"
 # consumer secret
-CLIENT_SECRET = "cff931b83bf07509ef93e8ef107eee5cf5412489"
+CLIENT_SECRET = "2fdb054293ed5c071e62048411c9f3f204512bcc"
 REDIRECT_URI = "http://gsa-dev.us-west-2.elasticbeanstalk.com"

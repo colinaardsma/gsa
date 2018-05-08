@@ -101,14 +101,18 @@ def fant_pro_player_dict_creator(single_player_html, headings_list_html):
                 single_player['last_name'] = norm_name['Last']
                 single_player["name"] = name_team_pos[0]
                 if len(name_team_pos) >= 3:
-                    single_player["team"] = team_normalizer(name_team_pos[2].replace(u'\xa0', u' '))
+                    single_player["team"] = team_normalizer(name_team_pos[2].replace(u'\xa0', u' ')).strip()
                 else:
                     single_player["team"] = "FA"
-                if len(name_team_pos) >= 4:
+                if name_team_pos[1] != ' (':
+                    single_player["pos"] = [name_team_pos[1].replace("(", "").replace(")", "").strip()]
+                elif len(name_team_pos) >= 4:
                     name_team_pos[3] = name_team_pos[3].strip(" - ")
                     name_team_pos[3] = name_team_pos[3].strip(")")
                     pos = name_team_pos[3].replace(u'\xa0', u' ')
                     single_player["pos"] = pos.split(",")
+                elif len(name_team_pos) == 2:
+                    single_player["pos"] = team_normalizer(name_team_pos[1].replace(u'\xa0', u' '))
                 else:
                     single_player["pos"] = "NONE"
                 if len(name_team_pos) >= 5:
@@ -122,10 +126,14 @@ def fant_pro_player_dict_creator(single_player_html, headings_list_html):
             else:
                 stat = single_player_html[counter].xpath("self::*/text()")
                 if len(stat) != 0:
+                    if stat[0] == "-":
+                        stat[0] = "0"
                     try:
                         cat = float(stat[0].replace(u'\xa0', ''))
                     except ValueError:
                         cat = stat[0].replace(u'\xa0', '')
+                    if "%" in stat[0]:
+                        cat = float(cat.replace("%", "")) * .01
                     single_player[headings_list_html[counter].lower()] = cat
             counter += 1
         return single_player
