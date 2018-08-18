@@ -68,7 +68,7 @@ def fantasy_pro_players(url):
                 player_list.append(player_stats)
             elif player_stats["category"] == "pitcher" and (player_stats['w'] > 0 or player_stats['sv'] > 0
                                                             or player_stats['k'] > 0 or player_stats['era'] > 0
-                                                            or player_stats['whip'] > 0):
+                                                            or player_stats['whip'] > 0) and player_stats['ip'] > 0:
                 player_stats['is_sp'] = True if 'SP' in player_stats['pos'] else False
                 player_stats['winsip'] = player_stats['w'] / player_stats['ip']
                 player_stats['kip'] = player_stats['k'] / player_stats['ip']
