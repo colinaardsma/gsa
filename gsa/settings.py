@@ -35,5 +35,3 @@ CLIENT_ID = "dj0yJmk9WElwNkFUbG1MVmZJJmQ9WVdrOVduWldOalpKTXpBbWNHbzlNQS0tJnM9Y29
 # consumer secret
 CLIENT_SECRET = "cff931b83bf07509ef93e8ef107eee5cf5412489"
 REDIRECT_URI = "http://gsa-dev.us-west-2.elasticbeanstalk.com"
-
-LOGGING_CONFIG = None
