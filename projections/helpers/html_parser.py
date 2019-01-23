@@ -89,10 +89,10 @@ def fant_pro_player_dict_creator(single_player_html, headings_list_html):
     """
     single_player = {}
     counter = 0
-    name_team_pos = single_player_html[1].xpath("descendant::*/text()")
+    name_team_pos = single_player_html[0].xpath("descendant::*/text()")
     if name_team_pos:
         while counter < len(single_player_html):
-            if counter == 1:
+            if counter == 0:
                 if name_team_pos[0] is None or name_team_pos[0] == " ()":
                     counter = len(single_player_html)
                     continue
