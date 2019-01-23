@@ -47,7 +47,7 @@ def fantasy_pro_players(url):
     document = html_to_document(url)
     headings_list_html = document.xpath("//div[@class='mobile-table']" +
                                         "/table/thead/tr/descendant::*/text()")
-    headings_list_html[len(headings_list_html) - 1] = "avg_own_pct"
+    headings_list_html.append("avg_own_pct")
     headings_list_html.append("yahoo_own_pct")
     headings_list_html.append("espn_own_pct")
     body_html = document.xpath("//div[@class='mobile-table']/table/tbody/tr")
