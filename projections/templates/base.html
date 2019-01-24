@@ -44,19 +44,13 @@
                         team tools
                     </a>
                     <div class="dropdown-menu bg-dark border border-light" aria-labelledby="navbarDropdown">
-                        {% for league in request.user.profile.leagues.all|dictsortreversed:"season" %}
-                        {% now "Y" as current_year %}
-                        {% if league.season|stringformat:'s' == current_year|stringformat:'s' and league.draft_status != 'predraft' %}
                         <form action="../team_tools/" method="POST">
                             {% csrf_token %}
                             <input type="hidden" name="league_key" value="{{league.league_key}}" />
                             <a class="dropdown-item" href="#" onclick="this.parentNode.submit()" style="color:rgba(255,255,255,.5)">{{league.league_name}} - {{league.season}}</a>
                         </form>
                         <!--<a class="dropdown-item" href="/team_tools?league={{league.league_key}}">{{league.league_name}} - {{league.season}}</a>-->
-                        {% else %}
 
-                        {% endif %}
-                        {% endfor %}
                         <!--<a class="dropdown-item" href="#">Another action</a>-->
                         <!--<div class="dropdown-divider"></div>-->
                         <!--<a class="dropdown-item" href="#">Something else here</a>-->
