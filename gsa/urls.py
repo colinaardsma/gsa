@@ -23,8 +23,8 @@ from projections.views import team_tools, user_
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('login/', auth_views.login,  {'template_name': 'login.html'}, name='login'),
-    path('logout/', auth_views.logout, {'template_name': 'main_page.html'}, name='logout'),
+    path('login/', auth_views.LoginView,  {'template_name': 'login.html'}, name='login'),
+    path('logout/', auth_views.LogoutView, {'template_name': 'main_page.html'}, name='logout'),
     path('registration/', registration, name='registration'),
 
     path('leagues/', include('leagues.urls')),
