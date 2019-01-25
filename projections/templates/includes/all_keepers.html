@@ -9,11 +9,11 @@
     {% endfor %}
 </select>
 
-<div id="potential_keepers">
+<div id="all_keepers">
     {% for key, value in all_players.keepers.items %}
     <div id="{{key}}_keepers" style="display:none;">
         <h3>{{key}}</h3>
-        <h4>Total Kept: ${{value.total_cost|floatformat}} on {{value.players|length}} players</h4>
+        <h4>Total Kept: ${{value.total_cost|floatformat}} on {{value.keeper_count}} players</h4>
         <h5>${{value.dollar_spent_per_point|floatformat:2}} spent per point</h5>
         <h4>Avg Stats Kept:</h4>
         <table id="proj_points_table" class="sortable display table table-hover">

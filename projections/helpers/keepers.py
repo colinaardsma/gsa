@@ -226,37 +226,76 @@ def get_auction_values(league, batter_pool, pitcher_pool, potential_keepers, act
     total_dollars_spent_on_keepers = 0
     keeper_dict_list = []
 
-    for team in actual_keepers:
-        for keeper in team['roster']:
-            keeper['fantasy_team'] = team['team_name']
-            keeper['manager_guids'] = team['manager_guids']
-            keeper['worth_keeping'] = True
-            if keeper['category'] == 'batter':
-                try:
-                    original_batter = batter_pool.get(last_name=keeper['last_name'], team=keeper['team'],
-                                                      normalized_first_name=keeper['first_name'])
-                    keeper['value'] = original_batter.dollarValue
-                except BatterProjection.DoesNotExist:
-                    keeper['value'] = 0
-                total_batters_kept += 1
-            if keeper['category'] == 'pitcher':
-                try:
-                    original_pitcher = pitcher_pool.get(last_name=keeper['last_name'], team=keeper['team'],
-                                                        normalized_first_name=keeper['first_name'])
-                    keeper['value'] = original_pitcher.dollarValue
-                except PitcherProjection.DoesNotExist:
-                    keeper['value'] = 0
-                total_pitchers_kept += 1
-            for tm in potential_keepers:
-                for ptkpr in tm['roster']:
-                    if (keeper['last_name'] == ptkpr['last_name'] and keeper['team'] == ptkpr['team']
-                            and keeper['first_name'] == ptkpr['first_name']):
-                        keeper['keeper_cost'] = ptkpr['keeper_cost']
-                        total_dollars_spent_on_keepers += ptkpr['keeper_cost']
-            # TODO: this is a super shitty workaround, need to find out why some players (ie. carlos corrasco) arent showing up properly
-            if 'keeper_cost' not in keeper:
-                keeper['keeper_cost'] = 10
-            keeper_dict_list.append(keeper)
+    if league.draft_status == "predraft":
+        for team in actual_keepers:
+            for keeper in team['roster']:
+                keeper['fantasy_team'] = team['team_name']
+                keeper['manager_guids'] = team['manager_guids']
+                keeper['worth_keeping'] = True
+                if keeper['category'] == 'batter':
+                    try:
+                        original_batter = batter_pool.get(last_name=keeper['last_name'], team=keeper['team'],
+                                                          normalized_first_name=keeper['first_name'])
+                        keeper['value'] = original_batter.dollarValue
+                    except BatterProjection.DoesNotExist:
+                        keeper['value'] = 0
+                    total_batters_kept += 1
+                if keeper['category'] == 'pitcher':
+                    try:
+                        original_pitcher = pitcher_pool.get(last_name=keeper['last_name'], team=keeper['team'],
+                                                            normalized_first_name=keeper['first_name'])
+                        keeper['value'] = original_pitcher.dollarValue
+                    except PitcherProjection.DoesNotExist:
+                        keeper['value'] = 0
+                    total_pitchers_kept += 1
+                for tm in potential_keepers:
+                    for ptkpr in tm['roster']:
+                        if (keeper['last_name'] == ptkpr['last_name'] and keeper['team'] == ptkpr['team']
+                                and keeper['first_name'] == ptkpr['first_name']):
+                            keeper['keeper_cost'] = ptkpr['keeper_cost']
+                            total_dollars_spent_on_keepers += ptkpr['keeper_cost']
+                # TODO: this is a super shitty workaround, need to find out why some players (ie. carlos corrasco) arent showing up properly
+                if 'keeper_cost' not in keeper:
+                    keeper['keeper_cost'] = 10
+                keeper_dict_list.append(keeper)
+
+    elif league.draft_status == "postdraft":
+        for team in actual_keepers:
+            for keeper in team['roster']:
+                for tm in potential_keepers:
+                    for ptkpr in tm['roster']:
+                        if (keeper['last_name'] == ptkpr['last_name'] and keeper['team'] == ptkpr['team']
+                                and keeper['first_name'] == ptkpr['first_name']):
+                            keeper['keeper_cost'] = ptkpr['keeper_cost']
+                keeper['fantasy_team'] = team['team_name']
+                keeper['manager_guids'] = team['manager_guids']
+                keeper['worth_keeping'] = False
+                if keeper['category'] == 'batter':
+                    try:
+                        original_batter = batter_pool.get(last_name=keeper['last_name'], team=keeper['team'],
+                                                          normalized_first_name=keeper['first_name'])
+                        keeper['value'] = original_batter.dollarValue
+                    except BatterProjection.DoesNotExist:
+                        keeper['value'] = 0
+                    if keeper['value'] > keeper['keeper_cost']:
+                        keeper['worth_keeping'] = True
+                        total_batters_kept += 1
+                        total_dollars_spent_on_keepers += keeper['keeper_cost']
+                if keeper['category'] == 'pitcher':
+                    try:
+                        original_pitcher = pitcher_pool.get(last_name=keeper['last_name'], team=keeper['team'],
+                                                            normalized_first_name=keeper['first_name'])
+                        keeper['value'] = original_pitcher.dollarValue
+                    except PitcherProjection.DoesNotExist:
+                        keeper['value'] = 0
+                    if keeper['value'] > keeper['keeper_cost']:
+                        keeper['worth_keeping'] = True
+                        total_pitchers_kept += 1
+                        total_dollars_spent_on_keepers += keeper['keeper_cost']
+                # TODO: this is a super shitty workaround, need to find out why some players (ie. carlos corrasco) arent showing up properly
+                if 'keeper_cost' not in keeper:
+                    keeper['keeper_cost'] = 10
+                keeper_dict_list.append(keeper)
 
     processed_keepers = remove_projected_keepers(list(keeper_dict_list), list(batter_pool), list(pitcher_pool))
     b_over_zero_remaining = b_over_zero - total_batters_kept
