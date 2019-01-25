@@ -71,13 +71,7 @@ def update_main_league(request):
 
 
 def main_page(request):
-    league = None
-    for lg in request.user.profile.leagues.all():
-        if lg.season == datetime.datetime.now().year:
-            league = lg
-        elif lg.season == datetime.datetime.now().year - 1:
-            league = lg
-    return render(request, "main_page.html", {'league': league})
+    return render(request, "main_page.html", {})
 
 
 def registration(request):

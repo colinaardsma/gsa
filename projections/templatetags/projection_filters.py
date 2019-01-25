@@ -91,3 +91,14 @@ def is_in_past(value):
 @register.filter
 def is_in_future(value):
     return value.replace(tzinfo=None) > datetime.now()
+
+
+@register.filter
+def current_league(leagues):
+    league = None
+    for lg in leagues.all():
+        if lg.season == datetime.now().year:
+            league = lg
+        elif lg.season == datetime.now().year - 1:
+            league = lg
+    return league

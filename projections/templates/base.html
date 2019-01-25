@@ -1,4 +1,5 @@
 {% load static %}
+{% load projection_filters %}
 <!doctype html>
 <html lang="en">
 <head>
@@ -43,6 +44,7 @@
                     <a class="nav-link dropdown-toggle" href="../team_tools" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         team tools
                     </a>
+                    {% with request.user.profile.leagues.all|current_league as league %}
                     <div class="dropdown-menu bg-dark border border-light" aria-labelledby="navbarDropdown">
                         <form action="../team_tools/" method="POST">
                             {% csrf_token %}
@@ -55,6 +57,7 @@
                         <!--<div class="dropdown-divider"></div>-->
                         <!--<a class="dropdown-item" href="#">Something else here</a>-->
                     </div>
+                    {% endwith %}
                 </li>
             </ul>
             <ul class="navbar-nav ml-auto">
