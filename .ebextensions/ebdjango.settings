@@ -1,8 +1,3 @@
-try:
-    from .settings_shared import *
-except ImportError:
-    pass
-
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'em0q#e0^ulf%d9%qy+32m9wyj&#_(fn884va^i%ve9(c3x6__#'
 
