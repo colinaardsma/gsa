@@ -56,6 +56,7 @@ class BatterProjection(models.Model):
     # Values
     fvaaz = models.FloatField()
     dollarValue = models.FloatField()
+    originalValue = models.FloatField()
     keeper = models.FloatField(default=0.0)
     # FA Status
     isFA = models.BooleanField(default=False)
@@ -110,6 +111,7 @@ class BatterValue(models.Model):
     # Values
     fvaaz = models.FloatField()
     dollarValue = models.FloatField()
+    originalValue = models.FloatField()
     keeper = models.FloatField(default=0.0)
     # FA Status
     isFA = models.BooleanField(default=False)
@@ -137,7 +139,8 @@ def save_batter(batter):
                               weightedZscoreSb=batter['weightedZscoreSb'],
                               weightedZscoreAvg=batter['weightedZscoreAvg'],
                               weightedZscoreOps=batter['weightedZscoreOps'], fvaaz=batter['fvaaz'],
-                              dollarValue=batter['dollarValue'], keeper=batter.get('keeper'), isFA=batter.get('isFA'))
+                              dollarValue=batter['dollarValue'], originalValue=batter['dollarValue'],
+                              keeper=batter.get('keeper'), isFA=batter.get('isFA'))
     batter.save()
     return batter
 
@@ -180,6 +183,7 @@ def save_batter_values(yahoo_guid, league, batter_proj_list):
                                    weightedZscoreOps=batter_proj_value.weightedZscoreOps,
                                    fvaaz=batter_proj_value.fvaaz,
                                    dollarValue=batter_proj_value.dollarValue,
+                                   originalValue=batter_proj_value.dollarValue,
                                    keeper=batter_proj_value.keeper)
         batter_value.save()
         batter_value_list.append(batter_value)
@@ -228,6 +232,7 @@ class PitcherProjection(models.Model):
     # Values
     fvaaz = models.FloatField()
     dollarValue = models.FloatField()
+    originalValue = models.FloatField()
     keeper = models.FloatField(default=0.0)
     # FA Status
     isFA = models.BooleanField(default=False)
@@ -279,6 +284,7 @@ class PitcherValue(models.Model):
     # Values
     fvaaz = models.FloatField()
     dollarValue = models.FloatField()
+    originalValue = models.FloatField()
     keeper = models.FloatField(default=0.0)
     # FA Status
     isFA = models.BooleanField(default=False)
@@ -304,8 +310,8 @@ def save_pitcher(pitcher):
                                 weightedZscoreK=pitcher['weightedZscoreK'],
                                 weightedZscoreEra=pitcher['weightedZscoreEra'],
                                 weightedZscoreWhip=pitcher['weightedZscoreWhip'], fvaaz=pitcher['fvaaz'],
-                                dollarValue=pitcher['dollarValue'], keeper=pitcher.get('keeper'),
-                                isFA=pitcher.get('isFA'))
+                                dollarValue=pitcher['dollarValue'], originalValue=pitcher['dollarValue'],
+                                keeper=pitcher.get('keeper'), isFA=pitcher.get('isFA'))
     pitcher.save()
     return pitcher
 
@@ -345,6 +351,7 @@ def save_pitcher_values(yahoo_guid, league, pitcher_proj_list):
                                      weightedZscoreWhip=pitcher_proj_value.weightedZscoreWhip,
                                      fvaaz=pitcher_proj_value.fvaaz,
                                      dollarValue=pitcher_proj_value.dollarValue,
+                                     originalValue=pitcher_proj_value.dollarValue,
                                      keeper=pitcher_proj_value.keeper)
         pitcher_value.save()
         pitcher_value_list.append(pitcher_value)

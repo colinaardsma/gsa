@@ -153,9 +153,9 @@ def run_keeper_passes(batter_pool, pitcher_pool, potential_keepers, total_dollar
     # print(p_over_zero_remaining)
     # print("-----------------------------------------------")
     batter_pool_ = calc_batter_z_score(processed_keepers['remaining_batters'], b_over_zero_remaining, b_one_dollar,
-                                       b_dollar_per_fvaaz, b_mult, True)
+                                       b_dollar_per_fvaaz, b_mult)
     pitcher_pool_ = calc_pitcher_z_score(processed_keepers['remaining_pitchers'], p_over_zero_remaining, p_one_dollar,
-                                         p_dollar_per_fvaaz, p_mult, True)
+                                         p_dollar_per_fvaaz, p_mult)
     all_projected_keepers.extend(processed_keepers['keepers'])
     potential_keepers_ = processed_keepers['remaining_potential_keepers']
 

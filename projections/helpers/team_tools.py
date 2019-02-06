@@ -172,6 +172,10 @@ def get_auction_values_(league, user, redirect):
 
     prev_year_league = league.prev_year_league or league
     auction_values['top_three_avg'] = get_prev_year_top_three_finishers(prev_year_league, user, redirect)
+
+    for key, value in auction_values['keepers'].items():
+        value['keeper_count'] = len(list(filter(lambda x: x['worth_keeping'] is True and x['status'] != 'REPLACEMENT_LEVEL', value['players'])))
+
     return auction_values
 
 

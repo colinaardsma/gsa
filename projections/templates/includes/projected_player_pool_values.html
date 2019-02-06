@@ -40,7 +40,7 @@
                 {% endif %}
                 <td><p {{style}}>${{batter.dollarValue|floatformat:2}}</p></td>
                 {% endwith %}
-                <td>${{batter.original_value|floatformat:2}}</td>
+                <td>${{batter.originalValue|floatformat:2}}</td>
                 <td><a href="https://baseball.fantasysports.yahoo.com/b1/{{request.user.profile.main_league|get_league_no}}/playersearch?&search={{batter.name|url_safe_spaces}}" target="_blank">{{batter.name}}</a></td>
                 <td>{{batter.team}}</td>
                 <td>{{batter.pos}}</td>
@@ -91,7 +91,7 @@
             {% if pitcher.dollarValue > 0 %}
             <tr>
                 {% with 'style=""' as style %}
-                {% if pitcher.dollarValue < pitcher.original_value %}
+                {% if pitcher.dollarValue < pitcher.originalValue %}
                 {% update_variable 'style="color:red;"' as style %}
                 {% elif pitcher.dollarValue|greater_than_eq_10_pct:pitcher.original_value %}
                 {% update_variable 'style="color:green;"' as style %}
