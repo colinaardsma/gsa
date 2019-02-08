@@ -98,7 +98,7 @@
                 {% endif %}
                 <td><p {{style}}>${{pitcher.dollarValue|floatformat:2}}</p></td>
                 {% endwith %}
-                <td>${{pitcher.original_value|floatformat:2}}</td>
+                <td>${{pitcher.originalValue|floatformat:2}}</td>
                 <td><a href="https://baseball.fantasysports.yahoo.com/b1/{{request.user.profile.main_league|get_league_no}}/playersearch?&search={{pitcher.name|url_safe_spaces}}" target="_blank">{{pitcher.name}}</a></td>
                 <td>{{pitcher.team}}</td>
                 <td>{{pitcher.pos}}</td>
