@@ -44,20 +44,17 @@
                     <a class="nav-link dropdown-toggle" href="../team_tools" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         team tools
                     </a>
-                    {% with request.user.profile.leagues.all|current_league as league %}
                     <div class="dropdown-menu bg-dark border border-light" aria-labelledby="navbarDropdown">
+                    {% with request.user.profile.leagues.all|current_league as lgs %}
+                    {% for lg in lgs %}
                         <form action="../team_tools/" method="POST">
                             {% csrf_token %}
-                            <input type="hidden" name="league_key" value="{{league.league_key}}" />
-                            <a class="dropdown-item" href="#" onclick="this.parentNode.submit()" style="color:rgba(255,255,255,.5)">{{league.league_name}} - {{league.season}}</a>
+                            <input type="hidden" name="league_key" value="{{lg.league_key}}" />
+                            <a class="dropdown-item" href="#" onclick="this.parentNode.submit()" style="color:rgba(255,255,255,.5)">{{lg.league_name}} - {{lg.season}}</a>
                         </form>
-                        <!--<a class="dropdown-item" href="/team_tools?league={{league.league_key}}">{{league.league_name}} - {{league.season}}</a>-->
-
-                        <!--<a class="dropdown-item" href="#">Another action</a>-->
-                        <!--<div class="dropdown-divider"></div>-->
-                        <!--<a class="dropdown-item" href="#">Something else here</a>-->
-                    </div>
+                    {% endfor %}
                     {% endwith %}
+                    </div>
                 </li>
             </ul>
             <ul class="navbar-nav ml-auto">
