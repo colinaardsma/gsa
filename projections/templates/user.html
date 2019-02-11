@@ -48,7 +48,7 @@
 <div class="row" id="projections">
     <div class="col" id="update_projections">
         <strong>Update Database Player Projections</strong>
-        <div id="razzball_update_check">Checking for updated Projections...</div>
+        <div id="projection_update_check">Checking for updated Projections...</div>
         {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
 
@@ -81,7 +81,7 @@
 <!--TODO: Move this into a js file-->
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 <script type="text/javascript">
-    function get_razzball_update_date(dbUpdateString) {
+    function get_projections_update_date(dbUpdateString) {
         var today = new Date();
         var dbUpdateDate = new Date(dbUpdateString);
         var updateText = '';
@@ -91,18 +91,27 @@
         var testDate = new Date("2001/1/1");
         if (today > leagueStartDate && today < leagueEndDate) {
             var dailyUpdate = `<a href="/projections/scrape_proj" class="btn btn-outline-primary btn-sm" onclick="getSpinner()">Scrape Projections</a>`;
-            document.getElementById("razzball_update_check").innerHTML = dailyUpdate;
+            document.getElementById("projection_update_check").innerHTML = dailyUpdate;
         }
         else if (dbUpdateDate.getFullYear() === today.getFullYear() && dbUpdateDate.getMonth() === today.getMonth() && dbUpdateDate.getDate() === today.getDate()) {
-            document.getElementById("razzball_update_check").innerHTML = noNewProjectionString;
+            document.getElementById("projection_update_check").innerHTML = noNewProjectionString;
         }
         else {
-            $.getJSON('http://allorigins.me/get?url=' + encodeURIComponent('https://razzball.com/steamer-hitter-projections/') + '&callback=?', function(data){
-                var razzballUpdateString = $(data.contents).find('abbr').attr("class", 'entry-date published updated').text();
-                var razzballUpdateDate = new Date(razzballUpdateString);
-                var formattedRazzUpdate = `${razzballUpdateDate.getMonth() + 1}.${razzballUpdateDate.getDate()}.${razzballUpdateDate.getFullYear()}`;
-                var newProjectionString = `<p><strong>NEW PROJECTIONS AVAILABLE AS OF ${formattedRazzUpdate}</strong></p>
-    <a href="/projections/scrape_proj" class="btn btn-outline-primary btn-sm" onclick="getSpinner()">Scrape Projections from Razzball</a>
+            $.getJSON('https://api.allorigins.ml/get?url=' + encodeURIComponent("{{batter_url}}"), function(data){
+                var expertsUpdateList = $(data.contents).find("table[id=experts] > tbody > tr");
+
+                var updateDate = new Date(0);
+                jQuery.makeArray(expertsUpdateList).forEach(function(x) {
+                    var textDate = $(x).find("td:nth-child(4)").clone().children().remove().end().text() + "/" + new Date().getFullYear();
+                    var date = new Date(textDate);
+
+                    if (date > updateDate) {
+                        updateDate = date;
+                    }
+                });
+                var formattedUpdate = `${updateDate.getMonth() + 1}.${updateDate.getDate()}.${updateDate.getFullYear()}`;
+                var newProjectionString = `<p><strong>NEW PROJECTIONS AVAILABLE AS OF ${formattedUpdate}</strong></p>
+    <a href="/projections/scrape_proj" class="btn btn-outline-primary btn-sm" onclick="getSpinner()">Scrape Projections</a>
     <div>
         <form action="/projections/process_players/" method="post" enctype="multipart/form-data" encoding='multipart/form-data'>
             {% csrf_token %}
@@ -124,16 +133,14 @@
             <button type="submit" class="btn btn-primary btn-sm">import</button>
         </form>
     </div>`;
-                updateText = (razzballUpdateDate > dbUpdateDate ? newProjectionString : noNewProjectionString);
-                document.getElementById("razzball_update_check").innerHTML = updateText;
+                updateText = (updateDate > dbUpdateDate ? newProjectionString : noNewProjectionString);
+                document.getElementById("projection_update_check").innerHTML = updateText;
             });
         }
     }
 </script>
 <script type="text/javascript">
-     get_razzball_update_date('{{proj_update_datetime|date:"c"}}');
+     get_projections_update_date('{{proj_update_datetime|date:"c"}}');
 </script>
 
 {% endblock %}
-
-
