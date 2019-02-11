@@ -99,9 +99,6 @@ def current_league(leagues):
     current_season = next(l for l in leagues if l.season == datetime.now().year)
     last_season = next(l for l in leagues if l.season == datetime.now().year - 1)
 
-    print(current_season)
-    print(last_season)
-
     if current_season:
         current_leagues.append(current_season)
         if current_season.draft_status == "predraft":
