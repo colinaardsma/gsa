@@ -60,7 +60,7 @@ def fantasy_pro_players(url):
         if player_stats and "name" in player_stats:
             player_stats['keeper'] = 0.0
             player_stats['isFA'] = False
-            if [pos for pos in player_stats["pos"] if "p" in pos.lower()]:
+            if [pos for pos in player_stats["pos"] if "p" in pos.lower()] and 'era' in player_stats:
                 player_stats["category"] = "pitcher"
             else:
                 player_stats["category"] = "batter"
