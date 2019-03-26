@@ -181,7 +181,7 @@ def format_league_standings_dict(league_standings_base_dict):
         team_stats_dict = team_standing_dict[1]['team_stats']['stats']
         for stat in team_stats_dict:
             stat_name = STAT_ID_DICT['{}'.format(stat['stat']['stat_id'])]
-            stat_value = float(stat['stat']['value'] or 0)
+            stat_value = float(0) if stat['stat']['value'] == "-" else float(stat['stat']['value'] or 0)
             standing['Stats{}'.format(stat_name)] = stat_value
             if stat_name == '':
                 continue
