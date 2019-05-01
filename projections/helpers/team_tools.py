@@ -375,7 +375,7 @@ def pull_batters(user, league, csv):
     batters_over_zero_dollars = lg.batters_over_zero_dollars_avg or lg.batters_over_zero_dollars
     one_dollar_batters = lg.one_dollar_batters_avg or lg.one_dollar_batters
     b_dollar_per_fvaaz = lg.b_dollar_per_fvaaz_avg or lg.b_dollar_per_fvaaz
-    b_player_pool_mult = lg.b_player_pool_mult_avg or lg.b_player_pool_mult
+    b_player_pool_mult = lg.b_player_pool_mult or lg.b_player_pool_mult_avg
 
     batters = calc_batter_z_score(batter_list, batters_over_zero_dollars, one_dollar_batters, b_dollar_per_fvaaz,
                                   b_player_pool_mult)
@@ -425,7 +425,7 @@ def pull_pitchers(user, league, csv):
     pitchers_over_zero_dollars = lg.pitchers_over_zero_dollars_avg or lg.pitchers_over_zero_dollars
     one_dollar_pitchers = lg.one_dollar_pitchers_avg or lg.one_dollar_pitchers
     p_dollar_per_fvaaz = lg.p_dollar_per_fvaaz_avg or lg.p_dollar_per_fvaaz
-    p_player_pool_mult = lg.p_player_pool_mult_avg or lg.p_player_pool_mult
+    p_player_pool_mult = lg.p_player_pool_mult or lg.p_player_pool_mult_avg
 
     pitchers = calc_pitcher_z_score(pitcher_list, pitchers_over_zero_dollars, one_dollar_pitchers, p_dollar_per_fvaaz,
                                     p_player_pool_mult)
@@ -487,11 +487,11 @@ def pull_players_(user, league, pitcher_list, batter_list):
     batters_over_zero_dollars = lg.batters_over_zero_dollars_avg or lg.batters_over_zero_dollars
     one_dollar_batters = lg.one_dollar_batters_avg or lg.one_dollar_batters
     b_dollar_per_fvaaz = lg.b_dollar_per_fvaaz_avg or lg.b_dollar_per_fvaaz
-    b_player_pool_mult = lg.b_player_pool_mult_avg or lg.b_player_pool_mult
+    b_player_pool_mult = lg.b_player_pool_mult or lg.b_player_pool_mult_avg
     pitchers_over_zero_dollars = lg.pitchers_over_zero_dollars_avg or lg.pitchers_over_zero_dollars
     one_dollar_pitchers = lg.one_dollar_pitchers_avg or lg.one_dollar_pitchers
     p_dollar_per_fvaaz = lg.p_dollar_per_fvaaz_avg or lg.p_dollar_per_fvaaz
-    p_player_pool_mult = lg.p_player_pool_mult_avg or lg.p_player_pool_mult
+    p_player_pool_mult = lg.p_player_pool_mult or lg.p_player_pool_mult_avg
 
     if league.draft_status == 'predraft' or batters_over_zero_dollars == 0 or one_dollar_batters == 0\
             or b_dollar_per_fvaaz == 0 or b_player_pool_mult == 0 or pitchers_over_zero_dollars == 0\
@@ -503,11 +503,11 @@ def pull_players_(user, league, pitcher_list, batter_list):
         batters_over_zero_dollars = lg.batters_over_zero_dollars_avg or lg.batters_over_zero_dollars
         one_dollar_batters = lg.one_dollar_batters_avg or lg.one_dollar_batters
         b_dollar_per_fvaaz = lg.b_dollar_per_fvaaz_avg or lg.b_dollar_per_fvaaz
-        b_player_pool_mult = lg.b_player_pool_mult_avg or lg.b_player_pool_mult
+        b_player_pool_mult = lg.b_player_pool_mult or lg.b_player_pool_mult_avg
         pitchers_over_zero_dollars = lg.pitchers_over_zero_dollars_avg or lg.pitchers_over_zero_dollars
         one_dollar_pitchers = lg.one_dollar_pitchers_avg or lg.one_dollar_pitchers
         p_dollar_per_fvaaz = lg.p_dollar_per_fvaaz_avg or lg.p_dollar_per_fvaaz
-        p_player_pool_mult = lg.p_player_pool_mult_avg or lg.p_player_pool_mult
+        p_player_pool_mult = lg.p_player_pool_mult or lg.p_player_pool_mult_avg
 
     pitchers = calc_pitcher_z_score(pitcher_list, pitchers_over_zero_dollars, one_dollar_pitchers, p_dollar_per_fvaaz,
                                     p_player_pool_mult)
